@@ -37,6 +37,7 @@ jobs:
             **/config/secret.php
             **/.env*
             **/vendor/**
+            **/includes/tcppdf/**
             **/*.log
             **/*.sql.bak
             **/*_backup.sql

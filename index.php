@@ -3,8 +3,8 @@
 require_once __DIR__ . '/includes/auth_check.php';
 
 // 頁面設定
-$pageTitle = '智慧單據辨識工具';
-$headerTitle = '智慧單據辨識工具';
+$pageTitle = '辨識單據';
+$headerTitle = '辨識單據';
 include __DIR__ . '/includes/header.php';
 ?>
 

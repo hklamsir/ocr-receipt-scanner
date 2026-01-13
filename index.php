@@ -10,7 +10,7 @@ include __DIR__ . '/includes/header.php';
 
 <div class="container">
 
-    <div id="dropzone">拖放圖片或點擊選擇（最多 20 張）也可以用相機拍照</div>
+    <div id="dropzone">拖放圖片或點擊選擇（最多 20 張），也可以用相機拍照</div>
     <input type="file" id="fileInput" accept="image/*,android/allowCamera" multiple hidden>
 
     <div class="actions">

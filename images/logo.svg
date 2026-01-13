@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Gradient for the scan beam -->
+    <linearGradient id="beamGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="rgba(59, 130, 246, 0.1)" />
+      <stop offset="50%" stop-color="rgba(59, 130, 246, 0.6)" />
+      <stop offset="100%" stop-color="rgba(59, 130, 246, 0.1)" />
+    </linearGradient>
+    
+    <!-- Drop shadow for the receipt -->
+    <filter id="dropShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+
+  <!-- Group for the Receipt to center it -->
+  <g transform="translate(96, 64)">
+      <!-- Receipt Background with jagged bottom -->
+      <!-- 320 wide, ~384 high -->
+      <path d="M0 0 H320 V352 
+               L288 384 L256 352 L224 384 L192 352 L160 384 L128 352 L96 384 L64 352 L32 384 L0 352 
+               Z" 
+            fill="#ffffff" stroke="#e2e8f0" stroke-width="8" filter="url(#dropShadow)"/>
+
+      <!-- Header Section -->
+      <rect x="48" y="48" width="64" height="64" rx="8" fill="#3b82f6" opacity="0.9"/>
+      <rect x="136" y="56" width="136" height="16" rx="8" fill="#1e293b" opacity="0.8"/>
+      <rect x="136" y="88" width="80" height="16" rx="8" fill="#64748b" opacity="0.6"/>
+
+      <!-- Divider -->
+      <line x1="32" y1="144" x2="288" y2="144" stroke="#e2e8f0" stroke-width="4" stroke-dasharray="8 8"/>
+
+      <!-- Line Items -->
+      <rect x="32" y="176" width="160" height="12" rx="6" fill="#cbd5e1"/>
+      <rect x="240" y="176" width="48" height="12" rx="6" fill="#94a3b8"/>
+      
+      <rect x="32" y="216" width="140" height="12" rx="6" fill="#cbd5e1"/>
+      <rect x="240" y="216" width="48" height="12" rx="6" fill="#94a3b8"/>
+      
+      <rect x="32" y="256" width="120" height="12" rx="6" fill="#cbd5e1"/>
+      <rect x="240" y="256" width="48" height="12" rx="6" fill="#94a3b8"/>
+
+      <!-- Total Section -->
+      <rect x="32" y="304" width="80" height="16" rx="8" fill="#64748b"/>
+      <rect x="208" y="304" width="80" height="16" rx="8" fill="#1e293b"/>
+  </g>
+
+  <!-- Scanning Beam Animation -->
+  <g>
+      <!-- Beam Rect -->
+      <rect x="64" y="0" width="384" height="64" fill="url(#beamGradient)" opacity="0.8">
+          <animate attributeName="y" values="32; 416; 32" dur="3s" repeatCount="indefinite" />
+      </rect>
+      
+      <!-- Laser Line -->
+      <line x1="80" y1="32" x2="432" y2="32" stroke="#3b82f6" stroke-width="4" stroke-linecap="round">
+          <animate attributeName="y1" values="64; 448; 64" dur="3s" repeatCount="indefinite" />
+          <animate attributeName="y2" values="64; 448; 64" dur="3s" repeatCount="indefinite" />
+          <animate attributeName="opacity" values="0.6; 1; 0.6" dur="3s" repeatCount="indefinite" />
+      </line>
+  </g>
+  
+</svg>

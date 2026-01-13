@@ -1,0 +1,56 @@
+/* ========================================
+   PDF Export Button Styles
+   ======================================== */
+
+/* PDF Export Button in Receipt Card */
+.receipt-card-actions .btn-pdf {
+    background: rgba(136, 75, 75, 0.9);
+    color: #fff;
+    border: none;
+}
+
+.receipt-card-actions .btn-pdf:hover {
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+/* Bulk Export PDF Button in Toolbar */
+#bulkExportPdfBtn {
+    background: rgba(136, 75, 75, 0.9);
+    color: #fff;
+    border: none;
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+}
+
+#bulkExportPdfBtn:hover {
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
+}
+
+#bulkExportPdfBtn:active {
+    box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+}
+
+/* ========================================
+   Radio Button Group Styles
+   ======================================== */
+
+.radio-group {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.radio-group label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-weight: normal !important;
+    margin-bottom: 0 !important;
+    font-size: 14px;
+}
+
+.radio-group input[type="radio"] {
+    margin-right: 6px;
+    cursor: pointer;
+    width: auto;
+}

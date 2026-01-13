@@ -1,0 +1,2 @@
+# 拒絕所有外部存取
+Deny from all

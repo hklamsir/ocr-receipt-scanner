@@ -1,0 +1,615 @@
+/* ========================================
+   設計系統 - 統一變數與基礎樣式
+   ======================================== */
+
+:root {
+  /* 主要顏色 */
+  --color-primary: #667eea;
+  --color-primary-hover: #5568d3;
+  --color-primary-light: #8b9df5;
+
+  /* 功能顏色 */
+  --color-success: #4CAF50;
+  --color-success-hover: #43a047;
+  --color-danger: #f44336;
+  --color-danger-hover: #d32f2f;
+  --color-warning: #ff9800;
+  --color-warning-hover: #f57c00;
+  --color-info: #2196F3;
+  --color-info-hover: #1976D2;
+
+  /* 中性色 */
+  --color-gray-100: #f9fafb;
+  --color-gray-200: #f4f6f8;
+  --color-gray-300: #e0e0e0;
+  --color-gray-400: #bdbdbd;
+  --color-gray-500: #9e9e9e;
+  --color-gray-600: #757575;
+  --color-gray-700: #555;
+  --color-gray-800: #333;
+  --color-gray-900: #212121;
+
+  /* 佈局 */
+  --border-radius: 6px;
+  --border-radius-lg: 10px;
+  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.2);
+
+  /* 過渡動畫 */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.3s ease;
+}
+
+/* ========================================
+   按鈕樣式
+   ======================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+  text-decoration: none;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 主要按鈕 */
+.btn-primary {
+  background: var(--color-primary);
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+/* 成功按鈕 */
+.btn-success {
+  background: var(--color-success);
+  color: white;
+}
+
+.btn-success:hover:not(:disabled) {
+  background: var(--color-success-hover);
+}
+
+/* 危險按鈕 */
+.btn-danger {
+  background: var(--color-danger);
+  color: white;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: var(--color-danger-hover);
+}
+
+/* 警告按鈕 */
+.btn-warning {
+  background: var(--color-warning);
+  color: white;
+}
+
+.btn-warning:hover:not(:disabled) {
+  background: var(--color-warning-hover);
+}
+
+/* 資訊按鈕 */
+.btn-info {
+  background: var(--color-info);
+  color: white;
+}
+
+.btn-info:hover:not(:disabled) {
+  background: var(--color-info-hover);
+}
+
+/* 次要按鈕 */
+.btn-secondary {
+  background: var(--color-gray-300);
+  color: var(--color-gray-800);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--color-gray-400);
+}
+
+/* 小按鈕 */
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+/* 大按鈕 */
+.btn-lg {
+  padding: 14px 28px;
+  font-size: 16px;
+}
+
+/* ========================================
+   表單樣式
+   ======================================== */
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: var(--color-gray-700);
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px;
+  font-size: 15px;
+  border: 2px solid var(--color-gray-300);
+  border-radius: var(--border-radius);
+  transition: border-color var(--transition-normal);
+  box-sizing: border-box;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.form-control::placeholder {
+  color: var(--color-gray-500);
+}
+
+/* ========================================
+   Toast 通知樣式
+   ======================================== */
+
+.toast-container {
+  position: fixed;
+  top: 100px;
+  right: 20px;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  background: white;
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-lg);
+  pointer-events: auto;
+  min-width: 280px;
+  max-width: 400px;
+  animation: toastSlideIn 0.3s ease;
+}
+
+.toast.toast-exit {
+  animation: toastSlideOut 0.3s ease forwards;
+}
+
+.toast-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.toast-message {
+  flex: 1;
+  font-size: 14px;
+  color: var(--color-gray-800);
+  line-height: 1.4;
+}
+
+.toast-close {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: var(--color-gray-500);
+  cursor: pointer;
+  padding: 0 4px;
+  opacity: 0.7;
+  transition: opacity var(--transition-fast);
+}
+
+.toast-close:hover {
+  opacity: 1;
+}
+
+/* Toast 類型樣式 */
+.toast-success {
+  border-left: 4px solid var(--color-success);
+}
+
+.toast-success .toast-icon {
+  color: var(--color-success);
+}
+
+.toast-error {
+  border-left: 4px solid var(--color-danger);
+}
+
+.toast-error .toast-icon {
+  color: var(--color-danger);
+}
+
+.toast-warning {
+  border-left: 4px solid var(--color-warning);
+}
+
+.toast-warning .toast-icon {
+  color: var(--color-warning);
+}
+
+.toast-info {
+  border-left: 4px solid var(--color-info);
+}
+
+.toast-info .toast-icon {
+  color: var(--color-info);
+}
+
+@keyframes toastSlideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes toastSlideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+/* ========================================
+   Dialog 對話框樣式
+   ======================================== */
+
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001;
+  animation: dialogFadeIn 0.2s ease;
+  padding: 20px;
+}
+
+.dialog-overlay.dialog-exit {
+  animation: dialogFadeOut 0.2s ease forwards;
+}
+
+.dialog {
+  background: white;
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-lg);
+  width: 100%;
+  max-width: 400px;
+  animation: dialogScaleIn 0.2s ease;
+}
+
+.dialog-overlay.dialog-exit .dialog {
+  animation: dialogScaleOut 0.2s ease forwards;
+}
+
+.dialog-header {
+  padding: 20px 20px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-gray-800);
+}
+
+.dialog-body {
+  padding: 16px 20px;
+  color: var(--color-gray-700);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.dialog-footer {
+  padding: 0 20px 20px;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.dialog-input {
+  width: 100%;
+  padding: 12px;
+  font-size: 15px;
+  border: 2px solid var(--color-gray-300);
+  border-radius: var(--border-radius);
+  margin-top: 12px;
+  box-sizing: border-box;
+}
+
+.dialog-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+@keyframes dialogFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes dialogFadeOut {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes dialogScaleIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes dialogScaleOut {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  to {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+}
+
+/* ========================================
+   登入頁面專用樣式
+   ======================================== */
+
+.login-page {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--color-primary) 0%, #764ba2 100%);
+}
+
+.login-container {
+  background: white;
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 40px;
+  width: 90%;
+  max-width: 400px;
+}
+
+.login-container h1 {
+  text-align: center;
+  color: var(--color-gray-800);
+  margin-bottom: 30px;
+  font-size: 24px;
+}
+
+.login-error {
+  background: #fee;
+  color: #c33;
+  padding: 12px;
+  border-radius: var(--border-radius);
+  margin-bottom: 20px;
+  display: none;
+  font-size: 14px;
+}
+
+.login-footer {
+  margin-top: 24px;
+  text-align: center;
+  color: var(--color-gray-500);
+  font-size: 14px;
+}
+
+/* ========================================
+   管理後台專用樣式
+   ======================================== */
+
+.admin-nav {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.admin-nav .btn {
+  background: var(--color-gray-300);
+  color: var(--color-gray-800);
+}
+
+.admin-nav .btn.active {
+  background: var(--color-primary);
+  color: white;
+}
+
+.admin-section {
+  display: none;
+}
+
+.admin-section.active {
+  display: block;
+}
+
+/* 管理後台用戶表格欄位寬度 */
+#users-table th:nth-child(1),
+#users-table td:nth-child(1) {
+  width: 5%;
+}
+
+/* ID - 窄 */
+
+#users-table th:nth-child(3),
+#users-table td:nth-child(3) {
+  width: 8%;
+}
+
+/* 角色 - 窄 */
+
+#users-table th:nth-child(4),
+#users-table td:nth-child(4) {
+  width: 10%;
+}
+
+/* 建立時間 - 窄 */
+
+#users-table th:nth-child(5),
+#users-table td:nth-child(5) {
+  width: 10%;
+}
+
+/* 最後登入 */
+
+#users-table th:nth-child(6),
+#users-table td:nth-child(6) {
+  width: 6%;
+}
+
+/* 單據數 - 窄 */
+
+#users-table th:nth-child(7),
+#users-table td:nth-child(7) {
+  width: 20%;
+  /* 操作 - 寬 */
+  white-space: nowrap;
+}
+
+#users-table .btn {
+  margin: 2px;
+}
+
+/* ========================================
+   歷史記錄專用樣式
+   ======================================== */
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.history-header h2 {
+  margin: 0;
+}
+
+.history-header .btn-group {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.receipt-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.receipt-card {
+  background: white;
+  border-radius: var(--border-radius-lg);
+  padding: 15px;
+  box-shadow: var(--shadow-sm);
+}
+
+.receipt-card img {
+  width: 100%;
+  border-radius: var(--border-radius);
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.receipt-info {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.receipt-info strong {
+  color: var(--color-gray-700);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--color-gray-500);
+}
+
+/* ========================================
+   響應式調整
+   ======================================== */
+
+@media (max-width: 600px) {
+  .toast-container {
+    left: 20px;
+    right: 20px;
+  }
+
+  .toast {
+    min-width: auto;
+    max-width: none;
+  }
+
+  .dialog {
+    max-width: none;
+    margin: 20px;
+  }
+
+  .admin-nav {
+    flex-direction: column;
+  }
+
+  .admin-nav .btn {
+    width: 100%;
+  }
+}

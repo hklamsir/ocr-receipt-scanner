@@ -1,0 +1,43 @@
+# ================================================
+# GitHub Actions - 自動部署到 InfinityFree (FTP)
+# ================================================
+# 每次推送到 main 分支時自動部署
+# 建議在 GitHub Secrets 中設定 FTP 相關資訊
+
+name: Deploy to InfinityFree
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: # 允許手動觸發
+
+jobs:
+  deploy:
+    name: 🚀 Deploy to InfinityFree via FTP
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 🔄 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 📤 Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: ${{ secrets.FTP_SERVER_DIR }}
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/tmp/**
+            **/receipts/**
+            !**/receipts/.htaccess
+            **/config/secret.php
+            **/.env*
+            **/vendor/**
+            **/*.log
+            **/*.sql.bak
+            **/*_backup.sql
+            **/dump.sql

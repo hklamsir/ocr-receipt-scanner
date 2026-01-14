@@ -35,8 +35,72 @@ export function closeImageModal() {
     document.getElementById('modal').style.display = 'none';
 }
 
-// 渲染表格
+// 渲染表格（含驗證）
 export function renderTable(data) {
+    // 動態導入驗證模組
+    import('./validation.js').then(({ validateReceipt }) => {
+        let tableHtml = '<table><thead><tr>' +
+            '<th onclick="sortTable(0, this.classList.contains(\'sorted-asc\') ? \'desc\' : \'asc\')">日期</th>' +
+            '<th onclick="sortTable(1, this.classList.contains(\'sorted-asc\') ? \'desc\' : \'asc\')">時間</th>' +
+            '<th onclick="sortTable(2, this.classList.contains(\'sorted-asc\') ? \'desc\' : \'asc\')">公司名稱</th>' +
+            '<th onclick="sortTable(3, this.classList.contains(\'sorted-asc\') ? \'desc\' : \'asc\')">購買物品</th>' +
+            '<th onclick="sortTable(4, this.classList.contains(\'sorted-asc\') ? \'desc\' : \'asc\')">支付方式</th>' +
+            '<th onclick="sortTable(5, this.classList.contains(\'sorted-asc\') ? \'desc\' : \'asc\')">總金額</th>' +
+            '</tr></thead><tbody>';
+
+        for (let item of data) {
+            // 驗證資料
+            const errors = validateReceipt(item);
+            const errorMap = new Map();
+            errors.forEach(err => {
+                if (!errorMap.has(err.field)) {
+                    errorMap.set(err.field, []);
+                }
+                errorMap.get(err.field).push(err);
+            });
+
+            // 生成錯誤提示
+            const getFieldHtml = (field, value) => {
+                if (errorMap.has(field)) {
+                    const fieldErrors = errorMap.get(field);
+                    const hasError = fieldErrors.some(e => e.severity === 'error');
+                    const hasWarning = fieldErrors.some(e => e.severity === 'warning');
+                    const className = hasError ? 'field-error' : (hasWarning ? 'field-warning' : '');
+                    const icon = hasError ? '⚠️' : (hasWarning ? '⚡' : '');
+                    const tooltip = fieldErrors.map(e => e.message).join('; ');
+
+                    return `<span class="${className}" data-tooltip="${tooltip}">${icon} ${value || ''}</span>`;
+                }
+                return value || '';
+            };
+
+            // 購買物品欄：總結（第1行）+ 購買物品摘要（第2行）
+            const summary = item.總結 || '';
+            const items = item.購買物品摘要 || '';
+            const purchaseContent = summary
+                ? `${summary}<br><span style="color:#666;font-size:12px;">${items}</span>`
+                : items;
+
+            tableHtml += `<tr>
+      <td>${getFieldHtml('日期', item.日期)}</td>
+      <td>${getFieldHtml('時間', item.時間)}</td>
+      <td>${item.公司名稱 || ''}</td>
+      <td>${purchaseContent}</td>
+      <td>${item.支付方式 || ''}</td>
+      <td>${getFieldHtml('總金額', item.總金額)}</td>
+    </tr>`;
+        }
+        tableHtml += '</tbody></table>';
+        document.getElementById('structuredTable').innerHTML = tableHtml;
+    }).catch(err => {
+        console.error('Failed to load validation module:', err);
+        // Fallback: 渲染無驗證的表格
+        renderTableWithoutValidation(data);
+    });
+}
+
+// 備用渲染函數（無驗證）
+function renderTableWithoutValidation(data) {
     let tableHtml = '<table><thead><tr>' +
         '<th onclick="sortTable(0, this.classList.contains(\'sorted-asc\') ? \'desc\' : \'asc\')">日期</th>' +
         '<th onclick="sortTable(1, this.classList.contains(\'sorted-asc\') ? \'desc\' : \'asc\')">時間</th>' +
@@ -47,7 +111,6 @@ export function renderTable(data) {
         '</tr></thead><tbody>';
 
     for (let item of data) {
-        // 購買物品欄：總結（第1行）+ 購買物品摘要（第2行）
         const summary = item.總結 || '';
         const items = item.購買物品摘要 || '';
         const purchaseContent = summary

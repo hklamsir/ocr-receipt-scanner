@@ -92,27 +92,28 @@ try {
 
             // 檢查大小
             if (strlen($imageBytes) > 250000) { // 250KB（留點餘裕）
-                logError("Image too large: " . strlen($imageBytes) . " bytes");
-                continue; // 跳過太大的圖片
+                logError("Image too large for receipt $index: " . strlen($imageBytes) . " bytes - saving receipt without image");
+                // 不使用 continue，繼續儲存單據資料（沒有圖片）
             }
-
             // 驗證 MIME 類型（Magic Bytes）
-            if (!isValidImageMime($imageBytes)) {
-                logError("Invalid image MIME type");
-                continue; // 跳過非法圖片格式
+            elseif (!isValidImageMime($imageBytes)) {
+                logError("Invalid image MIME type for receipt $index - saving receipt without image");
+                // 不使用 continue，繼續儲存單據資料（沒有圖片）
             }
+            // 只有當圖片有效時才儲存
+            else {
+                // 生成檔名
+                $imageFilename = $timestamp . '_' . ($index + 1) . '.jpg';
+                $imagePath = $userDir . '/' . $imageFilename;
 
-            // 生成檔名
-            $imageFilename = $timestamp . '_' . ($index + 1) . '.jpg';
-            $imagePath = $userDir . '/' . $imageFilename;
-
-            if (!@file_put_contents($imagePath, $imageBytes)) {
-                logError("Failed to save image: $imagePath");
-                continue;
+                if (!@file_put_contents($imagePath, $imageBytes)) {
+                    logError("Failed to save image for receipt $index: $imagePath - saving receipt without image");
+                    $imageFilename = null; // 儲存失敗，設為 null
+                }
             }
         }
 
-        // 插入資料庫
+        // 插入資料庫（即使沒有圖片也要儲存）
         $stmt = $pdo->prepare("
             INSERT INTO receipts (
                 user_id, receipt_date, receipt_time, company_name,

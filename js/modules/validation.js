@@ -104,11 +104,13 @@ export function validateReceipt(receipt) {
     
     // 檢查日期是否為未來日期（警告）
     if (receipt.日期 && isValidDate(receipt.日期)) {
-        const receiptDate = new Date(receipt.日期);
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+        // 使用字串比較避免時區問題
+        const receiptDateStr = receipt.日期; // YYYY-MM-DD
+        const now = new Date();
+        const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
         
-        if (receiptDate > today) {
+        // 只有當收據日期 > 今天時才警告（今天的日期不警告）
+        if (receiptDateStr > todayStr) {
             errors.push({
                 field: '日期',
                 message: '收據日期為未來日期，請確認是否正確',

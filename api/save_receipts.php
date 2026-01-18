@@ -56,6 +56,35 @@ function isValidImageMime($bytes)
     return false;
 }
 
+/**
+ * 帶重試機制的圖片儲存
+ * @param string $imagePath 圖片儲存路徑
+ * @param string $imageBytes 圖片二進制資料
+ * @param int $maxRetries 最大重試次數
+ * @return bool 是否儲存成功
+ */
+function saveImageWithRetry($imagePath, $imageBytes, $maxRetries = 3)
+{
+    $delay = 100000; // 100ms (微秒)
+    
+    for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
+        if (@file_put_contents($imagePath, $imageBytes)) {
+            if ($attempt > 1) {
+                logInfo("Image saved successfully on attempt $attempt: $imagePath");
+            }
+            return true;
+        }
+        
+        if ($attempt < $maxRetries) {
+            logInfo("Image save attempt $attempt failed, retrying in " . ($delay / 1000) . "ms...");
+            usleep($delay);
+            $delay *= 2; // 指數退避：100ms → 200ms → 400ms
+        }
+    }
+    
+    return false;
+}
+
 try {
     $pdo = getDB();
     $pdo->beginTransaction();
@@ -106,8 +135,8 @@ try {
                 $imageFilename = $timestamp . '_' . ($index + 1) . '.jpg';
                 $imagePath = $userDir . '/' . $imageFilename;
 
-                if (!@file_put_contents($imagePath, $imageBytes)) {
-                    logError("Failed to save image for receipt $index: $imagePath - saving receipt without image");
+                if (!saveImageWithRetry($imagePath, $imageBytes)) {
+                    logError("Failed to save image for receipt $index after 3 attempts: $imagePath - saving receipt without image");
                     $imageFilename = null; // 儲存失敗，設為 null
                 }
             }

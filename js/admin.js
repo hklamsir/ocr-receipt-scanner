@@ -11,12 +11,12 @@ let logPage = 1;
 let activityPage = 1;
 
 // ============ Section Navigation ============
-window.showSection = function(section) {
+window.showSection = function (section) {
   document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.admin-nav .btn').forEach(b => b.classList.remove('active'));
 
   document.getElementById(section + '-section').classList.add('active');
-  
+
   // Find and activate the correct button
   const buttons = document.querySelectorAll('.admin-nav .btn');
   const sectionMap = { dashboard: 0, users: 1, maintenance: 2, settings: 3, security: 4 };
@@ -49,12 +49,12 @@ window.showSection = function(section) {
   }
 };
 
-window.showUserTab = function(tab) {
+window.showUserTab = function (tab) {
   document.querySelectorAll('.user-tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.admin-sub-nav .btn').forEach(b => b.classList.remove('active'));
 
   document.getElementById('user-' + tab + '-tab').classList.add('active');
-  
+
   const buttons = document.querySelectorAll('.admin-sub-nav .btn');
   const tabMap = { list: 0, create: 1, activity: 2 };
   if (tabMap[tab] !== undefined) {
@@ -86,7 +86,7 @@ async function loadStats() {
   }
 }
 
-window.loadLogs = async function() {
+window.loadLogs = async function () {
   const logType = document.getElementById('logType').value;
   const search = document.getElementById('logSearch').value;
   const viewer = document.getElementById('logViewer');
@@ -131,7 +131,7 @@ function renderLogPagination(current, total) {
   container.innerHTML = html;
 }
 
-window.goLogPage = function(page) {
+window.goLogPage = function (page) {
   logPage = page;
   loadLogs();
 };
@@ -143,7 +143,7 @@ async function loadStorageChart() {
 
     if (data.success && data.by_user.length > 0) {
       const maxSize = Math.max(...data.by_user.map(u => u.size_bytes));
-      
+
       document.getElementById('storageChart').innerHTML = data.by_user.slice(0, 10).map(user => `
         <div class="storage-bar">
           <span class="username">${escapeHtml(user.username)}</span>
@@ -215,7 +215,7 @@ function renderUsers(users) {
 
 function populateUserSelect(users) {
   const select = document.getElementById('activityUser');
-  select.innerHTML = '<option value="">所有用戶</option>' + 
+  select.innerHTML = '<option value="">所有用戶</option>' +
     users.map(u => `<option value="${u.id}">${escapeHtml(u.username)}</option>`).join('');
 }
 
@@ -244,7 +244,7 @@ document.getElementById('create-form')?.addEventListener('submit', async (e) => 
   }
 });
 
-window.deleteUser = async function(id, username) {
+window.deleteUser = async function (id, username) {
   const confirmed = await Dialog.confirm(
     `確定要刪除用戶「${username}」嗎？<br><br><strong>此操作將同時刪除該用戶的所有單據及圖片！</strong>`,
     { title: '刪除用戶', confirmText: '刪除', danger: true }
@@ -271,7 +271,7 @@ window.deleteUser = async function(id, username) {
   }
 };
 
-window.resetPassword = async function(id, username) {
+window.resetPassword = async function (id, username) {
   const newPassword = await Dialog.prompt(
     `為用戶「${username}」設定新密碼：`,
     { title: '重設密碼', inputType: 'password', placeholder: '輸入新密碼' }
@@ -297,10 +297,10 @@ window.resetPassword = async function(id, username) {
   }
 };
 
-window.toggleUserStatus = async function(id, newStatus) {
+window.toggleUserStatus = async function (id, newStatus) {
   const action = newStatus === 'suspended' ? '停用' : '啟用';
   const confirmed = await Dialog.confirm(`確定要${action}此帳號嗎？`, { title: `${action}帳號` });
-  
+
   if (!confirmed) return;
 
   try {
@@ -323,7 +323,7 @@ window.toggleUserStatus = async function(id, newStatus) {
 };
 
 // User Activity
-window.loadUserActivity = async function() {
+window.loadUserActivity = async function () {
   const userId = document.getElementById('activityUser').value;
   const action = document.getElementById('activityAction').value;
   const container = document.getElementById('activityList');
@@ -365,7 +365,7 @@ window.loadUserActivity = async function() {
   }
 };
 
-window.viewUserActivity = async function(userId, username) {
+window.viewUserActivity = async function (userId, username) {
   document.getElementById('userActivityTitle').textContent = `${username} 的活動記錄`;
   document.getElementById('userActivityModal').style.display = 'flex';
   const container = document.getElementById('userActivityContent');
@@ -394,18 +394,18 @@ window.viewUserActivity = async function(userId, username) {
   }
 };
 
-window.closeUserActivityModal = function() {
+window.closeUserActivityModal = function () {
   document.getElementById('userActivityModal').style.display = 'none';
 };
 
 // Quota Modal
-window.showQuotaModal = function(userId, currentQuota) {
+window.showQuotaModal = function (userId, currentQuota) {
   document.getElementById('quotaUserId').value = userId;
   document.getElementById('quotaLimit').value = currentQuota;
   document.getElementById('quotaModal').style.display = 'flex';
 };
 
-window.closeQuotaModal = function() {
+window.closeQuotaModal = function () {
   document.getElementById('quotaModal').style.display = 'none';
 };
 
@@ -435,7 +435,7 @@ document.getElementById('quotaForm')?.addEventListener('submit', async (e) => {
 });
 
 // ============ System Maintenance ============
-window.runHealthCheck = async function() {
+window.runHealthCheck = async function () {
   const container = document.getElementById('healthStatus');
   container.innerHTML = '<div class="loading">檢查中...</div>';
 
@@ -469,7 +469,7 @@ window.runHealthCheck = async function() {
   }
 };
 
-window.findOrphanImages = async function() {
+window.findOrphanImages = async function () {
   const container = document.getElementById('orphanResults');
   container.innerHTML = '<div class="loading">掃描中...</div>';
 
@@ -510,11 +510,11 @@ window.findOrphanImages = async function() {
   }
 };
 
-window.selectAllOrphans = function() {
+window.selectAllOrphans = function () {
   document.querySelectorAll('#orphanCleanupForm input[type="checkbox"]').forEach(cb => cb.checked = true);
 };
 
-window.cleanupOrphans = async function() {
+window.cleanupOrphans = async function () {
   const form = document.getElementById('orphanCleanupForm');
   const checked = Array.from(form.querySelectorAll('input[name="paths"]:checked')).map(cb => cb.value);
 
@@ -546,27 +546,88 @@ window.cleanupOrphans = async function() {
 };
 
 // ============ Settings ============
+// 定義 API 金鑰設定
+const API_KEY_SETTINGS = ['deepseek_api_key', 'ocrspace_api_key', 'default_ocr_engine'];
+
+// 設定項顯示名稱對照表
+const SETTING_LABELS = {
+  'deepseek_api_key': 'DeepSeek API 金鑰',
+  'ocrspace_api_key': 'OCR.space API 金鑰',
+  'default_ocr_engine': '預設 OCR 引擎',
+  'max_files_per_upload': '每次上傳最大檔案數',
+  'image_quality': '圖片壓縮品質 (1-100)',
+  'max_image_size_kb': '圖片最大大小 (KB)',
+  'login_max_attempts': '登入失敗最大嘗試次數',
+  'login_lockout_minutes': '登入鎖定時間 (分鐘)'
+};
+
 async function loadSettings() {
   try {
     const res = await fetch('api/admin/settings.php');
     const data = await res.json();
 
     if (data.success) {
-      const container = document.getElementById('settingsList');
-      container.innerHTML = Object.entries(data.settings).map(([key, val]) => `
-        <div class="setting-item">
-          <div>
-            <div class="setting-label">${key}</div>
-            <div class="setting-description">${val.description || ''}</div>
+      const settingsContainer = document.getElementById('settingsList');
+      const apiKeysContainer = document.getElementById('apiKeysList');
+
+      let settingsHtml = '';
+      let apiKeysHtml = '';
+
+      Object.entries(data.settings).forEach(([key, val]) => {
+        const label = SETTING_LABELS[key] || val.description || key;
+        const isApiKey = API_KEY_SETTINGS.includes(key);
+        const isPassword = key.includes('api_key');
+
+        const itemHtml = `
+          <div class="setting-item">
+            <div>
+              <div class="setting-label">${label}</div>
+              <div class="setting-description">${val.description || ''}</div>
+            </div>
+            ${key === 'default_ocr_engine' ? `
+              <select class="form-control setting-input" name="${key}">
+                <option value="deepseek" ${val.value === 'deepseek' ? 'selected' : ''}>DeepSeek</option>
+                <option value="ocrspace" ${val.value === 'ocrspace' ? 'selected' : ''}>OCR.space</option>
+              </select>
+            ` : `
+              <input type="${isPassword ? 'password' : 'text'}" 
+                     class="form-control setting-input ${isPassword ? 'api-key-input' : ''}" 
+                     name="${key}" 
+                     value="${escapeHtml(val.value)}"
+                     ${isPassword ? 'autocomplete="off"' : ''}>
+            `}
+            ${isPassword ? `<button type="button" class="btn btn-sm toggle-visibility" onclick="toggleApiKeyVisibility(this)">👁️</button>` : ''}
           </div>
-          <input type="text" class="form-control setting-input" name="${key}" value="${escapeHtml(val.value)}">
-        </div>
-      `).join('');
+        `;
+
+        if (isApiKey) {
+          apiKeysHtml += itemHtml;
+        } else {
+          settingsHtml += itemHtml;
+        }
+      });
+
+      settingsContainer.innerHTML = settingsHtml || '<p class="text-muted">沒有一般設定</p>';
+      if (apiKeysContainer) {
+        apiKeysContainer.innerHTML = apiKeysHtml || '<p class="text-muted">沒有 API 金鑰設定</p>';
+      }
     }
   } catch (err) {
     console.error('Failed to load settings:', err);
   }
 }
+
+// 切換 API 金鑰可見性
+window.toggleApiKeyVisibility = function (btn) {
+  const input = btn.previousElementSibling;
+  if (input.type === 'password') {
+    input.type = 'text';
+    btn.textContent = '🙈';
+  } else {
+    input.type = 'password';
+    btn.textContent = '👁️';
+  }
+};
 
 document.getElementById('settingsForm')?.addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -631,7 +692,7 @@ async function loadAnnouncements() {
   }
 }
 
-window.showAnnouncementModal = function() {
+window.showAnnouncementModal = function () {
   document.getElementById('announcementModalTitle').textContent = '新增公告';
   document.getElementById('announcementId').value = '';
   document.getElementById('announcementTitle').value = '';
@@ -642,7 +703,7 @@ window.showAnnouncementModal = function() {
   document.getElementById('announcementModal').style.display = 'flex';
 };
 
-window.editAnnouncement = function(a) {
+window.editAnnouncement = function (a) {
   document.getElementById('announcementModalTitle').textContent = '編輯公告';
   document.getElementById('announcementId').value = a.id;
   document.getElementById('announcementTitle').value = a.title;
@@ -653,7 +714,7 @@ window.editAnnouncement = function(a) {
   document.getElementById('announcementModal').style.display = 'flex';
 };
 
-window.closeAnnouncementModal = function() {
+window.closeAnnouncementModal = function () {
   document.getElementById('announcementModal').style.display = 'none';
 };
 
@@ -690,7 +751,7 @@ document.getElementById('announcementForm')?.addEventListener('submit', async (e
   }
 });
 
-window.deleteAnnouncement = async function(id) {
+window.deleteAnnouncement = async function (id) {
   const confirmed = await Dialog.confirm('確定要刪除此公告嗎？');
   if (!confirmed) return;
 
@@ -710,7 +771,7 @@ window.deleteAnnouncement = async function(id) {
 };
 
 // ============ Security ============
-window.loadLoginAttempts = async function() {
+window.loadLoginAttempts = async function () {
   const failedOnly = document.getElementById('showFailedOnly').checked;
   const statsContainer = document.getElementById('loginStats');
   const listContainer = document.getElementById('loginAttemptsList');
@@ -758,7 +819,7 @@ window.loadLoginAttempts = async function() {
   }
 };
 
-window.loadIPBlocklist = async function() {
+window.loadIPBlocklist = async function () {
   try {
     const res = await fetch('api/admin/manage_ip_block.php');
     const data = await res.json();
@@ -784,18 +845,18 @@ window.loadIPBlocklist = async function() {
   }
 };
 
-window.showBlockIPModal = function() {
+window.showBlockIPModal = function () {
   document.getElementById('blockIP').value = '';
   document.getElementById('blockReason').value = '';
   document.getElementById('blockDuration').value = '0';
   document.getElementById('blockIPModal').style.display = 'flex';
 };
 
-window.closeBlockIPModal = function() {
+window.closeBlockIPModal = function () {
   document.getElementById('blockIPModal').style.display = 'none';
 };
 
-window.blockIP = function(ip) {
+window.blockIP = function (ip) {
   document.getElementById('blockIP').value = ip;
   document.getElementById('blockReason').value = '登入失敗過多';
   document.getElementById('blockDuration').value = '24';
@@ -830,7 +891,7 @@ document.getElementById('blockIPForm')?.addEventListener('submit', async (e) => 
   }
 });
 
-window.unblockIP = async function(id) {
+window.unblockIP = async function (id) {
   const confirmed = await Dialog.confirm('確定要解除此 IP 的封鎖嗎？');
   if (!confirmed) return;
 
@@ -849,7 +910,7 @@ window.unblockIP = async function(id) {
   }
 };
 
-window.loadActiveSessions = async function() {
+window.loadActiveSessions = async function () {
   try {
     const res = await fetch('api/admin/get_active_sessions.php');
     const data = await res.json();
@@ -867,10 +928,10 @@ window.loadActiveSessions = async function() {
                 ${s.session_id_masked} | ${s.ip_address || 'N/A'} | 最後活動: ${s.last_activity}
               </span>
             </div>
-            ${s.is_current ? 
-              '<span class="badge badge-info">目前 Session</span>' : 
-              `<button class="btn btn-sm btn-danger" onclick="forceLogout('${s.session_id}')">強制登出</button>`
-            }
+            ${s.is_current ?
+            '<span class="badge badge-info">目前 Session</span>' :
+            `<button class="btn btn-sm btn-danger" onclick="forceLogout('${s.session_id}')">強制登出</button>`
+          }
           </div>
         `).join('');
       }
@@ -880,7 +941,7 @@ window.loadActiveSessions = async function() {
   }
 };
 
-window.forceLogout = async function(sessionId) {
+window.forceLogout = async function (sessionId) {
   const confirmed = await Dialog.confirm('確定要強制登出此 Session 嗎？');
   if (!confirmed) return;
 
@@ -936,8 +997,8 @@ function getStatusIcon(status) {
 }
 
 let debounceTimer;
-window.debounce = function(fn, delay) {
-  return function() {
+window.debounce = function (fn, delay) {
+  return function () {
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(fn, delay);
   };

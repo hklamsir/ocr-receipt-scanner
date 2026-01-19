@@ -186,14 +186,24 @@ include __DIR__ . '/includes/header.php';
   <div id="settings-section" class="admin-section">
     <h3>⚙️ 系統設定</h3>
 
-    <!-- 一般設定 -->
+    <!-- API 金鑰管理 -->
     <div class="admin-panel">
       <div class="panel-header">
-        <h4>🔧 一般設定</h4>
+        <h4>🔑 API 金鑰管理</h4>
       </div>
       <form id="settingsForm">
+        <div class="settings-list" id="apiKeysList"></div>
+
+        <hr style="margin: 20px 0; border: none; border-top: 1px solid var(--border-color);">
+
+        <div class="panel-header" style="background: transparent; border: none; padding: 0 20px;">
+          <h4>🔧 一般設定</h4>
+        </div>
         <div class="settings-list" id="settingsList"></div>
-        <button type="submit" class="btn btn-primary">儲存設定</button>
+
+        <div style="padding: 0 20px 20px;">
+          <button type="submit" class="btn btn-primary">儲存所有設定</button>
+        </div>
       </form>
     </div>
 

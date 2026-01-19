@@ -47,7 +47,10 @@ INSERT IGNORE INTO system_settings (setting_key, setting_value, description) VAL
 ('image_quality', '60', '圖片壓縮品質 (1-100)'),
 ('max_image_size_kb', '200', '圖片最大大小 (KB)'),
 ('login_max_attempts', '5', '登入失敗最大嘗試次數'),
-('login_lockout_minutes', '15', '登入鎖定時間 (分鐘)');
+('login_lockout_minutes', '15', '登入鎖定時間 (分鐘)'),
+('deepseek_api_key', '', 'DeepSeek API 金鑰'),
+('ocrspace_api_key', '', 'OCR.space API 金鑰'),
+('default_ocr_engine', 'deepseek', '預設 OCR 引擎 (deepseek/ocrspace)');
 
 -- 5. 系統公告表
 CREATE TABLE IF NOT EXISTS announcements (

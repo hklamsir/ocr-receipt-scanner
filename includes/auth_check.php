@@ -47,4 +47,3 @@ if (!isset($_SESSION['status_check']) || (time() - $_SESSION['status_check']) > 
         // 資料庫錯誤時不阻止使用
     }
 }
-

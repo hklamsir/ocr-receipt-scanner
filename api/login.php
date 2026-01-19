@@ -118,9 +118,6 @@ try {
 
     // === 記錄活動 Session ===
     try {
-        // 清除該用戶的舊 session 記錄（可選：限制同時登入數）
-        // $pdo->prepare("DELETE FROM active_sessions WHERE user_id = ?")->execute([$user['id']]);
-
         $stmt = $pdo->prepare("
             INSERT INTO active_sessions (user_id, session_id, ip_address, user_agent)
             VALUES (?, ?, ?, ?)
@@ -165,4 +162,3 @@ try {
     logError("Login error: " . $e->getMessage());
     ApiResponse::error('系統錯誤', 500);
 }
-

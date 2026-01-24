@@ -13,12 +13,13 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['username'])) {
 // 更新最後活動時間
 $_SESSION['last_activity'] = time();
 
-// 驗證帳號狀態（每 5 分鐘檢查一次）
-if (!isset($_SESSION['status_check']) || (time() - $_SESSION['status_check']) > 300) {
+// 驗證帳號狀態和 Session 有效性（每 1 分鐘檢查一次）
+if (!isset($_SESSION['status_check']) || (time() - $_SESSION['status_check']) > 60) {
     try {
         require_once __DIR__ . '/db.php';
         $pdo = getDB();
 
+        // 檢查帳號狀態
         $stmt = $pdo->prepare("SELECT status FROM users WHERE id = ?");
         $stmt->execute([$_SESSION['user_id']]);
         $user = $stmt->fetch();
@@ -30,10 +31,20 @@ if (!isset($_SESSION['status_check']) || (time() - $_SESSION['status_check']) > 
             exit;
         }
 
-        $_SESSION['status_check'] = time();
-
-        // 更新 session 活動時間
+        // 檢查 Session 是否仍然有效（是否被強制登出）
         try {
+            $stmt = $pdo->prepare("SELECT id FROM active_sessions WHERE session_id = ?");
+            $stmt->execute([session_id()]);
+            $sessionRecord = $stmt->fetch();
+
+            if (!$sessionRecord) {
+                // Session 已被強制登出
+                session_destroy();
+                header('Location: login.php?error=session_expired');
+                exit;
+            }
+
+            // 更新 session 活動時間
             $stmt = $pdo->prepare("
                 UPDATE active_sessions 
                 SET last_activity = NOW() 
@@ -41,8 +52,11 @@ if (!isset($_SESSION['status_check']) || (time() - $_SESSION['status_check']) > 
             ");
             $stmt->execute([session_id()]);
         } catch (Exception $e) {
-            // 靜默失敗
+            // 靜默失敗（表可能不存在）
         }
+
+        $_SESSION['status_check'] = time();
+
     } catch (Exception $e) {
         // 資料庫錯誤時不阻止使用
     }

@@ -147,6 +147,16 @@ async function startOCR() {
     // 並行處理 OCR（限制 2 個）
     const results = await processImagesParallel(images, appConfig.ocrProxyUrl, updateOCRStatus);
 
+    // 檢查是否有配置錯誤（如 API Key 未設定）
+    const configError = results.find(r =>
+        r.status === 'fulfilled' && r.value.error && r.value.error.includes('系統尚未設定')
+    );
+    if (configError) {
+        Toast.error(configError.value.error);
+        updateGlobalStatus('錯誤：' + configError.value.error);
+        return;
+    }
+
     // 組合 OCR 結果
     const ocrText = combineOCRResults(results);
 

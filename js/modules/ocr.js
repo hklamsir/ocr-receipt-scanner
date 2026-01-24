@@ -36,6 +36,12 @@ async function processOCRWithRetry(img, index, ocrProxyUrl, onProgress) {
 
             const json = await response.json();
 
+            // 檢查是否有錯誤（包括 503 等 HTTP 錯誤）
+            if (json.error) {
+                onProgress(index, '錯誤');
+                return { success: false, name: img.name, error: json.error };
+            }
+
             if (json.text) {
                 onProgress(index, '完成');
                 return {

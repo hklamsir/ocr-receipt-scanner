@@ -10,6 +10,7 @@ try {
     // 查詢所有用戶及其單據數量
     $stmt = $pdo->query("
         SELECT u.id, u.username, u.is_admin, u.created_at, u.last_login,
+               u.status, u.quota_limit,
                COUNT(r.id) as receipt_count
         FROM users u
         LEFT JOIN receipts r ON u.id = r.user_id

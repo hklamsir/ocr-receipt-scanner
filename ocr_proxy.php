@@ -48,6 +48,13 @@ if (!isset($request_data['image'])) {
 
 $imageBase64 = $request_data['image'];
 
+// 檢查 API Key 是否已設定
+if (!defined('OCR_API_KEY') || empty(OCR_API_KEY)) {
+    http_response_code(503);
+    echo json_encode(['success' => false, 'error' => '系統尚未設定 OCR.space API 金鑰，請聯繫管理員']);
+    exit;
+}
+
 // 取得設定的引擎（預設為 2）
 $preferredEngine = defined('OCR_ENGINE') ? OCR_ENGINE : '2';
 

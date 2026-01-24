@@ -547,13 +547,13 @@ window.cleanupOrphans = async function () {
 
 // ============ Settings ============
 // 定義 API 金鑰設定
-const API_KEY_SETTINGS = ['deepseek_api_key', 'ocrspace_api_key', 'default_ocr_engine'];
+const API_KEY_SETTINGS = ['deepseek_api_key', 'ocrspace_api_key', 'ocr_engine'];
 
 // 設定項顯示名稱對照表
 const SETTING_LABELS = {
   'deepseek_api_key': 'DeepSeek API 金鑰',
   'ocrspace_api_key': 'OCR.space API 金鑰',
-  'default_ocr_engine': '預設 OCR 引擎',
+  'ocr_engine': 'OCR.space 引擎',
   'max_files_per_upload': '每次上傳最大檔案數',
   'image_quality': '圖片壓縮品質 (1-100)',
   'max_image_size_kb': '圖片最大大小 (KB)',
@@ -584,10 +584,10 @@ async function loadSettings() {
               <div class="setting-label">${label}</div>
               <div class="setting-description">${val.description || ''}</div>
             </div>
-            ${key === 'default_ocr_engine' ? `
+            ${key === 'ocr_engine' ? `
               <select class="form-control setting-input" name="${key}">
-                <option value="deepseek" ${val.value === 'deepseek' ? 'selected' : ''}>DeepSeek</option>
-                <option value="ocrspace" ${val.value === 'ocrspace' ? 'selected' : ''}>OCR.space</option>
+                <option value="1" ${val.value === '1' ? 'selected' : ''}>Engine 1 (較穩定)</option>
+                <option value="2" ${val.value === '2' ? 'selected' : ''}>Engine 2 (較準確)</option>
               </select>
             ` : `
               <input type="${isPassword ? 'password' : 'text'}" 

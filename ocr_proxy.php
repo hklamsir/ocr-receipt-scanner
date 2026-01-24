@@ -48,21 +48,25 @@ if (!isset($request_data['image'])) {
 
 $imageBase64 = $request_data['image'];
 
-// ===== 第一次嘗試: Engine 2 + auto language =====
-$result = callOcrSpace($imageBase64, '2', 'auto');
+// 取得設定的引擎（預設為 2）
+$preferredEngine = defined('OCR_ENGINE') ? OCR_ENGINE : '2';
+
+// ===== 第一次嘗試: 使用設定的引擎 =====
+$result = callOcrSpace($imageBase64, $preferredEngine, $preferredEngine === '2' ? 'auto' : 'cht');
 
 if ($result['success']) {
-    logInfo('OCR Proxy - Success with Engine 2 from IP: ' . $_SERVER['REMOTE_ADDR']);
-    echo json_encode(['text' => $result['text'], 'engine' => 2]);
+    logInfo('OCR Proxy - Success with Engine ' . $preferredEngine . ' from IP: ' . $_SERVER['REMOTE_ADDR']);
+    echo json_encode(['text' => $result['text'], 'engine' => (int) $preferredEngine]);
     exit;
 }
 
-// ===== 降級方案: Engine 1 + 繁體中文 =====
-$result = callOcrSpace($imageBase64, '1', 'cht');
+// ===== 降級方案: 使用另一個引擎 =====
+$fallbackEngine = $preferredEngine === '2' ? '1' : '2';
+$result = callOcrSpace($imageBase64, $fallbackEngine, $fallbackEngine === '2' ? 'auto' : 'cht');
 
 if ($result['success']) {
-    logInfo('OCR Proxy - Success with Engine 1 from IP: ' . $_SERVER['REMOTE_ADDR']);
-    echo json_encode(['text' => $result['text'], 'engine' => 1]);
+    logInfo('OCR Proxy - Success with Engine ' . $fallbackEngine . ' (fallback) from IP: ' . $_SERVER['REMOTE_ADDR']);
+    echo json_encode(['text' => $result['text'], 'engine' => (int) $fallbackEngine]);
     exit;
 }
 

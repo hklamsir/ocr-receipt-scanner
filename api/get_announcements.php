@@ -12,19 +12,24 @@ if (!isset($_SESSION['user_id'])) {
     ApiResponse::error('請先登入', 401);
 }
 
+// 設定香港時區
+date_default_timezone_set('Asia/Hong_Kong');
+$nowHK = date('Y-m-d H:i:s');
+
 try {
     $pdo = getDB();
 
-    // 只取得當前有效的公告
-    $stmt = $pdo->query("
+    // 只取得當前有效的公告（使用香港時間比較）
+    $stmt = $pdo->prepare("
         SELECT id, title, content
         FROM announcements
         WHERE is_active = 1
-          AND (start_date IS NULL OR start_date <= NOW())
-          AND (end_date IS NULL OR end_date >= NOW())
+          AND (start_date IS NULL OR start_date <= ?)
+          AND (end_date IS NULL OR end_date >= ?)
         ORDER BY created_at DESC
         LIMIT 5
     ");
+    $stmt->execute([$nowHK, $nowHK]);
 
     $announcements = $stmt->fetchAll();
     ApiResponse::success(['announcements' => $announcements]);

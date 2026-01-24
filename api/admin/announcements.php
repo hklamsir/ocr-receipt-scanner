@@ -5,10 +5,14 @@ require_once __DIR__ . '/../../includes/db.php';
 require_once __DIR__ . '/../../includes/admin_check.php';
 require_once __DIR__ . '/../../includes/api_response.php';
 
+// 設定香港時區
+date_default_timezone_set('Asia/Hong_Kong');
+
 $method = $_SERVER['REQUEST_METHOD'];
 
 try {
     $pdo = getDB();
+    $nowHK = date('Y-m-d H:i:s');
 
     switch ($method) {
         case 'GET':
@@ -24,18 +28,19 @@ try {
                     ORDER BY a.created_at DESC
                 ");
             } else {
-                // 只取得當前有效的公告
-                $stmt = $pdo->query("
+                // 只取得當前有效的公告（使用香港時間）
+                $stmt = $pdo->prepare("
                     SELECT id, title, content, start_date, end_date
                     FROM announcements
                     WHERE is_active = 1
-                      AND (start_date IS NULL OR start_date <= NOW())
-                      AND (end_date IS NULL OR end_date >= NOW())
+                      AND (start_date IS NULL OR start_date <= ?)
+                      AND (end_date IS NULL OR end_date >= ?)
                     ORDER BY created_at DESC
                 ");
+                $stmt->execute([$nowHK, $nowHK]);
             }
 
-            $announcements = $stmt->fetchAll();
+            $announcements = $showAll ? $stmt->fetchAll() : $stmt->fetchAll();
             ApiResponse::success(['announcements' => $announcements]);
             break;
 

@@ -7,6 +7,14 @@ require_once __DIR__ . '/includes/logger.php';
 // 從設定檔載入 API Key
 $DEEPSEEK_API_KEY = DEEPSEEK_API_KEY;
 
+// 檢查 API Key 是否已設定
+if (empty($DEEPSEEK_API_KEY)) {
+    header('Content-Type: application/json; charset=utf-8');
+    http_response_code(503);
+    echo json_encode(['success' => false, 'error' => '系統尚未設定 DeepSeek API 金鑰，請聯繫管理員']);
+    exit;
+}
+
 // Referer 檢查
 if (!Security::validateReferer()) {
     http_response_code(403);

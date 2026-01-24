@@ -70,3 +70,12 @@ if (!isset($headerTitle))
             <?php include __DIR__ . '/nav.php'; ?>
         <?php endif; ?>
     </header>
+
+    <!-- 公告橫幅 -->
+    <div id="announcementBanner" class="announcement-banner" style="display:none;">
+        <div class="announcement-content">
+            <span class="announcement-icon">📢</span>
+            <span id="announcementText"></span>
+            <button class="announcement-close" onclick="closeAnnouncement()">×</button>
+        </div>
+    </div>

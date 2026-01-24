@@ -37,15 +37,17 @@ try {
         ApiResponse::error("此 IP 已被封鎖{$until}（原因：{$reason}）", 403);
     }
 
-    // === 安全檢查：登入頻率限制 ===
+    // === 安全檢查：登入頻率限制（帳號 + IP 組合）===
+    // 只鎖定「同一帳號 + 同一 IP」的組合，不影響其他用戶
     $stmt = $pdo->prepare("
         SELECT COUNT(*) as fail_count
         FROM login_attempts 
-        WHERE ip_address = ? 
+        WHERE username = ?
+          AND ip_address = ? 
           AND success = 0 
           AND created_at > DATE_SUB(NOW(), INTERVAL 15 MINUTE)
     ");
-    $stmt->execute([$ipAddress]);
+    $stmt->execute([$username, $ipAddress]);
     $failCount = $stmt->fetch()['fail_count'];
 
     // 取得設定的最大嘗試次數
@@ -58,8 +60,8 @@ try {
     }
 
     if ($failCount >= $maxAttempts) {
-        logError("Login rate limited: $ipAddress (attempts: $failCount)");
-        ApiResponse::error('登入嘗試過多，請稍後再試', 429);
+        logError("Login rate limited: $username from $ipAddress (attempts: $failCount)");
+        ApiResponse::error('此帳號登入嘗試過多，請稍後再試', 429);
     }
 
     // 查詢用戶

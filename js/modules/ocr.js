@@ -75,11 +75,14 @@ export async function extractStructuredData(ocrText) {
         body: 'action=extract&ocr_text=' + encodeURIComponent(ocrText)
     });
 
-    if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    const json = await response.json();
+
+    // 若後端返回錯誤訊息，優先使用它
+    if (!response.ok || json.error) {
+        throw new Error(json.error || `HTTP ${response.status}: ${response.statusText}`);
     }
 
-    return response.json();
+    return json;
 }
 
 // 將 OCR 結果組合為文字

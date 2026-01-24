@@ -50,7 +50,7 @@ INSERT IGNORE INTO system_settings (setting_key, setting_value, description) VAL
 ('login_lockout_minutes', '15', '登入鎖定時間 (分鐘)'),
 ('deepseek_api_key', '', 'DeepSeek API 金鑰'),
 ('ocrspace_api_key', '', 'OCR.space API 金鑰'),
-('default_ocr_engine', 'deepseek', '預設 OCR 引擎 (deepseek/ocrspace)');
+('ocr_engine', '2', 'OCR.space 引擎 (1=較穩定, 2=較準確)');
 
 -- 5. 系統公告表
 CREATE TABLE IF NOT EXISTS announcements (

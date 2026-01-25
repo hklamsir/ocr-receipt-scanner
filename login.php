@@ -17,7 +17,9 @@ $extraStyles = '
             justify-content: center;
         }
         .header-branding {
-            text-align: center;
+            flex: none;
+            margin-left: 0;
+            justify-content: center;
         }
 
         /* 登入頁面居中佈局 */

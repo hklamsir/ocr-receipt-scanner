@@ -79,6 +79,15 @@ if (!isset($_SESSION['status_check']) || (time() - $_SESSION['status_check']) > 
                 WHERE session_id = ?
             ");
             $stmt->execute([session_id()]);
+
+            // 1% 機率清理過期 session（超過 24 小時無活動）
+            if (mt_rand(1, 100) === 1) {
+                try {
+                    $pdo->exec("DELETE FROM active_sessions WHERE last_activity < NOW() - INTERVAL 24 HOUR");
+                } catch (Exception $e) {
+                    // 靜默失敗
+                }
+            }
         } catch (Exception $e) {
             // 靜默失敗（表可能不存在）
         }

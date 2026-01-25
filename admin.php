@@ -180,6 +180,17 @@ include __DIR__ . '/includes/header.php';
         <p class="text-muted">掃描孤立圖片（檔案存在但資料庫無記錄）</p>
       </div>
     </div>
+
+    <!-- 資料庫備份 -->
+    <div class="admin-panel">
+      <div class="panel-header">
+        <h4>💾 資料庫備份</h4>
+        <button class="btn btn-sm btn-primary" onclick="downloadBackup()">下載備份</button>
+      </div>
+      <div id="backupInfo">
+        <p class="text-muted">產生完整資料庫備份 SQL 檔案供下載。建議定期備份以防資料遺失。</p>
+      </div>
+    </div>
   </div>
 
   <!-- ============ 系統設定 ============ -->

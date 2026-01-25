@@ -21,6 +21,7 @@ main,
 .container,
 .main-content {
   flex: 1 0 auto;
+  width: 100%;
 }
 
 /* 固定頂部標題 */
@@ -565,6 +566,11 @@ footer {
   font-size: 14px;
   z-index: 100;
   margin-top: 5vh;
+  /* 抵消 body padding 讓背景填滿全寬 */
+  margin-left: -15px;
+  margin-right: -15px;
+  padding-left: 15px;
+  padding-right: 15px;
 }
 
 /* Mobile */

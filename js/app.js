@@ -19,7 +19,7 @@ function getCSRFHeaders() {
 }
 
 // 全域設定
-let appConfig = { ocrProxyUrl: 'ocr_proxy.php', maxFiles: 20 };
+let appConfig = { ocrProxyUrl: 'ocr_proxy.php', maxFiles: 20, imageQuality: 60, maxImageSizeKb: 200 };
 
 // 初始化應用程式
 async function initApp() {
@@ -95,7 +95,7 @@ async function handleFiles(fileList) {
 
             if (!validateImageFile(file)) continue;
 
-            const compressed = await compressImage(file);
+            const compressed = await compressImage(file, { quality: appConfig.imageQuality, maxSizeKb: appConfig.maxImageSizeKb });
             AppState.addImage(compressed);
             renderPreview();
         } catch (err) {
@@ -580,7 +580,9 @@ window.applyCrop = function () {
     }
 
     // 轉換為 dataUrl
-    const croppedDataUrl = canvas.toDataURL('image/jpeg', 0.9);
+    // 使用系統設定的品質（轉換為 0-1 範圍）
+    const cropQuality = Math.min((appConfig.imageQuality || 60) / 100 + 0.2, 0.95); // 裁剪時稍微提高品質
+    const croppedDataUrl = canvas.toDataURL('image/jpeg', cropQuality);
 
     // 更新 AppState 中的圖片
     const images = AppState.getAllImages();

@@ -10,6 +10,9 @@ header('Access-Control-Allow-Origin: *');
 
 echo json_encode([
     'maxFiles' => MAX_FILES,
+    'imageQuality' => IMAGE_QUALITY,
+    'maxImageSizeKb' => MAX_IMAGE_SIZE_KB,
     'ocrProxyUrl' => 'ocr_proxy.php', // 使用本地 proxy
     'userId' => $_SESSION['user_id'] ?? null // 提供用戶 ID 用於 localStorage 區分
 ], JSON_UNESCAPED_SLASHES);
+

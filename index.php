@@ -1,6 +1,7 @@
 <?php
 // 檢查登入狀態
 require_once __DIR__ . '/includes/auth_check.php';
+require_once __DIR__ . '/includes/config.php';
 
 // 頁面設定
 $pageTitle = '辨識單據';
@@ -10,7 +11,9 @@ include __DIR__ . '/includes/header.php';
 
 <div class="container">
 
-    <div id="dropzone">拖放圖片或點擊選擇（最多 20 張），也可以用相機拍照</div>
+    <div id="dropzone">拖放圖片或點擊選擇（最多
+        <?php echo MAX_FILES; ?> 張），也可以用相機拍照
+    </div>
     <input type="file" id="fileInput" accept="image/*,android/allowCamera" multiple hidden>
 
     <div class="actions">

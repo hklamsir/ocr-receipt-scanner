@@ -22,6 +22,43 @@ $receipts = $data['receipts'];
 $userId = $_SESSION['user_id'];
 $username = $_SESSION['username'];
 
+// =============== 配額檢查 ===============
+try {
+    $pdo = getDB();
+
+    // 取得用戶配額設定
+    $quotaStmt = $pdo->prepare("SELECT quota_limit FROM users WHERE id = ?");
+    $quotaStmt->execute([$userId]);
+    $user = $quotaStmt->fetch();
+    $quotaLimit = $user['quota_limit'] ?? 0;
+
+    // 如果有配額限制（quota_limit > 0）
+    if ($quotaLimit > 0) {
+        // 計算本月已儲存的單據數量
+        $countStmt = $pdo->prepare("
+            SELECT COUNT(*) as count FROM receipts 
+            WHERE user_id = ? 
+            AND YEAR(created_at) = YEAR(CURRENT_DATE())
+            AND MONTH(created_at) = MONTH(CURRENT_DATE())
+        ");
+        $countStmt->execute([$userId]);
+        $result = $countStmt->fetch();
+        $currentCount = $result['count'] ?? 0;
+
+        // 檢查是否會超過配額
+        $newTotal = $currentCount + count($receipts);
+        if ($newTotal > $quotaLimit) {
+            $remaining = max(0, $quotaLimit - $currentCount);
+            logInfo("User $username quota exceeded: has $currentCount, trying to add " . count($receipts) . ", limit is $quotaLimit");
+            ApiResponse::error("已達本月配額上限（$quotaLimit 張）。本月已儲存 $currentCount 張，還可儲存 $remaining 張。", 429);
+        }
+    }
+} catch (PDOException $e) {
+    logError("Quota check error: " . $e->getMessage());
+    // 配額檢查失敗不阻止儲存
+}
+// =============== 配額檢查結束 ===============
+
 // 建立用戶圖片目錄
 $userDir = __DIR__ . '/../receipts/' . $username;
 if (!is_dir($userDir)) {
@@ -66,7 +103,7 @@ function isValidImageMime($bytes)
 function saveImageWithRetry($imagePath, $imageBytes, $maxRetries = 3)
 {
     $delay = 100000; // 100ms (微秒)
-    
+
     for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
         if (@file_put_contents($imagePath, $imageBytes)) {
             if ($attempt > 1) {
@@ -74,14 +111,14 @@ function saveImageWithRetry($imagePath, $imageBytes, $maxRetries = 3)
             }
             return true;
         }
-        
+
         if ($attempt < $maxRetries) {
             logInfo("Image save attempt $attempt failed, retrying in " . ($delay / 1000) . "ms...");
             usleep($delay);
             $delay *= 2; // 指數退避：100ms → 200ms → 400ms
         }
     }
-    
+
     return false;
 }
 

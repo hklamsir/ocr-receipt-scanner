@@ -6,6 +6,7 @@ require_once __DIR__ . '/../includes/auth_check.php';
 require_once __DIR__ . '/../includes/csrf_check.php';
 require_once __DIR__ . '/../includes/logger.php';
 require_once __DIR__ . '/../includes/api_response.php';
+require_once __DIR__ . '/../includes/quota_helper.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     ApiResponse::error('僅支援 POST 請求', 405);
@@ -27,32 +28,12 @@ $username = $_SESSION['username'];
 try {
     $pdo = getDB();
 
-    // 取得用戶配額設定
-    $quotaStmt = $pdo->prepare("SELECT quota_limit FROM users WHERE id = ?");
-    $quotaStmt->execute([$userId]);
-    $user = $quotaStmt->fetch();
-    $quotaLimit = $user['quota_limit'] ?? 0;
+    $quotaStatus = getQuotaStatus($pdo, $userId);
+    $checkResult = canAddReceipts($quotaStatus, count($receipts));
 
-    // 如果有配額限制（quota_limit > 0）
-    if ($quotaLimit > 0) {
-        // 計算本月已儲存的單據數量
-        $countStmt = $pdo->prepare("
-            SELECT COUNT(*) as count FROM receipts 
-            WHERE user_id = ? 
-            AND YEAR(created_at) = YEAR(CURRENT_DATE())
-            AND MONTH(created_at) = MONTH(CURRENT_DATE())
-        ");
-        $countStmt->execute([$userId]);
-        $result = $countStmt->fetch();
-        $currentCount = $result['count'] ?? 0;
-
-        // 檢查是否會超過配額
-        $newTotal = $currentCount + count($receipts);
-        if ($newTotal > $quotaLimit) {
-            $remaining = max(0, $quotaLimit - $currentCount);
-            logInfo("User $username quota exceeded: has $currentCount, trying to add " . count($receipts) . ", limit is $quotaLimit");
-            ApiResponse::error("已達本月配額上限（$quotaLimit 張）。本月已儲存 $currentCount 張，還可儲存 $remaining 張。", 429);
-        }
+    if (!$checkResult['allowed']) {
+        logInfo("User $username quota exceeded: " . $checkResult['error']);
+        ApiResponse::error($checkResult['error'], 429);
     }
 } catch (PDOException $e) {
     logError("Quota check error: " . $e->getMessage());

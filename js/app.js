@@ -142,6 +142,33 @@ async function startOCR() {
         return;
     }
 
+    // ===== 配額預檢查 =====
+    try {
+        const quotaRes = await fetch('api/check_quota.php');
+        const quotaData = await quotaRes.json();
+
+        if (quotaData.success && quotaData.has_limit) {
+            const remaining = quotaData.remaining;
+            const toProcess = images.length;
+
+            if (remaining <= 0) {
+                Toast.error(`已達本月配額上限（${quotaData.quota_limit} 張）。本月已儲存 ${quotaData.current_count} 張，無法繼續掃描。`);
+                updateGlobalStatus('錯誤：已達配額上限');
+                return;
+            }
+
+            if (toProcess > remaining) {
+                Toast.error(`配額不足！本月還可儲存 ${remaining} 張，但您選擇了 ${toProcess} 張圖片。`);
+                updateGlobalStatus(`錯誤：配額不足（剩餘 ${remaining} 張）`);
+                return;
+            }
+        }
+    } catch (err) {
+        console.error('配額檢查失敗:', err);
+        // 配額檢查失敗不阻止 OCR，後端會再次檢查
+    }
+    // ===== 配額預檢查結束 =====
+
     updateGlobalStatus('OCR 處理中...');
 
     // 並行處理 OCR（限制 2 個）

@@ -4,8 +4,30 @@
 
 session_start();
 
+// Helper function to check if request is API
+function isApiRequest()
+{
+    return strpos($_SERVER['REQUEST_URI'] ?? '', '/api/') !== false
+        || (isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false);
+}
+
+// Helper function for API error response
+function apiErrorAndExit($message, $code = 401)
+{
+    if (session_status() === PHP_SESSION_ACTIVE) {
+        session_destroy();
+    }
+    http_response_code($code);
+    header('Content-Type: application/json');
+    die(json_encode(['success' => false, 'error' => $message]));
+}
+
 // 檢查 Session 是否存在
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['username'])) {
+    if (isApiRequest()) {
+        apiErrorAndExit('請先登入');
+    }
+
     header('Location: login.php');
     exit;
 }
@@ -26,6 +48,9 @@ if (!isset($_SESSION['status_check']) || (time() - $_SESSION['status_check']) > 
 
         if (!$user || (isset($user['status']) && $user['status'] === 'suspended')) {
             // 帳號已被停用或刪除
+            if (isApiRequest()) {
+                apiErrorAndExit('帳號已被停用', 403);
+            }
             session_destroy();
             header('Location: login.php?error=suspended');
             exit;
@@ -39,6 +64,9 @@ if (!isset($_SESSION['status_check']) || (time() - $_SESSION['status_check']) > 
 
             if (!$sessionRecord) {
                 // Session 已被強制登出
+                if (isApiRequest()) {
+                    apiErrorAndExit('Session 已過期');
+                }
                 session_destroy();
                 header('Location: login.php?error=session_expired');
                 exit;

@@ -1,7 +1,13 @@
 // 工具函數模組
 
 // 壓縮圖片（更激進的壓縮以適應 localStorage 限制）
-export function compressImage(file) {
+// config: { quality: 1-100, maxSizeKb: number }
+export function compressImage(file, config = {}) {
+    // 預設值（向後相容）
+    const quality = (config.quality || 60) / 100; // 轉換為 0-1 範圍
+    const maxSizeBytes = (config.maxSizeKb || 200) * 1024; // 轉換為 bytes
+    const minQuality = 0.3; // 最低品質
+
     return new Promise(resolve => {
         const reader = new FileReader();
         reader.onload = e => {
@@ -22,13 +28,13 @@ export function compressImage(file) {
                 canvas.height = h;
                 canvas.getContext('2d').drawImage(img, 0, 0, w, h);
 
-                // 目標 200KB（資料庫儲存用）
-                let q = 0.8; // 起始質量
+                // 動態調整品質以符合大小限制
+                let q = quality; // 使用設定的起始品質
                 let data;
                 do {
                     data = canvas.toDataURL('image/jpeg', q);
                     q -= 0.05;
-                } while (data.length > 200_000 && q > 0.3); // 目標 200KB，最低質量 0.3
+                } while (data.length > maxSizeBytes && q > minQuality);
 
                 resolve({ name: file.name, dataUrl: data });
             };

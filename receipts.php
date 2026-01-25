@@ -330,6 +330,25 @@ include __DIR__ . '/includes/header.php';
             <button class="close-btn" onclick="closeExportModal()">✕</button>
         </div>
         <div class="export-modal-body">
+            <!-- 模板選擇區 -->
+            <div class="excel-template-section"
+                style="padding: 15px 0; border-bottom: 1px solid #ddd; margin-bottom: 15px;">
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 200px;">
+                        <label for="excelTemplateSelect"
+                            style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px;">快速套用模板</label>
+                        <select id="excelTemplateSelect"
+                            style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                            <option value="">不使用模板</option>
+                        </select>
+                    </div>
+                    <button type="button" id="applyExcelTemplateBtn" class="btn btn-secondary btn-sm"
+                        style="margin-top: 22px;">套用</button>
+                    <button type="button" id="saveExcelTemplateBtn" class="btn btn-primary btn-sm"
+                        style="margin-top: 22px;">💾 另存為模板</button>
+                </div>
+            </div>
+
             <p id="exportInfo" style="margin-bottom:15px;color:#666;"></p>
             <p style="margin-bottom:10px;font-weight:600;color:#333;">📌 選擇並排序欄位（拖拉調整順序）：</p>
             <div id="exportFieldsList" class="export-fields-list"></div>

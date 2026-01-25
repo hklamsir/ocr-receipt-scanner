@@ -5,7 +5,7 @@
 ?>
 
 <footer>
-    &copy; 2026 Designed by Lamsir, powered by Antigravity, OCRSpace and DeepSeek
+    &copy; 2026 Lamsir 設計，Antigravity 編寫程式
 </footer>
 
 <!-- 公告載入腳本 -->

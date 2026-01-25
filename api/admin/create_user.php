@@ -12,9 +12,14 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $username = $_POST['username'] ?? '';
 $password = $_POST['password'] ?? '';
 $is_admin = isset($_POST['is_admin']) ? intval($_POST['is_admin']) : 0;
+$quota_limit = isset($_POST['quota_limit']) ? intval($_POST['quota_limit']) : 0;
 
 if (empty($username) || empty($password)) {
     ApiResponse::error('請填寫用戶名和密碼', 400);
+}
+
+if ($quota_limit < 0) {
+    $quota_limit = 0;
 }
 
 try {
@@ -30,8 +35,8 @@ try {
 
     // 建立用戶
     $password_hash = password_hash($password, PASSWORD_DEFAULT);
-    $stmt = $pdo->prepare("INSERT INTO users (username, password_hash, is_admin) VALUES (?, ?, ?)");
-    $stmt->execute([$username, $password_hash, $is_admin]);
+    $stmt = $pdo->prepare("INSERT INTO users (username, password_hash, is_admin, quota_limit) VALUES (?, ?, ?, ?)");
+    $stmt->execute([$username, $password_hash, $is_admin, $quota_limit]);
 
     logInfo("Admin created user: $username");
 

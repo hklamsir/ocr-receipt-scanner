@@ -545,6 +545,47 @@ window.cleanupOrphans = async function () {
   }
 };
 
+// Database Backup
+window.downloadBackup = async function () {
+  const container = document.getElementById('backupInfo');
+  const originalContent = container.innerHTML;
+  container.innerHTML = '<div class="loading">正在產生備份...</div>';
+
+  try {
+    const res = await fetch('api/admin/backup_database.php');
+
+    if (!res.ok) {
+      const data = await res.json();
+      throw new Error(data.error || '備份失敗');
+    }
+
+    // 取得檔案名稱
+    const contentDisposition = res.headers.get('Content-Disposition');
+    let filename = 'backup.sql';
+    if (contentDisposition) {
+      const match = contentDisposition.match(/filename="(.+)"/);
+      if (match) filename = match[1];
+    }
+
+    // 下載檔案
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+
+    container.innerHTML = originalContent;
+    Toast.success('備份已下載');
+  } catch (err) {
+    container.innerHTML = originalContent;
+    Toast.error(err.message || '備份失敗');
+  }
+};
+
 // ============ Settings ============
 // 定義 API 金鑰設定
 const API_KEY_SETTINGS = ['deepseek_api_key', 'ocrspace_api_key', 'ocr_engine'];

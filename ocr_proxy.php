@@ -3,6 +3,7 @@
 require_once __DIR__ . '/includes/config.php';
 require_once __DIR__ . '/includes/security.php';
 require_once __DIR__ . '/includes/logger.php';
+require_once __DIR__ . '/includes/db.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -28,6 +29,50 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode(['success' => false, 'error' => '僅支援 POST 請求']);
     exit;
 }
+
+// =============== 用戶配額檢查 ===============
+session_start();
+if (isset($_SESSION['user_id'])) {
+    try {
+        $pdo = getDB();
+        $userId = $_SESSION['user_id'];
+
+        // 取得用戶配額設定
+        $quotaStmt = $pdo->prepare("SELECT quota_limit FROM users WHERE id = ?");
+        $quotaStmt->execute([$userId]);
+        $user = $quotaStmt->fetch();
+        $quotaLimit = $user['quota_limit'] ?? 0;
+
+        // 如果有配額限制（quota_limit > 0）
+        if ($quotaLimit > 0) {
+            // 計算本月已儲存的單據數量
+            $countStmt = $pdo->prepare("
+                SELECT COUNT(*) as count FROM receipts 
+                WHERE user_id = ? 
+                AND YEAR(created_at) = YEAR(CURRENT_DATE())
+                AND MONTH(created_at) = MONTH(CURRENT_DATE())
+            ");
+            $countStmt->execute([$userId]);
+            $result = $countStmt->fetch();
+            $currentCount = $result['count'] ?? 0;
+
+            // 如果已達或超過配額，禁止 OCR
+            if ($currentCount >= $quotaLimit) {
+                http_response_code(429);
+                logInfo("OCR Proxy - User quota exceeded: user_id=$userId, current=$currentCount, limit=$quotaLimit");
+                echo json_encode([
+                    'success' => false,
+                    'error' => "已達本月配額上限（$quotaLimit 張）。本月已儲存 $currentCount 張，無法繼續掃描。"
+                ]);
+                exit;
+            }
+        }
+    } catch (Exception $e) {
+        logError("OCR Proxy - Quota check error: " . $e->getMessage());
+        // 配額檢查失敗不阻止 OCR
+    }
+}
+// =============== 配額檢查結束 ===============
 
 // 讀取請求 body
 $request_body = file_get_contents('php://input');

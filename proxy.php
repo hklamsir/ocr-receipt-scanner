@@ -3,6 +3,7 @@
 require_once __DIR__ . '/includes/config.php';
 require_once __DIR__ . '/includes/security.php';
 require_once __DIR__ . '/includes/logger.php';
+require_once __DIR__ . '/includes/db.php';
 
 // 從設定檔載入 API Key
 $DEEPSEEK_API_KEY = DEEPSEEK_API_KEY;
@@ -30,6 +31,51 @@ if (!Security::checkRateLimit(10, 60)) {
     echo json_encode(['success' => false, 'error' => '請求過於頻繁，請稍後再試']);
     exit;
 }
+
+// =============== 用戶配額檢查 ===============
+session_start();
+if (isset($_SESSION['user_id'])) {
+    try {
+        $pdo = getDB();
+        $userId = $_SESSION['user_id'];
+
+        // 取得用戶配額設定
+        $quotaStmt = $pdo->prepare("SELECT quota_limit FROM users WHERE id = ?");
+        $quotaStmt->execute([$userId]);
+        $user = $quotaStmt->fetch();
+        $quotaLimit = $user['quota_limit'] ?? 0;
+
+        // 如果有配額限制（quota_limit > 0）
+        if ($quotaLimit > 0) {
+            // 計算本月已儲存的單據數量
+            $countStmt = $pdo->prepare("
+                SELECT COUNT(*) as count FROM receipts 
+                WHERE user_id = ? 
+                AND YEAR(created_at) = YEAR(CURRENT_DATE())
+                AND MONTH(created_at) = MONTH(CURRENT_DATE())
+            ");
+            $countStmt->execute([$userId]);
+            $result = $countStmt->fetch();
+            $currentCount = $result['count'] ?? 0;
+
+            // 如果已達或超過配額，禁止處理
+            if ($currentCount >= $quotaLimit) {
+                http_response_code(429);
+                header('Content-Type: application/json; charset=utf-8');
+                logInfo("DeepSeek Proxy - User quota exceeded: user_id=$userId, current=$currentCount, limit=$quotaLimit");
+                echo json_encode([
+                    'success' => false,
+                    'error' => "已達本月配額上限（$quotaLimit 張）。本月已儲存 $currentCount 張，無法繼續處理。"
+                ]);
+                exit;
+            }
+        }
+    } catch (Exception $e) {
+        logError("DeepSeek Proxy - Quota check error: " . $e->getMessage());
+        // 配額檢查失敗不阻止處理
+    }
+}
+// =============== 配額檢查結束 ===============
 
 logInfo('Request from IP: ' . $_SERVER['REMOTE_ADDR']);
 

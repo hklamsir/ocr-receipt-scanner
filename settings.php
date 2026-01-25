@@ -350,12 +350,12 @@ include __DIR__ . '/includes/header.php';
 
 <!-- 編輯 Excel 模板 Modal -->
 <div id="editExcelTemplateModal" class="edit-modal">
-    <div class="edit-modal-content" style="max-width: 600px;">
+    <div class="edit-modal-content edit-modal-scrollable" style="max-width: 600px;">
         <div class="edit-modal-header">
             <span>✏️ 編輯模板</span>
             <button class="close-btn" onclick="closeEditExcelTemplateModal()">✕</button>
         </div>
-        <form id="editExcelTemplateForm" style="padding: 20px;">
+        <form id="editExcelTemplateForm" class="edit-modal-body">
             <input type="hidden" id="editExcelTemplateId">
 
             <!-- 模板名稱 -->
@@ -374,12 +374,14 @@ include __DIR__ . '/includes/header.php';
 
             <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">
 
-            <!-- 欄位配置預覽 -->
+            <!-- 欄位配置 -->
             <div class="form-group">
-                <label>欄位配置</label>
-                <div id="editExcelFieldsPreview"
-                    style="background: #f8f9fa; padding: 15px; border-radius: 8px; font-size: 14px;"></div>
-                <small style="color: #666; margin-top: 8px; display: block;">如需修改欄位配置，請在匯出時重新儲存模板</small>
+                <label style="font-weight: 600;">📌 選擇並排序欄位（拖拉調整順序）：</label>
+                <div id="editExcelFieldsList" class="export-fields-list"></div>
+                <div style="margin-top: 10px;">
+                    <button type="button" class="btn btn-outline btn-sm" id="editExcelAddEmptyColumnBtn">+
+                        新增空欄位</button>
+                </div>
             </div>
 
             <div class="form-actions">
@@ -387,6 +389,26 @@ include __DIR__ . '/includes/header.php';
                 <button type="submit" class="btn btn-success">儲存</button>
             </div>
         </form>
+    </div>
+</div>
+
+<!-- 編輯 Excel 模板時新增空欄位 Modal -->
+<div id="editExcelAddColumnModal" class="edit-modal">
+    <div class="edit-modal-content" style="max-width:350px;">
+        <div class="edit-modal-header">
+            <span>➕ 新增空欄位</span>
+            <button class="close-btn" onclick="closeEditExcelAddColumnModal()">✕</button>
+        </div>
+        <div style="padding:20px;">
+            <div class="form-group">
+                <label for="editExcelEmptyColumnName">欄位名稱</label>
+                <input type="text" id="editExcelEmptyColumnName" maxlength="20" placeholder="例如：備註">
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeEditExcelAddColumnModal()">取消</button>
+                <button type="button" class="btn btn-primary" id="confirmEditExcelAddColumnBtn">新增</button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -1007,33 +1029,154 @@ include __DIR__ . '/includes/header.php';
     }
 
     // 編輯模板
+    let excelEditDraggedItem = null;
+
     window.openEditExcelTemplateModal = function (id) {
         const template = excelTemplates.find(t => t.id === id);
         if (!template) return;
 
-        editExcelTemplateData = template;
+        // Deep copy the fields config so we can edit it
+        editExcelTemplateData = {
+            ...template,
+            fields_config: template.fields_config.map(f => ({ ...f }))
+        };
 
         // 基本資訊
         document.getElementById('editExcelTemplateId').value = id;
         document.getElementById('editExcelTemplateName').value = template.template_name;
         document.getElementById('editExcelTemplateIsDefault').checked = template.is_default;
 
-        // 欄位配置預覽
-        const enabledFields = template.fields_config.filter(f => f.enabled);
-        const disabledFields = template.fields_config.filter(f => !f.enabled);
-
-        let previewHtml = '<div style="margin-bottom: 8px;"><strong>已啟用欄位:</strong></div>';
-        previewHtml += enabledFields.map(f => `<span style="display: inline-block; background: #22c55e; color: white; padding: 2px 8px; border-radius: 4px; margin: 2px; font-size: 12px;">${f.label}</span>`).join('');
-
-        if (disabledFields.length > 0) {
-            previewHtml += '<div style="margin: 8px 0;"><strong>已停用欄位:</strong></div>';
-            previewHtml += disabledFields.map(f => `<span style="display: inline-block; background: #9ca3af; color: white; padding: 2px 8px; border-radius: 4px; margin: 2px; font-size: 12px;">${f.label}</span>`).join('');
-        }
-
-        document.getElementById('editExcelFieldsPreview').innerHTML = previewHtml;
+        // 渲染欄位配置列表
+        renderEditExcelFieldsList();
 
         document.getElementById('editExcelTemplateModal').style.display = 'flex';
     };
+
+    // 渲染欄位列表
+    function renderEditExcelFieldsList() {
+        const container = document.getElementById('editExcelFieldsList');
+        container.innerHTML = editExcelTemplateData.fields_config.map((field, index) => `
+            <div class="export-field-item ${field.enabled ? 'enabled' : ''}" 
+                 data-index="${index}" 
+                 draggable="true">
+                <span class="drag-handle">☰</span>
+                <label class="export-field-label">
+                    <input type="checkbox" class="edit-excel-field-checkbox" 
+                           data-index="${index}" 
+                           ${field.enabled ? 'checked' : ''}>
+                    <span>${field.label}</span>
+                </label>
+                ${field.key.startsWith('empty_') ?
+                `<button type="button" class="remove-empty-column" data-index="${index}">✕</button>` :
+                ''}
+            </div>
+        `).join('');
+
+        // 綁定拖拉事件
+        container.querySelectorAll('.export-field-item').forEach(item => {
+            item.addEventListener('dragstart', handleExcelEditDragStart);
+            item.addEventListener('dragend', handleExcelEditDragEnd);
+            item.addEventListener('dragover', handleExcelEditDragOver);
+            item.addEventListener('drop', handleExcelEditDrop);
+            item.addEventListener('dragenter', handleExcelEditDragEnter);
+            item.addEventListener('dragleave', handleExcelEditDragLeave);
+        });
+
+        // 綁定 checkbox 事件
+        container.querySelectorAll('.edit-excel-field-checkbox').forEach(cb => {
+            cb.addEventListener('change', (e) => {
+                const index = parseInt(e.target.dataset.index);
+                editExcelTemplateData.fields_config[index].enabled = e.target.checked;
+                e.target.closest('.export-field-item').classList.toggle('enabled', e.target.checked);
+            });
+        });
+
+        // 綁定移除空欄位事件
+        container.querySelectorAll('.remove-empty-column').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const index = parseInt(e.target.dataset.index);
+                editExcelTemplateData.fields_config.splice(index, 1);
+                renderEditExcelFieldsList();
+            });
+        });
+    }
+
+    // 拖拉排序處理函數
+    function handleExcelEditDragStart(e) {
+        excelEditDraggedItem = this;
+        this.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', this.dataset.index);
+    }
+
+    function handleExcelEditDragEnd() {
+        this.classList.remove('dragging');
+        document.querySelectorAll('#editExcelFieldsList .export-field-item').forEach(item => {
+            item.classList.remove('drag-over');
+        });
+        excelEditDraggedItem = null;
+    }
+
+    function handleExcelEditDragOver(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+    }
+
+    function handleExcelEditDragEnter(e) {
+        e.preventDefault();
+        if (this !== excelEditDraggedItem) {
+            this.classList.add('drag-over');
+        }
+    }
+
+    function handleExcelEditDragLeave() {
+        this.classList.remove('drag-over');
+    }
+
+    function handleExcelEditDrop(e) {
+        e.preventDefault();
+        this.classList.remove('drag-over');
+
+        if (excelEditDraggedItem === this) return;
+
+        const fromIndex = parseInt(excelEditDraggedItem.dataset.index);
+        const toIndex = parseInt(this.dataset.index);
+
+        const [movedItem] = editExcelTemplateData.fields_config.splice(fromIndex, 1);
+        editExcelTemplateData.fields_config.splice(toIndex, 0, movedItem);
+
+        renderEditExcelFieldsList();
+    }
+
+    // 新增空欄位
+    document.getElementById('editExcelAddEmptyColumnBtn').addEventListener('click', () => {
+        document.getElementById('editExcelEmptyColumnName').value = '';
+        document.getElementById('editExcelAddColumnModal').style.display = 'flex';
+    });
+
+    window.closeEditExcelAddColumnModal = function () {
+        document.getElementById('editExcelAddColumnModal').style.display = 'none';
+    };
+
+    document.getElementById('confirmEditExcelAddColumnBtn').addEventListener('click', () => {
+        const name = document.getElementById('editExcelEmptyColumnName').value.trim();
+        if (!name) {
+            Toast.warning('請輸入欄位名稱');
+            return;
+        }
+
+        const uniqueKey = 'empty_' + Date.now();
+        editExcelTemplateData.fields_config.push({
+            key: uniqueKey,
+            label: name,
+            enabled: true
+        });
+
+        renderEditExcelFieldsList();
+        closeEditExcelAddColumnModal();
+        Toast.success('已新增欄位');
+    });
 
     window.closeEditExcelTemplateModal = function () {
         document.getElementById('editExcelTemplateModal').style.display = 'none';
@@ -1072,6 +1215,7 @@ include __DIR__ . '/includes/header.php';
             Toast.error('更新模板失敗');
         }
     });
+
 
     // 刪除模板
     window.openDeleteExcelTemplateModal = function (id) {

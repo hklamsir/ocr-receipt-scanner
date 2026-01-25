@@ -41,6 +41,16 @@ include __DIR__ . '/includes/header.php';
             <button class="btn btn-primary" onclick="openPasswordModal()">變更密碼</button>
         </div>
 
+        <!-- Excel 模板管理卡片 -->
+        <div class="settings-card" id="excelTemplatesCard">
+            <div class="settings-card-header">
+                <span class="settings-card-icon">📊</span>
+                <h3>Excel 模板管理</h3>
+            </div>
+            <p>管理您的 Excel 匯出設定模板</p>
+            <button class="btn btn-primary" onclick="openExcelTemplatesManager()">管理模板</button>
+        </div>
+
     </div>
 </div>
 
@@ -325,7 +335,80 @@ include __DIR__ . '/includes/header.php';
     </div>
 </div>
 
+<!-- Excel 模板管理 Modal -->
+<div id="excelTemplatesManagerModal" class="edit-modal">
+    <div class="edit-modal-content" style="max-width: 700px;">
+        <div class="edit-modal-header">
+            <span>📊 Excel 模板管理</span>
+            <button class="close-btn" onclick="closeExcelTemplatesManager()">✕</button>
+        </div>
+        <div style="padding: 20px;">
+            <div id="excelTemplatesList"></div>
+        </div>
+    </div>
+</div>
 
+<!-- 編輯 Excel 模板 Modal -->
+<div id="editExcelTemplateModal" class="edit-modal">
+    <div class="edit-modal-content" style="max-width: 600px;">
+        <div class="edit-modal-header">
+            <span>✏️ 編輯模板</span>
+            <button class="close-btn" onclick="closeEditExcelTemplateModal()">✕</button>
+        </div>
+        <form id="editExcelTemplateForm" style="padding: 20px;">
+            <input type="hidden" id="editExcelTemplateId">
+
+            <!-- 模板名稱 -->
+            <div class="form-group">
+                <label for="editExcelTemplateName">模板名稱</label>
+                <input type="text" id="editExcelTemplateName" required maxlength="100">
+            </div>
+
+            <!-- 設為預設 -->
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="editExcelTemplateIsDefault">
+                    設為預設模板（開啟匯出時自動套用）
+                </label>
+            </div>
+
+            <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">
+
+            <!-- 欄位配置預覽 -->
+            <div class="form-group">
+                <label>欄位配置</label>
+                <div id="editExcelFieldsPreview"
+                    style="background: #f8f9fa; padding: 15px; border-radius: 8px; font-size: 14px;"></div>
+                <small style="color: #666; margin-top: 8px; display: block;">如需修改欄位配置，請在匯出時重新儲存模板</small>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeEditExcelTemplateModal()">取消</button>
+                <button type="submit" class="btn btn-success">儲存</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 刪除 Excel 模板確認 Modal -->
+<div id="deleteExcelTemplateModal" class="edit-modal">
+    <div class="edit-modal-content delete-confirm">
+        <div class="edit-modal-header">
+            <span>⚠️ 確認刪除</span>
+            <button class="close-btn" onclick="closeDeleteExcelTemplateModal()">✕</button>
+        </div>
+        <div class="delete-body">
+            <div class="delete-message">
+                <p>確定要刪除模板「<span id="deleteExcelTemplateName"></span>」嗎？</p>
+                <p style="color:#999;font-size:13px;">此操作無法復原。</p>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeDeleteExcelTemplateModal()">取消</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteExcelTemplateBtn">刪除</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script type="module">
     import { Toast } from './js/modules/toast.js';
@@ -849,6 +932,177 @@ include __DIR__ . '/includes/header.php';
                 Toast.success('模板刪除成功');
                 closeDeletePdfTemplateModal();
                 loadPdfTemplates();
+            } else {
+                Toast.error(data.error || '刪除失敗');
+            }
+        } catch (err) {
+            console.error('刪除模板失敗:', err);
+            Toast.error('刪除模板失敗');
+        }
+    });
+
+    // ========================================
+    // Excel 模板管理
+    // ========================================
+    let excelTemplates = [];
+    let deleteExcelTemplateId = null;
+    let editExcelTemplateData = null;
+
+    // 開啟 Excel 模板管理
+    window.openExcelTemplatesManager = async function () {
+        await loadExcelTemplates();
+        document.getElementById('excelTemplatesManagerModal').style.display = 'flex';
+    };
+
+    window.closeExcelTemplatesManager = function () {
+        document.getElementById('excelTemplatesManagerModal').style.display = 'none';
+    };
+
+    // 載入 Excel 模板
+    async function loadExcelTemplates() {
+        try {
+            const res = await fetch('api/get_excel_templates.php');
+            const data = await res.json();
+
+            if (data.success) {
+                // 只顯示用戶自己的模板（排除系統模板）
+                excelTemplates = data.templates.filter(t => !t.is_system);
+                renderExcelTemplatesList();
+            }
+        } catch (err) {
+            console.error('載入模板失敗:', err);
+            Toast.error('載入模板失敗');
+        }
+    }
+
+    // 渲染模板列表
+    function renderExcelTemplatesList() {
+        const list = document.getElementById('excelTemplatesList');
+
+        if (excelTemplates.length === 0) {
+            list.innerHTML = '<p style="color:#999;text-align:center;padding:40px;">尚無自訂模板<br><small>您可以在 Excel 匯出時點擊「另存為模板」來建立模板</small></p>';
+            return;
+        }
+
+        list.innerHTML = excelTemplates.map(t => {
+            const enabledFields = t.fields_config.filter(f => f.enabled).map(f => f.label).join(', ');
+            return `
+            <div class="template-item" style="display: flex; align-items: center; padding: 15px; background: #f8f9fa; border-radius: 8px; margin-bottom: 10px;">
+                <div style="flex: 1;">
+                    <div style="font-weight: 600; margin-bottom: 5px;">
+                        ${t.template_name}
+                        ${t.is_default ? '<span style="background: #22c55e; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-left: 8px;">預設</span>' : ''}
+                    </div>
+                    <div style="font-size: 13px; color: #666;">
+                        欄位: ${enabledFields || '(無)'}
+                    </div>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn btn-sm btn-secondary" onclick="openEditExcelTemplateModal(${t.id})">✏️ 編輯</button>
+                    <button class="btn btn-sm btn-danger" onclick="openDeleteExcelTemplateModal(${t.id})">🗑️ 刪除</button>
+                </div>
+            </div>
+        `;
+        }).join('');
+    }
+
+    // 編輯模板
+    window.openEditExcelTemplateModal = function (id) {
+        const template = excelTemplates.find(t => t.id === id);
+        if (!template) return;
+
+        editExcelTemplateData = template;
+
+        // 基本資訊
+        document.getElementById('editExcelTemplateId').value = id;
+        document.getElementById('editExcelTemplateName').value = template.template_name;
+        document.getElementById('editExcelTemplateIsDefault').checked = template.is_default;
+
+        // 欄位配置預覽
+        const enabledFields = template.fields_config.filter(f => f.enabled);
+        const disabledFields = template.fields_config.filter(f => !f.enabled);
+
+        let previewHtml = '<div style="margin-bottom: 8px;"><strong>已啟用欄位:</strong></div>';
+        previewHtml += enabledFields.map(f => `<span style="display: inline-block; background: #22c55e; color: white; padding: 2px 8px; border-radius: 4px; margin: 2px; font-size: 12px;">${f.label}</span>`).join('');
+
+        if (disabledFields.length > 0) {
+            previewHtml += '<div style="margin: 8px 0;"><strong>已停用欄位:</strong></div>';
+            previewHtml += disabledFields.map(f => `<span style="display: inline-block; background: #9ca3af; color: white; padding: 2px 8px; border-radius: 4px; margin: 2px; font-size: 12px;">${f.label}</span>`).join('');
+        }
+
+        document.getElementById('editExcelFieldsPreview').innerHTML = previewHtml;
+
+        document.getElementById('editExcelTemplateModal').style.display = 'flex';
+    };
+
+    window.closeEditExcelTemplateModal = function () {
+        document.getElementById('editExcelTemplateModal').style.display = 'none';
+        editExcelTemplateData = null;
+    };
+
+    document.getElementById('editExcelTemplateForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const id = parseInt(document.getElementById('editExcelTemplateId').value);
+
+        const templateData = {
+            template_id: id,
+            template_name: document.getElementById('editExcelTemplateName').value.trim(),
+            is_default: document.getElementById('editExcelTemplateIsDefault').checked,
+            fields_config: editExcelTemplateData.fields_config
+        };
+
+        try {
+            const res = await fetch('api/update_excel_template.php', {
+                method: 'POST',
+                headers: getCSRFHeaders(),
+                body: JSON.stringify(templateData)
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                Toast.success('模板更新成功');
+                closeEditExcelTemplateModal();
+                loadExcelTemplates();
+            } else {
+                Toast.error(data.error || '更新失敗');
+            }
+        } catch (err) {
+            console.error('更新模板失敗:', err);
+            Toast.error('更新模板失敗');
+        }
+    });
+
+    // 刪除模板
+    window.openDeleteExcelTemplateModal = function (id) {
+        const template = excelTemplates.find(t => t.id === id);
+        if (!template) return;
+
+        deleteExcelTemplateId = id;
+        document.getElementById('deleteExcelTemplateName').textContent = template.template_name;
+        document.getElementById('deleteExcelTemplateModal').style.display = 'flex';
+    };
+
+    window.closeDeleteExcelTemplateModal = function () {
+        deleteExcelTemplateId = null;
+        document.getElementById('deleteExcelTemplateModal').style.display = 'none';
+    };
+
+    document.getElementById('confirmDeleteExcelTemplateBtn').addEventListener('click', async () => {
+        if (!deleteExcelTemplateId) return;
+
+        try {
+            const res = await fetch('api/delete_excel_template.php', {
+                method: 'POST',
+                headers: getCSRFHeaders(),
+                body: JSON.stringify({ template_id: deleteExcelTemplateId })
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                Toast.success('模板刪除成功');
+                closeDeleteExcelTemplateModal();
+                loadExcelTemplates();
             } else {
                 Toast.error(data.error || '刪除失敗');
             }

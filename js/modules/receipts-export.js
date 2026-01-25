@@ -21,9 +21,123 @@ const DEFAULT_EXPORT_FIELDS = [
 let exportFields = [];
 let exportIdsToExport = [];
 let draggedItem = null;
+let excelTemplates = [];
 
 export function getExportFields() { return exportFields; }
 export function getExportIdsToExport() { return exportIdsToExport; }
+export function getExcelTemplates() { return excelTemplates; }
+
+// ========================================
+// Excel Templates API
+// ========================================
+export async function loadExcelTemplates() {
+    try {
+        const res = await fetch('api/get_excel_templates.php');
+        const data = await res.json();
+        if (data.success) {
+            excelTemplates = data.templates;
+            renderExcelTemplateSelect();
+            return excelTemplates;
+        }
+    } catch (err) {
+        console.error('載入 Excel 模板失敗:', err);
+    }
+    return [];
+}
+
+function renderExcelTemplateSelect() {
+    const select = document.getElementById('excelTemplateSelect');
+    if (!select) return;
+
+    select.innerHTML = '';
+
+    excelTemplates.forEach(t => {
+        const option = document.createElement('option');
+        option.value = t.id;
+        let label = t.template_name;
+        if (t.is_system) label += ' (系統)';
+        if (t.is_default) label += ' [預設]';
+        option.textContent = label;
+        select.appendChild(option);
+    });
+
+    // Add "no template" option last
+    const noTemplateOption = document.createElement('option');
+    noTemplateOption.value = '';
+    noTemplateOption.textContent = '不使用模板';
+    select.appendChild(noTemplateOption);
+
+    // Apply default template if exists
+    const defaultTemplate = excelTemplates.find(t => t.is_default && !t.is_system);
+    if (defaultTemplate) {
+        applyExcelTemplate(defaultTemplate);
+        select.value = defaultTemplate.id;
+    }
+}
+
+export function applyExcelTemplate(template) {
+    if (!template || !template.fields_config) return;
+
+    // Apply template fields config
+    exportFields = template.fields_config.map(f => ({ ...f }));
+    renderExportFieldsList();
+}
+
+export function applyExcelTemplateById(templateId) {
+    if (!templateId) {
+        Toast.warning('請先選擇模板');
+        return false;
+    }
+
+    const template = excelTemplates.find(t => t.id == templateId);
+    if (template) {
+        applyExcelTemplate(template);
+        Toast.success('模板套用成功');
+        return true;
+    }
+    return false;
+}
+
+export async function saveExcelTemplate(templateName, isDefault = false) {
+    if (!templateName || !templateName.trim()) {
+        Toast.warning('請輸入模板名稱');
+        return false;
+    }
+
+    const templateData = {
+        template_name: templateName.trim(),
+        is_default: isDefault,
+        fields_config: exportFields
+    };
+
+    try {
+        const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+        const csrfToken = csrfMeta ? csrfMeta.content : '';
+
+        const res = await fetch('api/save_excel_template.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: JSON.stringify(templateData)
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            Toast.success('模板儲存成功');
+            await loadExcelTemplates();
+            return true;
+        } else {
+            Toast.error(data.error || '儲存失敗');
+            return false;
+        }
+    } catch (err) {
+        console.error('儲存模板失敗:', err);
+        Toast.error('儲存模板發生錯誤');
+        return false;
+    }
+}
 
 // ========================================
 // Initialize Export Fields
@@ -151,7 +265,7 @@ function handleDrop(e) {
 // ========================================
 // Open Export Modal
 // ========================================
-export function openExportModal() {
+export async function openExportModal() {
     const selectedReceiptIds = State.getSelectedReceiptIds();
     const receiptsData = State.getReceiptsData();
 
@@ -169,6 +283,10 @@ export function openExportModal() {
     document.getElementById('exportInfo').textContent = `將匯出 ${exportIdsToExport.length} 筆單據`;
     initExportFields();
     renderExportFieldsList();
+
+    // Load Excel templates
+    await loadExcelTemplates();
+
     document.getElementById('exportModal').style.display = 'flex';
 }
 

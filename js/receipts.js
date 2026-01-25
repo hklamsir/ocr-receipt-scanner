@@ -468,6 +468,22 @@ function initEventListeners() {
         }
     });
 
+    // Excel template apply
+    document.getElementById('applyExcelTemplateBtn').addEventListener('click', () => {
+        const select = document.getElementById('excelTemplateSelect');
+        const templateId = select.value;
+        Export.applyExcelTemplateById(templateId);
+    });
+
+    // Excel template save
+    document.getElementById('saveExcelTemplateBtn').addEventListener('click', async () => {
+        const templateName = prompt('請輸入模板名稱:');
+        if (!templateName || !templateName.trim()) return;
+
+        const isDefault = confirm('是否設為預設模板？');
+        await Export.saveExcelTemplate(templateName, isDefault);
+    });
+
     // Edit tags
     document.getElementById('selectTagsBtn').addEventListener('click', () => {
         Modals.openEditTagsModal();

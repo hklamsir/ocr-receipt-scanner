@@ -486,42 +486,40 @@
 }
 
 /* ID - 窄 */
-
+/* 角色 - 窄 */
 #users-table th:nth-child(3),
 #users-table td:nth-child(3) {
   width: 10%;
 }
 
-/* 角色 - 窄 */
-
+/* 狀態 - 窄 */
 #users-table th:nth-child(4),
 #users-table td:nth-child(4) {
   width: 9%;
 }
 
-/* 建立時間 - 窄 */
-
+/* 配額 - 窄 */
 #users-table th:nth-child(5),
 #users-table td:nth-child(5) {
   width: 9%;
 }
 
-/* 最後登入 */
-
+/* 建立時間 - 窄 */
 #users-table th:nth-child(6),
 #users-table td:nth-child(6) {
   width: 10%;
 }
 
-/* 單據數 - 窄 */
 
+/* 最後登入 */
 #users-table th:nth-child(7),
 #users-table td:nth-child(7) {
-  width: 20%;
+  width: 15%;
   /* 操作 - 寬 */
   white-space: nowrap;
 }
 
+/* 單據數 - 窄 */
 #users-table th:nth-child(8),
 #users-table td:nth-child(8) {
   width: 8%;

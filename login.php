@@ -12,6 +12,14 @@ $headerTitle = '智慧單據辨識系統';
 $showNav = false;  // 登入頁不顯示導航列
 $extraStyles = '
     <style>
+        /* 登入頁面 Header 置中 */
+        header {
+            justify-content: center;
+        }
+        .header-branding {
+            text-align: center;
+        }
+
         /* 登入頁面居中佈局 */
         .login-wrapper {
             display: flex;

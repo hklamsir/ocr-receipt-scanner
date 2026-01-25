@@ -43,85 +43,85 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
 </nav>
 
 <script>
-(function () {
-    const hamburger = document.getElementById('hamburgerBtn');
-    const navLinks = document.getElementById('navLinks');
-    const dropdownBtn = document.getElementById('userDropdownBtn');
-    const dropdownMenu = document.getElementById('userDropdownMenu');
-    let isProfileLoaded = false;
+    (function () {
+        const hamburger = document.getElementById('hamburgerBtn');
+        const navLinks = document.getElementById('navLinks');
+        const dropdownBtn = document.getElementById('userDropdownBtn');
+        const dropdownMenu = document.getElementById('userDropdownMenu');
+        let isProfileLoaded = false;
 
-    // 漢堡選單邏輯
-    if (hamburger && navLinks) {
-        hamburger.addEventListener('click', function (e) {
-            e.stopPropagation();
-            navLinks.classList.toggle('open');
-            hamburger.textContent = navLinks.classList.contains('open') ? '✕' : '☰';
-        });
-    }
+        // 漢堡選單邏輯
+        if (hamburger && navLinks) {
+            hamburger.addEventListener('click', function (e) {
+                e.stopPropagation();
+                navLinks.classList.toggle('open');
+                hamburger.textContent = navLinks.classList.contains('open') ? '✕' : '☰';
+            });
+        }
 
-    // 用戶下拉選單邏輯
-    if (dropdownBtn && dropdownMenu) {
-        dropdownBtn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            e.preventDefault();
-            
-            const isOpen = dropdownMenu.classList.contains('show');
-            dropdownMenu.classList.toggle('show');
-            dropdownBtn.classList.toggle('active');
-            dropdownBtn.setAttribute('aria-expanded', !isOpen);
+        // 用戶下拉選單邏輯
+        if (dropdownBtn && dropdownMenu) {
+            dropdownBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                e.preventDefault();
 
-            if (!isOpen && !isProfileLoaded) {
-                loadUserProfile();
+                const isOpen = dropdownMenu.classList.contains('show');
+                dropdownMenu.classList.toggle('show');
+                dropdownBtn.classList.toggle('active');
+                dropdownBtn.setAttribute('aria-expanded', !isOpen);
+
+                if (!isOpen && !isProfileLoaded) {
+                    loadUserProfile();
+                }
+            });
+        }
+
+        // 點擊外部關閉選單
+        document.addEventListener('click', function (e) {
+            // 關閉手機版導航
+            if (navLinks && navLinks.classList.contains('open') &&
+                !navLinks.contains(e.target) && !hamburger.contains(e.target)) {
+                navLinks.classList.remove('open');
+                hamburger.textContent = '☰';
+            }
+            // 關閉用戶下拉
+            if (dropdownMenu && dropdownMenu.classList.contains('show') &&
+                !dropdownMenu.contains(e.target) && !dropdownBtn.contains(e.target)) {
+                dropdownMenu.classList.remove('show');
+                dropdownBtn.classList.remove('active');
+                dropdownBtn.setAttribute('aria-expanded', 'false');
             }
         });
-    }
 
-    // 點擊外部關閉選單
-    document.addEventListener('click', function (e) {
-        // 關閉手機版導航
-        if (navLinks && navLinks.classList.contains('open') && 
-            !navLinks.contains(e.target) && !hamburger.contains(e.target)) {
-            navLinks.classList.remove('open');
-            hamburger.textContent = '☰';
-        }
-        // 關閉用戶下拉
-        if (dropdownMenu && dropdownMenu.classList.contains('show') &&
-            !dropdownMenu.contains(e.target) && !dropdownBtn.contains(e.target)) {
-            dropdownMenu.classList.remove('show');
-            dropdownBtn.classList.remove('active');
-            dropdownBtn.setAttribute('aria-expanded', 'false');
-        }
-    });
+        // 載入用戶資料
+        async function loadUserProfile() {
+            try {
+                const res = await fetch('api/get_user_profile.php');
+                const result = await res.json();
 
-    // 載入用戶資料
-    async function loadUserProfile() {
-        try {
-            const res = await fetch('api/get_user_profile.php');
-            const result = await res.json();
-            
-            if (result.success) {
-                renderDropdown(result.data);
-                isProfileLoaded = true;
-            } else {
-                dropdownMenu.innerHTML = '<div class="dropdown-section" style="color:red;text-align:center;">載入失敗</div>';
+                if (result.success) {
+                    renderDropdown(result);
+                    isProfileLoaded = true;
+                } else {
+                    dropdownMenu.innerHTML = '<div class="dropdown-section" style="color:red;text-align:center;">載入失敗</div>';
+                }
+            } catch (err) {
+                console.error('Failed to load profile:', err);
+                dropdownMenu.innerHTML = '<div class="dropdown-section" style="color:red;text-align:center;">網路錯誤</div>';
             }
-        } catch (err) {
-            console.error('Failed to load profile:', err);
-            dropdownMenu.innerHTML = '<div class="dropdown-section" style="color:red;text-align:center;">網路錯誤</div>';
         }
-    }
 
-    // 渲染下拉內容
-    function renderDropdown(data) {
-        const { username, is_admin, joined_at, last_login_relative, quota, stats } = data;
-        
-        const roleBadge = is_admin 
-            ? '<span class="dropdown-role admin">管理員</span>' 
-            : '<span class="dropdown-role">一般用戶</span>';
+        // 渲染下拉內容
+        function renderDropdown(data) {
+            const { username, is_admin, joined_at, last_login_relative, quota, stats } = data;
 
-        let quotaHtml = '';
-        if (quota.limit > 0) {
-            quotaHtml = `
+            const roleBadge = is_admin
+                ? '<span class="dropdown-role admin">管理員</span>'
+                : '<span class="dropdown-role">一般用戶</span>';
+
+            let quotaHtml = '';
+            if (quota.limit > 0) {
+                quotaHtml = `
                 <div class="quota-box">
                     <div class="quota-label">
                         <span>本月配額</span>
@@ -132,8 +132,8 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
                     </div>
                 </div>
             `;
-        } else {
-            quotaHtml = `
+            } else {
+                quotaHtml = `
                 <div class="quota-box">
                     <div class="quota-label">
                         <span>本月配額</span>
@@ -141,9 +141,9 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
                     </div>
                 </div>
             `;
-        }
+            }
 
-        const html = `
+            const html = `
             <div class="dropdown-header">
                 <span class="dropdown-username">${username} ${roleBadge}</span>
                 <div class="dropdown-sub">加入於 ${joined_at}</div>
@@ -171,31 +171,31 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
                 <a href="#" class="dropdown-link" onclick="openPasswordModalFromNav(event)">🔐 變更密碼</a>
             </div>
         `;
-        
-        dropdownMenu.innerHTML = html;
-    }
 
-    // 變更密碼跳轉
-    window.openPasswordModalFromNav = function(e) {
-        e.preventDefault();
-        if (typeof openPasswordModal === 'function') {
-            openPasswordModal();
-            dropdownMenu.classList.remove('show');
-            dropdownBtn.classList.remove('active');
-        } else {
-            window.location.href = 'settings.php?action=change_password';
+            dropdownMenu.innerHTML = html;
         }
-    };
-    
-    // URL 參數自動開啟密碼 modal
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('action') === 'change_password') {
-        window.addEventListener('load', function() {
+
+        // 變更密碼跳轉
+        window.openPasswordModalFromNav = function (e) {
+            e.preventDefault();
             if (typeof openPasswordModal === 'function') {
                 openPasswordModal();
-                window.history.replaceState({}, document.title, window.location.pathname);
+                dropdownMenu.classList.remove('show');
+                dropdownBtn.classList.remove('active');
+            } else {
+                window.location.href = 'settings.php?action=change_password';
             }
-        });
-    }
-})();
+        };
+
+        // URL 參數自動開啟密碼 modal
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('action') === 'change_password') {
+            window.addEventListener('load', function () {
+                if (typeof openPasswordModal === 'function') {
+                    openPasswordModal();
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+            });
+        }
+    })();
 </script>

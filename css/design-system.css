@@ -489,7 +489,7 @@
 
 #users-table th:nth-child(3),
 #users-table td:nth-child(3) {
-  width: 8%;
+  width: 10%;
 }
 
 /* 角色 - 窄 */
@@ -520,6 +520,12 @@
   width: 20%;
   /* 操作 - 寬 */
   white-space: nowrap;
+}
+
+#users-table th:nth-child(8),
+#users-table td:nth-child(8) {
+  width: 8%;
+  text-align: center;
 }
 
 #users-table .btn {

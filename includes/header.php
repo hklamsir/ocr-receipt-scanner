@@ -24,7 +24,7 @@ if (!isset($headerTitle))
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="<?php echo Security::getCSRFToken(); ?>">
-    <title><?php echo htmlspecialchars($pageTitle); ?> - 智慧單據辨識</title>
+    <title><?php echo htmlspecialchars($pageTitle); ?> - 智慧單據辨識工具</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/design-system.css">
     <link rel="stylesheet" href="css/pdf-buttons.css">

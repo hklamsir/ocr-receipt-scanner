@@ -147,6 +147,16 @@ async function startOCR() {
     // 並行處理 OCR（限制 2 個）
     const results = await processImagesParallel(images, appConfig.ocrProxyUrl, updateOCRStatus);
 
+    // 檢查是否有配額錯誤
+    const quotaError = results.find(r =>
+        r.status === 'fulfilled' && r.value.error && r.value.error.includes('配額上限')
+    );
+    if (quotaError) {
+        Toast.error(quotaError.value.error);
+        updateGlobalStatus('錯誤：已達配額上限');
+        return;
+    }
+
     // 檢查是否有配置錯誤（如 API Key 未設定）
     const configError = results.find(r =>
         r.status === 'fulfilled' && r.value.error && r.value.error.includes('系統尚未設定')
@@ -154,6 +164,21 @@ async function startOCR() {
     if (configError) {
         Toast.error(configError.value.error);
         updateGlobalStatus('錯誤：' + configError.value.error);
+        return;
+    }
+
+    // 檢查是否全部都有錯誤
+    const allErrors = results.every(r =>
+        r.status === 'rejected' || (r.status === 'fulfilled' && !r.value.success)
+    );
+    if (allErrors) {
+        // 找到第一個錯誤訊息
+        const firstError = results.find(r =>
+            r.status === 'fulfilled' && r.value.error
+        );
+        const errorMsg = firstError?.value?.error || 'OCR 處理失敗';
+        Toast.error(errorMsg);
+        updateGlobalStatus('錯誤：' + errorMsg);
         return;
     }
 
@@ -191,8 +216,14 @@ async function startOCR() {
             }
         } catch (err) {
             console.error('提取錯誤:', err);
-            showError(err.message);
-            updateGlobalStatus('提取請求失敗');
+            // 檢查是否為配額錯誤
+            if (err.message && err.message.includes('配額上限')) {
+                Toast.error(err.message);
+                updateGlobalStatus('錯誤：已達配額上限');
+            } else {
+                showError(err.message);
+                updateGlobalStatus('提取請求失敗');
+            }
         }
     } else {
         updateGlobalStatus('OCR 完成（無文字內容）');

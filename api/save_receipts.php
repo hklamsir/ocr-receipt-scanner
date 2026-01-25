@@ -1,6 +1,7 @@
 <?php
 // 儲存單據 API
 require_once __DIR__ . '/../includes/db.php';
+require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/auth_check.php';
 require_once __DIR__ . '/../includes/csrf_check.php';
 require_once __DIR__ . '/../includes/logger.php';
@@ -156,8 +157,9 @@ try {
             $imageData = preg_replace('/^data:image\/\w+;base64,/', '', $imageData);
             $imageBytes = base64_decode($imageData);
 
-            // 檢查大小
-            if (strlen($imageBytes) > 250000) { // 250KB（留點餘裕）
+            // 檢查大小（從系統設定取得，轉換 KB 為 bytes）
+            $maxImageBytes = MAX_IMAGE_SIZE_KB * 1024 + 500; // (留點餘裕)
+            if (strlen($imageBytes) > $maxImageBytes) { // 使用系統設定的大小限制
                 logError("Image too large for receipt $index: " . strlen($imageBytes) . " bytes - saving receipt without image");
                 // 不使用 continue，繼續儲存單據資料（沒有圖片）
             }

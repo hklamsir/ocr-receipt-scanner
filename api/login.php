@@ -39,25 +39,30 @@ try {
 
     // === 安全檢查：登入頻率限制（帳號 + IP 組合）===
     // 只鎖定「同一帳號 + 同一 IP」的組合，不影響其他用戶
+
+    // 取得登入安全設定
+    $maxAttempts = 5;
+    $lockoutMinutes = 15;
+    $stmt = $pdo->prepare("SELECT setting_key, setting_value FROM system_settings WHERE setting_key IN ('login_max_attempts', 'login_lockout_minutes')");
+    $stmt->execute();
+    while ($setting = $stmt->fetch()) {
+        if ($setting['setting_key'] === 'login_max_attempts') {
+            $maxAttempts = (int) $setting['setting_value'];
+        } elseif ($setting['setting_key'] === 'login_lockout_minutes') {
+            $lockoutMinutes = (int) $setting['setting_value'];
+        }
+    }
+
     $stmt = $pdo->prepare("
         SELECT COUNT(*) as fail_count
         FROM login_attempts 
         WHERE username = ?
           AND ip_address = ? 
           AND success = 0 
-          AND created_at > DATE_SUB(NOW(), INTERVAL 15 MINUTE)
+          AND created_at > DATE_SUB(NOW(), INTERVAL ? MINUTE)
     ");
-    $stmt->execute([$username, $ipAddress]);
+    $stmt->execute([$username, $ipAddress, $lockoutMinutes]);
     $failCount = $stmt->fetch()['fail_count'];
-
-    // 取得設定的最大嘗試次數
-    $maxAttempts = 5;
-    $stmt = $pdo->prepare("SELECT setting_value FROM system_settings WHERE setting_key = 'login_max_attempts'");
-    $stmt->execute();
-    $setting = $stmt->fetch();
-    if ($setting) {
-        $maxAttempts = (int) $setting['setting_value'];
-    }
 
     if ($failCount >= $maxAttempts) {
         logError("Login rate limited: $username from $ipAddress (attempts: $failCount)");

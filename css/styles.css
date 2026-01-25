@@ -1945,7 +1945,8 @@ body.has-announcement {
   border-top: 1px solid #eee;
 }
 
-.dropdown-link {
+/* 使用更具體的選擇器來覆蓋 .nav-links a 的樣式 */
+.nav-user-dropdown .dropdown-link {
   display: block;
   padding: 12px 15px;
   color: #1a1a1a !important;
@@ -1955,7 +1956,7 @@ body.has-announcement {
   font-weight: 500;
 }
 
-.dropdown-link:hover {
+.nav-user-dropdown .dropdown-link:hover {
   background: #e2e8f0;
   color: #000 !important;
 }

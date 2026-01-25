@@ -1940,22 +1940,24 @@ body.has-announcement {
 }
 
 .dropdown-footer {
-  padding: 5px 0;
-  background: #fff;
+  padding: 8px 0;
+  background: #f8f9fa;
+  border-top: 1px solid #eee;
 }
 
 .dropdown-link {
   display: block;
   padding: 12px 15px;
-  color: #333;
-  text-decoration: none;
+  color: #1a1a1a !important;
+  text-decoration: none !important;
   transition: background 0.2s;
   font-size: 14px;
+  font-weight: 500;
 }
 
 .dropdown-link:hover {
-  background: #f1f5f9;
-  color: #000;
+  background: #e2e8f0;
+  color: #000 !important;
 }
 
 .dropdown-loading {

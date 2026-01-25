@@ -496,21 +496,21 @@
 
 #users-table th:nth-child(4),
 #users-table td:nth-child(4) {
-  width: 10%;
+  width: 9%;
 }
 
 /* 建立時間 - 窄 */
 
 #users-table th:nth-child(5),
 #users-table td:nth-child(5) {
-  width: 10%;
+  width: 9%;
 }
 
 /* 最後登入 */
 
 #users-table th:nth-child(6),
 #users-table td:nth-child(6) {
-  width: 6%;
+  width: 10%;
 }
 
 /* 單據數 - 窄 */

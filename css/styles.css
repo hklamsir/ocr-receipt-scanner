@@ -2,12 +2,25 @@
   box-sizing: border-box;
 }
 
+html {
+  min-height: 100%;
+}
+
 body {
   font-family: Arial, sans-serif;
   background: #f4f6f8;
   margin: 0;
-  padding: 80px 15px 80px 15px;
+  padding: 80px 15px 0 15px;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 主要內容區域 - 用於 sticky footer 佈局 */
+main,
+.container,
+.main-content {
+  flex: 1 0 auto;
 }
 
 /* 固定頂部標題 */
@@ -542,18 +555,16 @@ td:nth-child(6) {
   cursor: pointer;
 }
 
-/* 固定頁尾 */
+/* Sticky 頁尾 - 短頁面固定底部，長頁面隨內容 */
 footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  flex-shrink: 0;
   background: #333;
   color: #ddd;
   text-align: center;
   padding: 12px;
   font-size: 14px;
   z-index: 100;
+  margin-top: 5vh;
 }
 
 /* Mobile */

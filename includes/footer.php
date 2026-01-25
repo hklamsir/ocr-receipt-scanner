@@ -5,7 +5,7 @@
 ?>
 
 <footer>
-    &copy; 2026 Lamsir 架構系統，Antigravity 編寫程式
+    &copy; 2026 Lamsir 設計架構，Antigravity 編寫程式
 </footer>
 
 <!-- 公告載入腳本 -->

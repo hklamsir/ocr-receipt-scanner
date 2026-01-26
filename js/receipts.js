@@ -500,7 +500,7 @@ function initEventListeners() {
     });
 
     // Edit form
-    document.getElementById('editForm').addEventListener('submit', async function (e) {
+    document.getElementById('editForm')?.addEventListener('submit', async function (e) {
         e.preventDefault();
         const id = document.getElementById('editId').value;
         const data = {
@@ -551,7 +551,7 @@ function initEventListeners() {
     });
 
     // Delete confirm
-    document.getElementById('confirmDeleteBtn').addEventListener('click', async function () {
+    document.getElementById('confirmDeleteBtn')?.addEventListener('click', async function () {
         const deleteTargetId = State.getDeleteTargetId();
         if (!deleteTargetId) return;
 
@@ -576,35 +576,35 @@ function initEventListeners() {
     });
 
     // Tag filter
-    document.getElementById('tagFilterBtn').addEventListener('click', () => {
+    document.getElementById('tagFilterBtn')?.addEventListener('click', () => {
         Modals.openTagSelectModal();
     });
 
-    document.getElementById('applyTagFilterBtn').addEventListener('click', () => {
+    document.getElementById('applyTagFilterBtn')?.addEventListener('click', () => {
         Modals.closeTagSelectModal();
         filterAndRenderReceipts();
     });
 
     // Search debounce
     let searchTimeout = null;
-    document.getElementById('searchInput').addEventListener('input', () => {
+    document.getElementById('searchInput')?.addEventListener('input', () => {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(filterAndRenderReceipts, 300);
     });
 
-    document.getElementById('yearFilter').addEventListener('change', () => {
+    document.getElementById('yearFilter')?.addEventListener('change', () => {
         document.getElementById('monthFilter').value = '';
         filterAndRenderReceipts();
     });
 
-    document.getElementById('monthFilter').addEventListener('change', () => {
+    document.getElementById('monthFilter')?.addEventListener('change', () => {
         document.getElementById('yearFilter').value = '';
         filterAndRenderReceipts();
     });
 
-    document.getElementById('sortSelect').addEventListener('change', filterAndRenderReceipts);
+    document.getElementById('sortSelect')?.addEventListener('change', filterAndRenderReceipts);
 
-    document.getElementById('clearFilterBtn').addEventListener('click', () => {
+    document.getElementById('clearFilterBtn')?.addEventListener('click', () => {
         document.getElementById('searchInput').value = '';
         document.getElementById('yearFilter').value = '';
         document.getElementById('monthFilter').value = '';
@@ -673,11 +673,11 @@ function initEventListeners() {
     }
 
     // Create new tag
-    document.getElementById('createNewTagBtn').addEventListener('click', () => {
+    document.getElementById('createNewTagBtn')?.addEventListener('click', () => {
         Modals.openCreateTagModal();
     });
 
-    document.getElementById('saveNewTagBtn').addEventListener('click', async () => {
+    document.getElementById('saveNewTagBtn')?.addEventListener('click', async () => {
         const name = document.getElementById('newTagName').value.trim();
         const color = document.getElementById('newTagColor').value;
 
@@ -723,7 +723,7 @@ function initEventListeners() {
     });
 
     // PDF template apply
-    document.getElementById('applyTemplateBtn').addEventListener('click', () => {
+    document.getElementById('applyTemplateBtn')?.addEventListener('click', () => {
         const select = document.getElementById('pdfTemplateSelect');
         const templateId = select.value;
 
@@ -740,7 +740,7 @@ function initEventListeners() {
     });
 
     // PDF template save
-    document.getElementById('saveTemplateBtn').addEventListener('click', async () => {
+    document.getElementById('saveTemplateBtn')?.addEventListener('click', async () => {
         const templateName = prompt('請輸入模板名稱:');
         if (!templateName || !templateName.trim()) return;
 
@@ -786,7 +786,7 @@ function initEventListeners() {
     });
 
     // PDF export form
-    document.getElementById('pdfExportForm').addEventListener('submit', async function (e) {
+    document.getElementById('pdfExportForm')?.addEventListener('submit', async function (e) {
         e.preventDefault();
 
         const pdfExportReceiptId = Modals.getPdfExportReceiptId();
@@ -924,19 +924,13 @@ function initEventListeners() {
     });
 
     // PDF sliders
-    const pdfImageHeightScale = document.getElementById('pdfImageHeightScale');
-    if (pdfImageHeightScale) {
-        pdfImageHeightScale.addEventListener('input', function () {
-            document.getElementById('pdfImageHeightScaleValue').textContent = this.value;
-        });
-    }
+    document.getElementById('pdf_imageHeightScale')?.addEventListener('input', function () {
+        document.getElementById('pdf_imageHeightScaleValue').textContent = this.value;
+    });
 
-    const pdfImageWidthScale = document.getElementById('pdfImageWidthScale');
-    if (pdfImageWidthScale) {
-        pdfImageWidthScale.addEventListener('input', function () {
-            document.getElementById('pdfImageWidthScaleValue').textContent = this.value;
-        });
-    }
+    document.getElementById('pdf_imageWidthScale')?.addEventListener('input', function () {
+        document.getElementById('pdf_imageWidthScaleValue').textContent = this.value;
+    });
 
     // Infinite scroll
     let scrollTimeout = null;
@@ -958,18 +952,7 @@ function initEventListeners() {
     });
 }
 
-// ========================================
-// Initialize
-// ========================================
-// PDF Slider Listeners
-document.getElementById('pdf_imageHeightScale')?.addEventListener('input', function () {
-    document.getElementById('pdf_imageHeightScaleValue').textContent = this.value;
-});
-
-document.getElementById('pdf_imageWidthScale')?.addEventListener('input', function () {
-    document.getElementById('pdf_imageWidthScaleValue').textContent = this.value;
-});
-
+// Initial load
 function init() {
     Modals.attachWindowHandlers();
     initEventListeners();

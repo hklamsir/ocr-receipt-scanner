@@ -998,13 +998,16 @@ function initEventListeners() {
         document.getElementById('pdf_imageWidthScaleValue').textContent = this.value;
     });
 
-    // PDF variable hints - Use event delegation for better reliability
+    // PDF variable hints - Base trigger
     document.addEventListener('click', (e) => {
         const trigger = e.target.closest('.pdf-hint-trigger');
         if (trigger) {
-            console.log('[PDF Hint] Triggered');
             e.preventDefault();
-            Modals.openPdfHintModal();
+            if (typeof window.openPdfHintModal === 'function') {
+                window.openPdfHintModal();
+            } else {
+                console.error('[PDF Hint] openPdfHintModal is not defined in window!');
+            }
         }
     });
 

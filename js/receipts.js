@@ -210,6 +210,8 @@ async function loadAndApplyPdfTemplates() {
     Modals.setPdfTemplates(templates);
 
     const select = document.getElementById('pdfTemplateSelect');
+    if (!select) return;
+
     select.innerHTML = '';
 
     templates.forEach(t => {

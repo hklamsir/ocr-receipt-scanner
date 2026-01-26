@@ -303,28 +303,42 @@ export function closePdfExportModal() {
 // Apply PDF Template
 // ========================================
 export function applyTemplate(template) {
-    document.getElementById('pdf_pageSize').value = template.page_size;
-    document.getElementById('pdf_marginTop').value = template.margin_top;
-    document.getElementById('pdf_marginBottom').value = template.margin_bottom;
-    document.getElementById('pdf_marginLeft').value = template.margin_left;
-    document.getElementById('pdf_marginRight').value = template.margin_right;
+    const pageSize = document.getElementById('pdf_pageSize');
+    const marginTop = document.getElementById('pdf_marginTop');
+    const marginBottom = document.getElementById('pdf_marginBottom');
+    const marginLeft = document.getElementById('pdf_marginLeft');
+    const marginRight = document.getElementById('pdf_marginRight');
+    const headerText = document.getElementById('pdf_headerText');
+    const headerFontSize = document.getElementById('pdf_headerFontSize');
+    const footerText = document.getElementById('pdf_footerText');
+    const footerFontSize = document.getElementById('pdf_footerFontSize');
+    const imageHeightScale = document.getElementById('pdf_imageHeightScale');
+    const imageHeightScaleValue = document.getElementById('pdf_imageHeightScaleValue');
+    const imageWidthScale = document.getElementById('pdf_imageWidthScale');
+    const imageWidthScaleValue = document.getElementById('pdf_imageWidthScaleValue');
 
-    document.getElementById('pdf_headerText').value = template.header_text || '';
+    if (pageSize) pageSize.value = template.page_size;
+    if (marginTop) marginTop.value = template.margin_top;
+    if (marginBottom) marginBottom.value = template.margin_bottom;
+    if (marginLeft) marginLeft.value = template.margin_left;
+    if (marginRight) marginRight.value = template.margin_right;
+
+    if (headerText) headerText.value = template.header_text || '';
     const headerAlignRadio = document.querySelector(`input[name="pdf_headerAlign"][value="${template.header_align}"]`);
     if (headerAlignRadio) headerAlignRadio.checked = true;
-    document.getElementById('pdf_headerFontSize').value = template.header_font_size;
+    if (headerFontSize) headerFontSize.value = template.header_font_size;
 
-    document.getElementById('pdf_footerText').value = template.footer_text || '';
+    if (footerText) footerText.value = template.footer_text || '';
     const footerAlignRadio = document.querySelector(`input[name="pdf_footerAlign"][value="${template.footer_align}"]`);
     if (footerAlignRadio) footerAlignRadio.checked = true;
-    document.getElementById('pdf_footerFontSize').value = template.footer_font_size;
+    if (footerFontSize) footerFontSize.value = template.footer_font_size;
 
     const imageAlignRadio = document.querySelector(`input[name="pdf_imageAlign"][value="${template.image_align}"]`);
     if (imageAlignRadio) imageAlignRadio.checked = true;
-    document.getElementById('pdf_imageHeightScale').value = template.image_height_scale;
-    document.getElementById('pdf_imageHeightScaleValue').textContent = template.image_height_scale;
-    document.getElementById('pdf_imageWidthScale').value = template.image_width_scale;
-    document.getElementById('pdf_imageWidthScaleValue').textContent = template.image_width_scale;
+    if (imageHeightScale) imageHeightScale.value = template.image_height_scale;
+    if (imageHeightScaleValue) imageHeightScaleValue.textContent = template.image_height_scale;
+    if (imageWidthScale) imageWidthScale.value = template.image_width_scale;
+    if (imageWidthScaleValue) imageWidthScaleValue.textContent = template.image_width_scale;
 }
 
 // ========================================

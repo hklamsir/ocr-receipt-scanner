@@ -998,12 +998,14 @@ function initEventListeners() {
         document.getElementById('pdf_imageWidthScaleValue').textContent = this.value;
     });
 
-    // PDF variable hints
-    document.querySelectorAll('.pdf-hint-trigger').forEach(trigger => {
-        trigger.addEventListener('click', (e) => {
+    // PDF variable hints - Use event delegation for better reliability
+    document.addEventListener('click', (e) => {
+        const trigger = e.target.closest('.pdf-hint-trigger');
+        if (trigger) {
+            console.log('[PDF Hint] Triggered');
             e.preventDefault();
             Modals.openPdfHintModal();
-        });
+        }
     });
 
     // Infinite scroll

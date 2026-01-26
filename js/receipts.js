@@ -251,11 +251,18 @@ function initEventListeners() {
     document.getElementById('cancelSelectBtn')?.addEventListener('click', () => {
         State.clearSelectedReceiptIds();
         document.querySelectorAll('.card-checkbox').forEach(cb => cb.checked = false);
-        const selectAllCb = document.getElementById('selectAllCheckbox');
-        if (selectAllCb) {
-            selectAllCb.checked = false;
-            selectAllCb.indeterminate = false;
-        }
+
+        // Reset both select all checkboxes
+        const resetCheckbox = (cbId) => {
+            const cb = document.getElementById(cbId);
+            if (cb) {
+                cb.checked = false;
+                cb.indeterminate = false;
+            }
+        };
+        resetCheckbox('selectAllCheckbox');
+        resetCheckbox('bottomSelectAllCheckbox');
+
         UI.updateSelectedCount();
     });
 

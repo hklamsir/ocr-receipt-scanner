@@ -241,7 +241,7 @@ async function loadAndApplyPdfTemplates() {
 // ========================================
 function initEventListeners() {
     // Cancel selection
-    document.getElementById('cancelSelectBtn').addEventListener('click', () => {
+    document.getElementById('cancelSelectBtn')?.addEventListener('click', () => {
         State.clearSelectedReceiptIds();
         document.querySelectorAll('.card-checkbox').forEach(cb => cb.checked = false);
         document.getElementById('selectAllCheckbox').checked = false;
@@ -250,11 +250,11 @@ function initEventListeners() {
     });
 
     // Bulk add tags
-    document.getElementById('bulkAddTagBtn').addEventListener('click', () => {
+    document.getElementById('bulkAddTagBtn')?.addEventListener('click', () => {
         Modals.openBulkTagsModal();
     });
 
-    document.getElementById('saveBulkTagsBtn').addEventListener('click', async () => {
+    document.getElementById('saveBulkTagsBtn')?.addEventListener('click', async () => {
         const bulkSelectedTags = UI.getBulkSelectedTags();
         if (bulkSelectedTags.length === 0) {
             Toast.warning('請選擇至少一個標籤');
@@ -290,11 +290,11 @@ function initEventListeners() {
     });
 
     // Bulk remove tags
-    document.getElementById('bulkRemoveTagBtn').addEventListener('click', () => {
+    document.getElementById('bulkRemoveTagBtn')?.addEventListener('click', () => {
         Modals.openBulkRemoveTagsModal();
     });
 
-    document.getElementById('saveBulkRemoveTagsBtn').addEventListener('click', async () => {
+    document.getElementById('saveBulkRemoveTagsBtn')?.addEventListener('click', async () => {
         const bulkRemoveTags = UI.getBulkRemoveTags();
         if (bulkRemoveTags.length === 0) {
             Toast.warning('請選擇至少一個標籤');
@@ -331,11 +331,11 @@ function initEventListeners() {
     });
 
     // Bulk delete
-    document.getElementById('bulkDeleteBtn').addEventListener('click', () => {
+    document.getElementById('bulkDeleteBtn')?.addEventListener('click', () => {
         Modals.openBulkDeleteModal();
     });
 
-    document.getElementById('confirmBulkDeleteBtn').addEventListener('click', async () => {
+    document.getElementById('confirmBulkDeleteBtn')?.addEventListener('click', async () => {
         const receiptIds = Array.from(State.getSelectedReceiptIds());
         let successCount = 0;
 
@@ -436,27 +436,27 @@ function initEventListeners() {
         UI.updateSelectAllState();
         UI.updateSelectedCount();
     }
-    document.getElementById('selectAllCheckbox').addEventListener('change', handleSelectAllChange);
+    document.getElementById('selectAllCheckbox')?.addEventListener('change', handleSelectAllChange);
 
     // Export Excel
-    document.getElementById('exportExcelBtn').addEventListener('click', () => {
+    document.getElementById('exportExcelBtn')?.addEventListener('click', () => {
         Export.openExportModal();
     });
 
-    document.getElementById('excel_addEmptyColumnBtn').addEventListener('click', () => {
+    document.getElementById('excel_addEmptyColumnBtn')?.addEventListener('click', () => {
         document.getElementById('emptyColumnName').value = '';
         document.getElementById('addEmptyColumnModal').style.display = 'flex';
         document.getElementById('emptyColumnName').focus();
     });
 
-    document.getElementById('confirmAddEmptyColumnBtn').addEventListener('click', () => {
+    document.getElementById('confirmAddEmptyColumnBtn')?.addEventListener('click', () => {
         const name = document.getElementById('emptyColumnName').value.trim();
         if (Export.addEmptyColumn(name)) {
             Modals.closeAddEmptyColumnModal();
         }
     });
 
-    document.getElementById('emptyColumnName').addEventListener('keypress', (e) => {
+    document.getElementById('emptyColumnName')?.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
             document.getElementById('confirmAddEmptyColumnBtn').click();
         }

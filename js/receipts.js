@@ -247,12 +247,21 @@ async function loadAndApplyPdfTemplates() {
 // Event Listeners
 // ========================================
 function initEventListeners() {
+    // Debug: Check key elements
+    console.log('[initEventListeners] exportExcelBtn:', document.getElementById('exportExcelBtn'));
+    console.log('[initEventListeners] bulkExportPdfBtn:', document.getElementById('bulkExportPdfBtn'));
+    console.log('[initEventListeners] exportModal:', document.getElementById('exportModal'));
+    console.log('[initEventListeners] pdfExportModal:', document.getElementById('pdfExportModal'));
+
     // Cancel selection
     document.getElementById('cancelSelectBtn')?.addEventListener('click', () => {
         State.clearSelectedReceiptIds();
         document.querySelectorAll('.card-checkbox').forEach(cb => cb.checked = false);
-        document.getElementById('selectAllCheckbox').checked = false;
-        document.getElementById('selectAllCheckbox').indeterminate = false;
+        const selectAllCb = document.getElementById('selectAllCheckbox');
+        if (selectAllCb) {
+            selectAllCb.checked = false;
+            selectAllCb.indeterminate = false;
+        }
         UI.updateSelectedCount();
     });
 

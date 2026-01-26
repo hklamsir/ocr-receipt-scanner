@@ -253,28 +253,28 @@ export function closePdfExportModal() {
 // Apply PDF Template
 // ========================================
 export function applyTemplate(template) {
-    document.getElementById('pdfPageSize').value = template.page_size;
-    document.getElementById('pdfMarginTop').value = template.margin_top;
-    document.getElementById('pdfMarginBottom').value = template.margin_bottom;
-    document.getElementById('pdfMarginLeft').value = template.margin_left;
-    document.getElementById('pdfMarginRight').value = template.margin_right;
+    document.getElementById('pdf_pageSize').value = template.page_size;
+    document.getElementById('pdf_marginTop').value = template.margin_top;
+    document.getElementById('pdf_marginBottom').value = template.margin_bottom;
+    document.getElementById('pdf_marginLeft').value = template.margin_left;
+    document.getElementById('pdf_marginRight').value = template.margin_right;
 
-    document.getElementById('pdfHeader').value = template.header_text || '';
-    const headerAlignRadio = document.querySelector(`input[name="pdfHeaderAlign"][value="${template.header_align}"]`);
+    document.getElementById('pdf_headerText').value = template.header_text || '';
+    const headerAlignRadio = document.querySelector(`input[name="pdf_headerAlign"][value="${template.header_align}"]`);
     if (headerAlignRadio) headerAlignRadio.checked = true;
-    document.getElementById('pdfHeaderFontSize').value = template.header_font_size;
+    document.getElementById('pdf_headerFontSize').value = template.header_font_size;
 
-    document.getElementById('pdfFooter').value = template.footer_text || '';
-    const footerAlignRadio = document.querySelector(`input[name="pdfFooterAlign"][value="${template.footer_align}"]`);
+    document.getElementById('pdf_footerText').value = template.footer_text || '';
+    const footerAlignRadio = document.querySelector(`input[name="pdf_footerAlign"][value="${template.footer_align}"]`);
     if (footerAlignRadio) footerAlignRadio.checked = true;
-    document.getElementById('pdfFooterFontSize').value = template.footer_font_size;
+    document.getElementById('pdf_footerFontSize').value = template.footer_font_size;
 
-    const imageAlignRadio = document.querySelector(`input[name="pdfImageAlign"][value="${template.image_align}"]`);
+    const imageAlignRadio = document.querySelector(`input[name="pdf_imageAlign"][value="${template.image_align}"]`);
     if (imageAlignRadio) imageAlignRadio.checked = true;
-    document.getElementById('pdfImageHeightScale').value = template.image_height_scale;
-    document.getElementById('pdfImageHeightScaleValue').textContent = template.image_height_scale;
-    document.getElementById('pdfImageWidthScale').value = template.image_width_scale;
-    document.getElementById('pdfImageWidthScaleValue').textContent = template.image_width_scale;
+    document.getElementById('pdf_imageHeightScale').value = template.image_height_scale;
+    document.getElementById('pdf_imageHeightScaleValue').textContent = template.image_height_scale;
+    document.getElementById('pdf_imageWidthScale').value = template.image_width_scale;
+    document.getElementById('pdf_imageWidthScaleValue').textContent = template.image_width_scale;
 }
 
 // ========================================

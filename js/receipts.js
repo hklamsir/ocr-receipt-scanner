@@ -443,7 +443,7 @@ function initEventListeners() {
         Export.openExportModal();
     });
 
-    document.getElementById('addEmptyColumnBtn').addEventListener('click', () => {
+    document.getElementById('excel_addEmptyColumnBtn').addEventListener('click', () => {
         document.getElementById('emptyColumnName').value = '';
         document.getElementById('addEmptyColumnModal').style.display = 'flex';
         document.getElementById('emptyColumnName').focus();
@@ -749,20 +749,20 @@ function initEventListeners() {
         const templateData = {
             template_name: templateName.trim(),
             is_default: isDefault,
-            page_size: document.getElementById('pdfPageSize').value,
-            margin_top: document.getElementById('pdfMarginTop').value,
-            margin_bottom: document.getElementById('pdfMarginBottom').value,
-            margin_left: document.getElementById('pdfMarginLeft').value,
-            margin_right: document.getElementById('pdfMarginRight').value,
-            header_text: document.getElementById('pdfHeader').value,
-            header_align: document.querySelector('input[name="pdfHeaderAlign"]:checked')?.value || 'C',
-            header_font_size: document.getElementById('pdfHeaderFontSize').value,
-            footer_text: document.getElementById('pdfFooter').value,
-            footer_align: document.querySelector('input[name="pdfFooterAlign"]:checked')?.value || 'C',
-            footer_font_size: document.getElementById('pdfFooterFontSize').value,
-            image_align: document.querySelector('input[name="pdfImageAlign"]:checked')?.value || 'C',
-            image_height_scale: document.getElementById('pdfImageHeightScale').value,
-            image_width_scale: document.getElementById('pdfImageWidthScale').value
+            page_size: document.getElementById('pdf_pageSize').value,
+            margin_top: document.getElementById('pdf_marginTop').value,
+            margin_bottom: document.getElementById('pdf_marginBottom').value,
+            margin_left: document.getElementById('pdf_marginLeft').value,
+            margin_right: document.getElementById('pdf_marginRight').value,
+            header_text: document.getElementById('pdf_headerText').value,
+            header_align: document.querySelector('input[name="pdf_headerAlign"]:checked')?.value || 'C',
+            header_font_size: document.getElementById('pdf_headerFontSize').value,
+            footer_text: document.getElementById('pdf_footerText').value,
+            footer_align: document.querySelector('input[name="pdf_footerAlign"]:checked')?.value || 'C',
+            footer_font_size: document.getElementById('pdf_footerFontSize').value,
+            image_align: document.querySelector('input[name="pdf_imageAlign"]:checked')?.value || 'C',
+            image_height_scale: document.getElementById('pdf_imageHeightScale').value,
+            image_width_scale: document.getElementById('pdf_imageWidthScale').value
         };
 
         try {
@@ -825,20 +825,20 @@ function initEventListeners() {
         }
 
         const formData = {
-            page_size: document.getElementById('pdfPageSize').value,
-            margin_top: document.getElementById('pdfMarginTop').value,
-            margin_bottom: document.getElementById('pdfMarginBottom').value,
-            margin_left: document.getElementById('pdfMarginLeft').value,
-            margin_right: document.getElementById('pdfMarginRight').value,
-            header_text: document.getElementById('pdfHeader').value,
-            header_align: document.querySelector('input[name="pdfHeaderAlign"]:checked')?.value || 'C',
-            header_font_size: document.getElementById('pdfHeaderFontSize').value,
-            footer_text: document.getElementById('pdfFooter').value,
-            footer_align: document.querySelector('input[name="pdfFooterAlign"]:checked')?.value || 'C',
-            footer_font_size: document.getElementById('pdfFooterFontSize').value,
-            image_align: document.querySelector('input[name="pdfImageAlign"]:checked')?.value || 'C',
-            image_height_scale: document.getElementById('pdfImageHeightScale').value,
-            image_width_scale: document.getElementById('pdfImageWidthScale').value
+            page_size: document.getElementById('pdf_pageSize').value,
+            margin_top: document.getElementById('pdf_marginTop').value,
+            margin_bottom: document.getElementById('pdf_marginBottom').value,
+            margin_left: document.getElementById('pdf_marginLeft').value,
+            margin_right: document.getElementById('pdf_marginRight').value,
+            header_text: document.getElementById('pdf_headerText').value,
+            header_align: document.querySelector('input[name="pdf_headerAlign"]:checked')?.value || 'C',
+            header_font_size: document.getElementById('pdf_headerFontSize').value,
+            footer_text: document.getElementById('pdf_footerText').value,
+            footer_align: document.querySelector('input[name="pdf_footerAlign"]:checked')?.value || 'C',
+            footer_font_size: document.getElementById('pdf_footerFontSize').value,
+            image_align: document.querySelector('input[name="pdf_imageAlign"]:checked')?.value || 'C',
+            image_height_scale: document.getElementById('pdf_imageHeightScale').value,
+            image_width_scale: document.getElementById('pdf_imageWidthScale').value
         };
 
         if (isBatchMode) {
@@ -961,6 +961,15 @@ function initEventListeners() {
 // ========================================
 // Initialize
 // ========================================
+// PDF Slider Listeners
+document.getElementById('pdf_imageHeightScale')?.addEventListener('input', function () {
+    document.getElementById('pdf_imageHeightScaleValue').textContent = this.value;
+});
+
+document.getElementById('pdf_imageWidthScale')?.addEventListener('input', function () {
+    document.getElementById('pdf_imageWidthScaleValue').textContent = this.value;
+});
+
 function init() {
     Modals.attachWindowHandlers();
     initEventListeners();

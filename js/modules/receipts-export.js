@@ -168,7 +168,7 @@ export function saveExportFieldsConfig() {
 // Render Export Fields List
 // ========================================
 export function renderExportFieldsList() {
-    const container = document.getElementById('exportFieldsList');
+    const container = document.getElementById('excel_fieldsList');
     container.innerHTML = exportFields.map((field, index) => `
         <div class="export-field-item ${field.enabled ? 'enabled' : ''}" 
              data-index="${index}" 

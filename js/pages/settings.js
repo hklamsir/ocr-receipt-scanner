@@ -618,6 +618,12 @@ window.openEditExcelTemplateModal = function (id) {
     // 渲染欄位配置列表
     renderEditExcelFieldsList();
 
+    // 填充排序設定
+    const sortBySelect = document.getElementById('excel_sortBy');
+    const sortOrderSelect = document.getElementById('excel_sortOrder');
+    if (sortBySelect) sortBySelect.value = template.sort_by || 'date';
+    if (sortOrderSelect) sortOrderSelect.value = template.sort_order || 'desc';
+
     document.getElementById('editExcelTemplateModal').style.display = 'flex';
 };
 
@@ -762,7 +768,9 @@ document.getElementById('editExcelTemplateForm')?.addEventListener('submit', asy
         template_id: id,
         template_name: document.getElementById('editExcelTemplateName').value.trim(),
         is_default: document.getElementById('editExcelTemplateIsDefault').checked,
-        fields_config: editExcelTemplateData.fields_config
+        fields_config: editExcelTemplateData.fields_config,
+        sort_by: document.getElementById('excel_sortBy')?.value || 'date',
+        sort_order: document.getElementById('excel_sortOrder')?.value || 'desc'
     };
 
     try {

@@ -76,11 +76,19 @@ function renderExcelTemplateSelect() {
 }
 
 export function applyExcelTemplate(template) {
-    if (!template || !template.fields_config) return;
+    if (!template) return;
 
     // Apply template fields config
-    exportFields = template.fields_config.map(f => ({ ...f }));
-    renderExportFieldsList();
+    if (template.fields_config) {
+        exportFields = template.fields_config.map(f => ({ ...f }));
+        renderExportFieldsList();
+    }
+
+    // Apply sort settings
+    const sortBySelect = document.getElementById('excel_sortBy');
+    const sortOrderSelect = document.getElementById('excel_sortOrder');
+    if (sortBySelect && template.sort_by) sortBySelect.value = template.sort_by;
+    if (sortOrderSelect && template.sort_order) sortOrderSelect.value = template.sort_order;
 }
 
 export function applyExcelTemplateById(templateId) {
@@ -107,7 +115,9 @@ export async function saveExcelTemplate(templateName, isDefault = false) {
     const templateData = {
         template_name: templateName.trim(),
         is_default: isDefault,
-        fields_config: exportFields
+        fields_config: exportFields,
+        sort_by: document.getElementById('excel_sortBy')?.value || 'date',
+        sort_order: document.getElementById('excel_sortOrder')?.value || 'desc'
     };
 
     try {
@@ -347,6 +357,19 @@ export function executeExport() {
     columnsInput.name = 'columns';
     columnsInput.value = JSON.stringify(enabledFields.map(f => ({ key: f.key, label: f.label })));
     form.appendChild(columnsInput);
+
+    // Add sort parameters
+    const sortByInput = document.createElement('input');
+    sortByInput.type = 'hidden';
+    sortByInput.name = 'sort_by';
+    sortByInput.value = document.getElementById('excel_sortBy')?.value || 'date';
+    form.appendChild(sortByInput);
+
+    const sortOrderInput = document.createElement('input');
+    sortOrderInput.type = 'hidden';
+    sortOrderInput.name = 'sort_order';
+    sortOrderInput.value = document.getElementById('excel_sortOrder')?.value || 'desc';
+    form.appendChild(sortOrderInput);
 
     document.body.appendChild(form);
     form.submit();

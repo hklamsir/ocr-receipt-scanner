@@ -91,6 +91,28 @@ include __DIR__ . '/includes/header.php';
         <a href="index.php" class="btn btn-primary">開始辨識單據</a>
     </div>
 
+    <!-- 底部選取工具列 -->
+    <div class="select-toolbar bottom-select-toolbar">
+        <label class="select-all-label">
+            <input type="checkbox" id="bottomSelectAllCheckbox">
+            <span>全選</span>
+        </label>
+        <span id="bottomFilteredCount" class="filtered-count" style="display:none;"></span>
+        <span id="bottomSelectedCount" class="selected-count"></span>
+        <div class="toolbar-actions" id="bottomToolbarActions" style="display:none;">
+            <button id="bottomCancelSelectBtn" class="btn btn-outline btn-sm">✖ 取消選取</button>
+            <!-- Desktop buttons - hidden on mobile -->
+            <div class="desktop-actions">
+                <button id="bottomBulkAddTagBtn" class="btn btn-secondary btn-sm">🏷️ 加入標籤</button>
+                <button id="bottomBulkRemoveTagBtn" class="btn btn-warning btn-sm">🏷️ 移除標籤</button>
+                <button id="bottomBulkDeleteBtn" class="btn btn-danger btn-sm">🗑️ 刪除選取</button>
+                <button id="bottomBulkExportPdfBtn" class="btn btn-success btn-sm">📄 批量匯出PDF</button>
+            </div>
+            <!-- Mobile button - hidden on desktop -->
+            <button id="bottomMobileActionsBtn" class="btn btn-primary btn-sm mobile-actions-btn">📱 操作選單</button>
+        </div>
+    </div>
+
     <!-- 底部匯出按鈕 -->
     <div class="bottom-export-bar">
         <button id="bottomExportBtn" class="btn btn-success">📥 匯出 Excel</button>

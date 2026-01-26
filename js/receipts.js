@@ -247,12 +247,6 @@ async function loadAndApplyPdfTemplates() {
 // Event Listeners
 // ========================================
 function initEventListeners() {
-    // Debug: Check key elements
-    console.log('[initEventListeners] exportExcelBtn:', document.getElementById('exportExcelBtn'));
-    console.log('[initEventListeners] bulkExportPdfBtn:', document.getElementById('bulkExportPdfBtn'));
-    console.log('[initEventListeners] exportModal:', document.getElementById('exportModal'));
-    console.log('[initEventListeners] pdfExportModal:', document.getElementById('pdfExportModal'));
-
     // Cancel selection
     document.getElementById('cancelSelectBtn')?.addEventListener('click', () => {
         State.clearSelectedReceiptIds();
@@ -974,21 +968,11 @@ function initEventListeners() {
 
 // Initial load
 function init() {
-    console.log('[receipts.js] init() started');
-    try {
-        Modals.attachWindowHandlers();
-        console.log('[receipts.js] attachWindowHandlers done');
-        initEventListeners();
-        console.log('[receipts.js] initEventListeners done');
-        initYears();
-        console.log('[receipts.js] initYears done');
-        initTags();
-        console.log('[receipts.js] initTags done');
-        loadInitialReceipts();
-        console.log('[receipts.js] loadInitialReceipts started');
-    } catch (err) {
-        console.error('[receipts.js] init() error:', err);
-    }
+    Modals.attachWindowHandlers();
+    initEventListeners();
+    initYears();
+    initTags();
+    loadInitialReceipts();
 }
 
 init();

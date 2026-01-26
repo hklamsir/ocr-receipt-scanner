@@ -361,13 +361,13 @@ function initEventListeners() {
     });
 
     // Bulk export PDF
-    document.getElementById('bulkExportPdfBtn').addEventListener('click', () => {
+    document.getElementById('bulkExportPdfBtn')?.addEventListener('click', () => {
         Modals.openBulkPdfExportModal();
     });
 
     // Bottom export button
-    document.getElementById('bottomExportBtn').addEventListener('click', () => {
-        document.getElementById('exportExcelBtn').click();
+    document.getElementById('bottomExportBtn')?.addEventListener('click', () => {
+        document.getElementById('exportExcelBtn')?.click();
     });
 
     // Select all - use named function to allow re-attaching
@@ -405,7 +405,7 @@ function initEventListeners() {
                     const newCb = document.getElementById('selectAllCheckbox');
                     newCb.checked = true;
                     // Re-attach event listener using named function
-                    newCb.addEventListener('change', handleSelectAllChange);
+                    newCb?.addEventListener('change', handleSelectAllChange);
                 }
             } else {
                 console.log('[SelectAll] No need to load more, using cache directly');
@@ -462,21 +462,21 @@ function initEventListeners() {
         }
     });
 
-    document.getElementById('confirmExportBtn').addEventListener('click', () => {
+    document.getElementById('confirmExportBtn')?.addEventListener('click', () => {
         if (Export.executeExport()) {
             Modals.closeExportModal();
         }
     });
 
     // Excel template apply
-    document.getElementById('applyExcelTemplateBtn').addEventListener('click', () => {
+    document.getElementById('applyExcelTemplateBtn')?.addEventListener('click', () => {
         const select = document.getElementById('excelTemplateSelect');
         const templateId = select.value;
         Export.applyExcelTemplateById(templateId);
     });
 
     // Excel template save
-    document.getElementById('saveExcelTemplateBtn').addEventListener('click', async () => {
+    document.getElementById('saveExcelTemplateBtn')?.addEventListener('click', async () => {
         const templateName = prompt('請輸入模板名稱:');
         if (!templateName || !templateName.trim()) return;
 
@@ -485,11 +485,11 @@ function initEventListeners() {
     });
 
     // Edit tags
-    document.getElementById('selectTagsBtn').addEventListener('click', () => {
+    document.getElementById('selectTagsBtn')?.addEventListener('click', () => {
         Modals.openEditTagsModal();
     });
 
-    document.getElementById('saveEditTagsBtn').addEventListener('click', async () => {
+    document.getElementById('saveEditTagsBtn')?.addEventListener('click', async () => {
         const tempSelectedTags = State.getTempSelectedTags();
         const allTags = State.getAllTags();
         const editReceiptTags = tempSelectedTags.map(id => allTags.find(t => t.id === id)).filter(t => t);
@@ -502,16 +502,16 @@ function initEventListeners() {
     // Edit form
     document.getElementById('editForm')?.addEventListener('submit', async function (e) {
         e.preventDefault();
-        const id = document.getElementById('editId').value;
+        const id = document.getElementById('editId')?.value;
         const data = {
             id: parseInt(id),
-            date: document.getElementById('editDate').value,
-            time: document.getElementById('editTime').value,
-            company: document.getElementById('editCompany').value,
-            items: document.getElementById('editItems').value,
-            payment: document.getElementById('editPayment').value,
-            amount: document.getElementById('editAmount').value,
-            summary: document.getElementById('editSummary').value
+            date: document.getElementById('editDate')?.value || '',
+            time: document.getElementById('editTime')?.value || '',
+            company: document.getElementById('editCompany')?.value || '',
+            items: document.getElementById('editItems')?.value || '',
+            payment: document.getElementById('editPayment')?.value || '',
+            amount: document.getElementById('editAmount')?.value || '0',
+            summary: document.getElementById('editSummary')?.value || ''
         };
 
         try {
@@ -800,6 +800,8 @@ function initEventListeners() {
 
         // Show loading overlay
         const exportBtn = document.getElementById('pdfExportBtn');
+        if (!exportBtn) return;
+
         const originalBtnText = exportBtn.textContent;
         exportBtn.disabled = true;
         exportBtn.innerHTML = '<span class="btn-spinner"></span> 生成中...';
@@ -817,28 +819,28 @@ function initEventListeners() {
                     <div class="pdf-loading-subtext">${isBatchMode ? `處理 ${pdfExportReceiptIds.length} 筆單據` : '請稍候'}</div>
                 </div>
             `;
-            document.getElementById('pdfExportModal').querySelector('.edit-modal-content').appendChild(loadingOverlay);
+            document.getElementById('pdfExportModal')?.querySelector('.edit-modal-content')?.appendChild(loadingOverlay);
         } else {
-            loadingOverlay.querySelector('.pdf-loading-subtext').textContent =
-                isBatchMode ? `處理 ${pdfExportReceiptIds.length} 筆單據` : '請稍候';
+            const subtext = loadingOverlay.querySelector('.pdf-loading-subtext');
+            if (subtext) subtext.textContent = isBatchMode ? `處理 ${pdfExportReceiptIds.length} 筆單據` : '請稍候';
             loadingOverlay.style.display = 'flex';
         }
 
         const formData = {
-            page_size: document.getElementById('pdf_pageSize').value,
-            margin_top: document.getElementById('pdf_marginTop').value,
-            margin_bottom: document.getElementById('pdf_marginBottom').value,
-            margin_left: document.getElementById('pdf_marginLeft').value,
-            margin_right: document.getElementById('pdf_marginRight').value,
-            header_text: document.getElementById('pdf_headerText').value,
+            page_size: document.getElementById('pdf_pageSize')?.value || 'A4',
+            margin_top: document.getElementById('pdf_marginTop')?.value || '10',
+            margin_bottom: document.getElementById('pdf_marginBottom')?.value || '10',
+            margin_left: document.getElementById('pdf_marginLeft')?.value || '10',
+            margin_right: document.getElementById('pdf_marginRight')?.value || '10',
+            header_text: document.getElementById('pdf_headerText')?.value || '',
             header_align: document.querySelector('input[name="pdf_headerAlign"]:checked')?.value || 'C',
-            header_font_size: document.getElementById('pdf_headerFontSize').value,
-            footer_text: document.getElementById('pdf_footerText').value,
+            header_font_size: document.getElementById('pdf_headerFontSize')?.value || '12',
+            footer_text: document.getElementById('pdf_footerText')?.value || '',
             footer_align: document.querySelector('input[name="pdf_footerAlign"]:checked')?.value || 'C',
-            footer_font_size: document.getElementById('pdf_footerFontSize').value,
+            footer_font_size: document.getElementById('pdf_footerFontSize')?.value || '12',
             image_align: document.querySelector('input[name="pdf_imageAlign"]:checked')?.value || 'C',
-            image_height_scale: document.getElementById('pdf_imageHeightScale').value,
-            image_width_scale: document.getElementById('pdf_imageWidthScale').value
+            image_height_scale: document.getElementById('pdf_imageHeightScale')?.value || '80',
+            image_width_scale: document.getElementById('pdf_imageWidthScale')?.value || '40'
         };
 
         if (isBatchMode) {
@@ -848,8 +850,10 @@ function initEventListeners() {
         }
 
         const hideLoading = () => {
-            exportBtn.disabled = false;
-            exportBtn.textContent = originalBtnText;
+            if (exportBtn) {
+                exportBtn.disabled = false;
+                exportBtn.textContent = originalBtnText;
+            }
             if (loadingOverlay) loadingOverlay.style.display = 'none';
         };
 

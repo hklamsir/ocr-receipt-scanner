@@ -169,6 +169,8 @@ export function saveExportFieldsConfig() {
 // ========================================
 export function renderExportFieldsList() {
     const container = document.getElementById('excel_fieldsList');
+    if (!container) return;
+
     container.innerHTML = exportFields.map((field, index) => `
         <div class="export-field-item ${field.enabled ? 'enabled' : ''}" 
              data-index="${index}" 
@@ -280,14 +282,21 @@ export async function openExportModal() {
         return;
     }
 
-    document.getElementById('exportInfo').textContent = `將匯出 ${exportIdsToExport.length} 筆單據`;
+    const exportInfo = document.getElementById('exportInfo');
+    if (exportInfo) {
+        exportInfo.textContent = `將匯出 ${exportIdsToExport.length} 筆單據`;
+    }
+
     initExportFields();
     renderExportFieldsList();
 
     // Load Excel templates
     await loadExcelTemplates();
 
-    document.getElementById('exportModal').style.display = 'flex';
+    const exportModal = document.getElementById('exportModal');
+    if (exportModal) {
+        exportModal.style.display = 'flex';
+    }
 }
 
 // ========================================

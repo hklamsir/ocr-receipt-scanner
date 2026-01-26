@@ -22,12 +22,15 @@ export function setPdfTemplates(templates) { pdfTemplates = templates; }
 // Image Modal
 // ========================================
 export function openModal(src) {
-    document.getElementById('modalImg').src = src;
-    document.getElementById('modal').style.display = 'flex';
+    const modalImg = document.getElementById('modalImg');
+    const modal = document.getElementById('modal');
+    if (modalImg) modalImg.src = src;
+    if (modal) modal.style.display = 'flex';
 }
 
 export function closeModal() {
-    document.getElementById('modal').style.display = 'none';
+    const modal = document.getElementById('modal');
+    if (modal) modal.style.display = 'none';
 }
 
 // ========================================
@@ -41,21 +44,32 @@ export function openEditModal(id) {
     State.setEditReceiptId(id);
     State.setEditReceiptTags(receipt.tags ? [...receipt.tags] : []);
 
-    document.getElementById('editId').value = id;
-    document.getElementById('editDate').value = receipt.receipt_date || '';
-    document.getElementById('editTime').value = receipt.receipt_time || '';
-    document.getElementById('editCompany').value = receipt.company_name || '';
-    document.getElementById('editItems').value = receipt.items_summary || '';
-    document.getElementById('editPayment').value = receipt.payment_method || '';
-    document.getElementById('editAmount').value = receipt.total_amount || '';
-    document.getElementById('editSummary').value = receipt.summary || '';
+    const editId = document.getElementById('editId');
+    const editDate = document.getElementById('editDate');
+    const editTime = document.getElementById('editTime');
+    const editCompany = document.getElementById('editCompany');
+    const editItems = document.getElementById('editItems');
+    const editPayment = document.getElementById('editPayment');
+    const editAmount = document.getElementById('editAmount');
+    const editSummary = document.getElementById('editSummary');
+    const editModal = document.getElementById('editModal');
+
+    if (editId) editId.value = id;
+    if (editDate) editDate.value = receipt.receipt_date || '';
+    if (editTime) editTime.value = receipt.receipt_time || '';
+    if (editCompany) editCompany.value = receipt.company_name || '';
+    if (editItems) editItems.value = receipt.items_summary || '';
+    if (editPayment) editPayment.value = receipt.payment_method || '';
+    if (editAmount) editAmount.value = receipt.total_amount || '';
+    if (editSummary) editSummary.value = receipt.summary || '';
 
     UI.renderEditTags();
-    document.getElementById('editModal').style.display = 'flex';
+    if (editModal) editModal.style.display = 'flex';
 }
 
 export function closeEditModal() {
-    document.getElementById('editModal').style.display = 'none';
+    const editModal = document.getElementById('editModal');
+    if (editModal) editModal.style.display = 'none';
     State.setEditReceiptId(null);
     State.setEditReceiptTags([]);
 }
@@ -65,12 +79,14 @@ export function closeEditModal() {
 // ========================================
 export function openDeleteModal(id) {
     State.setDeleteTargetId(id);
-    document.getElementById('deleteModal').style.display = 'flex';
+    const deleteModal = document.getElementById('deleteModal');
+    if (deleteModal) deleteModal.style.display = 'flex';
 }
 
 export function closeDeleteModal() {
     State.setDeleteTargetId(null);
-    document.getElementById('deleteModal').style.display = 'none';
+    const deleteModal = document.getElementById('deleteModal');
+    if (deleteModal) deleteModal.style.display = 'none';
 }
 
 // ========================================
@@ -85,13 +101,16 @@ export function openBulkTagsModal() {
         return;
     }
     UI.setBulkSelectedTags([]);
-    document.getElementById('bulkTagsInfo').textContent = `將為 ${selectedReceiptIds.size} 張單據加入標籤`;
+    const bulkTagsInfo = document.getElementById('bulkTagsInfo');
+    if (bulkTagsInfo) bulkTagsInfo.textContent = `將為 ${selectedReceiptIds.size} 張單據加入標籤`;
     UI.renderBulkTagsGrid();
-    document.getElementById('bulkTagsModal').style.display = 'flex';
+    const bulkTagsModal = document.getElementById('bulkTagsModal');
+    if (bulkTagsModal) bulkTagsModal.style.display = 'flex';
 }
 
 export function closeBulkTagsModal() {
-    document.getElementById('bulkTagsModal').style.display = 'none';
+    const bulkTagsModal = document.getElementById('bulkTagsModal');
+    if (bulkTagsModal) bulkTagsModal.style.display = 'none';
 }
 
 // ========================================
@@ -106,13 +125,16 @@ export function openBulkRemoveTagsModal() {
         return;
     }
     UI.setBulkRemoveTags([]);
-    document.getElementById('bulkRemoveTagsInfo').textContent = `將從 ${selectedReceiptIds.size} 張單據移除標籤`;
+    const bulkRemoveTagsInfo = document.getElementById('bulkRemoveTagsInfo');
+    if (bulkRemoveTagsInfo) bulkRemoveTagsInfo.textContent = `將從 ${selectedReceiptIds.size} 張單據移除標籤`;
     UI.renderBulkRemoveTagsGrid();
-    document.getElementById('bulkRemoveTagsModal').style.display = 'flex';
+    const bulkRemoveTagsModal = document.getElementById('bulkRemoveTagsModal');
+    if (bulkRemoveTagsModal) bulkRemoveTagsModal.style.display = 'flex';
 }
 
 export function closeBulkRemoveTagsModal() {
-    document.getElementById('bulkRemoveTagsModal').style.display = 'none';
+    const bulkRemoveTagsModal = document.getElementById('bulkRemoveTagsModal');
+    if (bulkRemoveTagsModal) bulkRemoveTagsModal.style.display = 'none';
 }
 
 // ========================================
@@ -126,13 +148,17 @@ export function openBulkDeleteModal() {
         }));
         return;
     }
-    document.getElementById('bulkDeleteInfo').textContent =
-        `確定要刪除選取的 ${selectedReceiptIds.size} 張單據嗎？此操作無法復原。`;
-    document.getElementById('bulkDeleteModal').style.display = 'flex';
+    const bulkDeleteInfo = document.getElementById('bulkDeleteInfo');
+    if (bulkDeleteInfo) {
+        bulkDeleteInfo.textContent = `確定要刪除選取的 ${selectedReceiptIds.size} 張單據嗎？此操作無法復原。`;
+    }
+    const bulkDeleteModal = document.getElementById('bulkDeleteModal');
+    if (bulkDeleteModal) bulkDeleteModal.style.display = 'flex';
 }
 
 export function closeBulkDeleteModal() {
-    document.getElementById('bulkDeleteModal').style.display = 'none';
+    const bulkDeleteModal = document.getElementById('bulkDeleteModal');
+    if (bulkDeleteModal) bulkDeleteModal.style.display = 'none';
 }
 
 // ========================================
@@ -140,11 +166,13 @@ export function closeBulkDeleteModal() {
 // ========================================
 export function openTagSelectModal() {
     UI.renderTagGrid();
-    document.getElementById('tagSelectModal').style.display = 'flex';
+    const tagSelectModal = document.getElementById('tagSelectModal');
+    if (tagSelectModal) tagSelectModal.style.display = 'flex';
 }
 
 export function closeTagSelectModal() {
-    document.getElementById('tagSelectModal').style.display = 'none';
+    const tagSelectModal = document.getElementById('tagSelectModal');
+    if (tagSelectModal) tagSelectModal.style.display = 'none';
 }
 
 // ========================================
@@ -154,27 +182,35 @@ export function openEditTagsModal() {
     const editReceiptTags = State.getEditReceiptTags();
     State.setTempSelectedTags(editReceiptTags.map(t => t.id));
     UI.renderEditTagsGrid();
-    document.getElementById('editTagsModal').style.display = 'flex';
+    const editTagsModal = document.getElementById('editTagsModal');
+    if (editTagsModal) editTagsModal.style.display = 'flex';
 }
 
 export function closeEditTagsModal() {
-    document.getElementById('editTagsModal').style.display = 'none';
+    const editTagsModal = document.getElementById('editTagsModal');
+    if (editTagsModal) editTagsModal.style.display = 'none';
 }
 
 // ========================================
 // Create Tag Modal
 // ========================================
 export function openCreateTagModal() {
-    document.getElementById('newTagName').value = '';
-    document.getElementById('newTagColor').value = '#3b82f6';
+    const newTagName = document.getElementById('newTagName');
+    const newTagColor = document.getElementById('newTagColor');
+    const createTagModal = document.getElementById('createTagModal');
+
+    if (newTagName) newTagName.value = '';
+    if (newTagColor) newTagColor.value = '#3b82f6';
     UI.renderColorPalette('newTagColorPalette', '#3b82f6', (color) => {
-        document.getElementById('newTagColor').value = color;
+        const colorInput = document.getElementById('newTagColor');
+        if (colorInput) colorInput.value = color;
     });
-    document.getElementById('createTagModal').style.display = 'flex';
+    if (createTagModal) createTagModal.style.display = 'flex';
 }
 
 export function closeCreateTagModal() {
-    document.getElementById('createTagModal').style.display = 'none';
+    const createTagModal = document.getElementById('createTagModal');
+    if (createTagModal) createTagModal.style.display = 'none';
 }
 
 // ========================================
@@ -188,12 +224,15 @@ export function openMobileActionsModal() {
         }));
         return;
     }
-    document.getElementById('mobileActionsInfo').textContent = `已選取 ${selectedReceiptIds.size} 張單據`;
-    document.getElementById('mobileActionsModal').style.display = 'flex';
+    const mobileActionsInfo = document.getElementById('mobileActionsInfo');
+    if (mobileActionsInfo) mobileActionsInfo.textContent = `已選取 ${selectedReceiptIds.size} 張單據`;
+    const mobileActionsModal = document.getElementById('mobileActionsModal');
+    if (mobileActionsModal) mobileActionsModal.style.display = 'flex';
 }
 
 export function closeMobileActionsModal() {
-    document.getElementById('mobileActionsModal').style.display = 'none';
+    const mobileActionsModal = document.getElementById('mobileActionsModal');
+    if (mobileActionsModal) mobileActionsModal.style.display = 'none';
 }
 
 // ========================================
@@ -203,7 +242,8 @@ export function openPdfExportModal(id) {
     pdfExportReceiptId = id;
     pdfExportReceiptIds = [];
 
-    document.getElementById('pdfBatchInfo').style.display = 'none';
+    const pdfBatchInfo = document.getElementById('pdfBatchInfo');
+    if (pdfBatchInfo) pdfBatchInfo.style.display = 'none';
 
     // Load templates will be called by main module
     document.dispatchEvent(new CustomEvent('receipts:loadPdfTemplates'));
@@ -213,10 +253,14 @@ export function openPdfExportModal(id) {
     const defaultFilename = receipt
         ? `單據_${receipt.company_name || 'unknown'}_${receipt.receipt_date || ''}.pdf`
         : `單據_${id}.pdf`;
-    document.getElementById('pdfDefaultFilename').textContent = defaultFilename;
-    document.getElementById('pdfCustomFilename').value = '';
 
-    document.getElementById('pdfExportModal').style.display = 'flex';
+    const pdfDefaultFilename = document.getElementById('pdfDefaultFilename');
+    const pdfCustomFilename = document.getElementById('pdfCustomFilename');
+    const pdfExportModal = document.getElementById('pdfExportModal');
+
+    if (pdfDefaultFilename) pdfDefaultFilename.textContent = defaultFilename;
+    if (pdfCustomFilename) pdfCustomFilename.value = '';
+    if (pdfExportModal) pdfExportModal.style.display = 'flex';
 }
 
 export function openBulkPdfExportModal() {
@@ -231,22 +275,28 @@ export function openBulkPdfExportModal() {
     pdfExportReceiptId = null;
     pdfExportReceiptIds = Array.from(selectedReceiptIds);
 
-    document.getElementById('pdfBatchInfo').style.display = 'block';
-    document.getElementById('pdfBatchCount').textContent = `將匯出 ${pdfExportReceiptIds.length} 筆單據至單一 PDF 檔案`;
+    const pdfBatchInfo = document.getElementById('pdfBatchInfo');
+    const pdfBatchCount = document.getElementById('pdfBatchCount');
+    if (pdfBatchInfo) pdfBatchInfo.style.display = 'block';
+    if (pdfBatchCount) pdfBatchCount.textContent = `將匯出 ${pdfExportReceiptIds.length} 筆單據至單一 PDF 檔案`;
 
     document.dispatchEvent(new CustomEvent('receipts:loadPdfTemplates'));
 
     const defaultFilename = `批量單據_${pdfExportReceiptIds.length}筆_${new Date().toISOString().slice(0, 10).replace(/-/g, '')}.pdf`;
-    document.getElementById('pdfDefaultFilename').textContent = defaultFilename;
-    document.getElementById('pdfCustomFilename').value = '';
+    const pdfDefaultFilename = document.getElementById('pdfDefaultFilename');
+    const pdfCustomFilename = document.getElementById('pdfCustomFilename');
+    const pdfExportModal = document.getElementById('pdfExportModal');
 
-    document.getElementById('pdfExportModal').style.display = 'flex';
+    if (pdfDefaultFilename) pdfDefaultFilename.textContent = defaultFilename;
+    if (pdfCustomFilename) pdfCustomFilename.value = '';
+    if (pdfExportModal) pdfExportModal.style.display = 'flex';
 }
 
 export function closePdfExportModal() {
     pdfExportReceiptId = null;
     pdfExportReceiptIds = [];
-    document.getElementById('pdfExportModal').style.display = 'none';
+    const pdfExportModal = document.getElementById('pdfExportModal');
+    if (pdfExportModal) pdfExportModal.style.display = 'none';
 }
 
 // ========================================
@@ -285,11 +335,13 @@ export function openExportModal() {
 }
 
 export function closeExportModal() {
-    document.getElementById('exportModal').style.display = 'none';
+    const exportModal = document.getElementById('exportModal');
+    if (exportModal) exportModal.style.display = 'none';
 }
 
 export function closeAddEmptyColumnModal() {
-    document.getElementById('addEmptyColumnModal').style.display = 'none';
+    const addEmptyColumnModal = document.getElementById('addEmptyColumnModal');
+    if (addEmptyColumnModal) addEmptyColumnModal.style.display = 'none';
 }
 
 // ========================================

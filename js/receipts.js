@@ -392,14 +392,23 @@ function initEventListeners() {
             // If there are more receipts to load, load them all first (data only, no UI re-render)
             if (hasMore && loadedCount < totalCount) {
                 console.log('[SelectAll] Loading remaining receipts...');
-                const selectAllCb = e.target;
-                selectAllCb.disabled = true;
 
-                // Show loading state
-                const label = selectAllCb.closest('label') || selectAllCb.parentElement;
-                if (label) {
-                    label.innerHTML = '<input type="checkbox" id="selectAllCheckbox" disabled checked> 載入中...';
-                }
+                // Disable both checkboxes and show loading state
+                const selectAllCb = document.getElementById('selectAllCheckbox');
+                const bottomSelectAllCb = document.getElementById('bottomSelectAllCheckbox');
+
+                const setLoadingState = (cb) => {
+                    if (!cb) return;
+                    cb.disabled = true;
+                    const label = cb.closest('label') || cb.parentElement;
+                    if (label) {
+                        const cbId = cb.id;
+                        label.innerHTML = `<input type="checkbox" id="${cbId}" disabled checked> 載入中...`;
+                    }
+                };
+
+                setLoadingState(selectAllCb);
+                setLoadingState(bottomSelectAllCb);
 
                 // Load all remaining receipts using dedicated function
                 await API.loadAllRemainingReceipts();
@@ -409,14 +418,23 @@ function initEventListeners() {
                     hasMore: State.getHasMoreReceipts()
                 });
 
-                // Restore checkbox without re-rendering UI
-                if (label) {
-                    label.innerHTML = '<input type="checkbox" id="selectAllCheckbox" checked> 全選';
-                    const newCb = document.getElementById('selectAllCheckbox');
-                    newCb.checked = true;
-                    // Re-attach event listener using named function
-                    newCb?.addEventListener('change', handleSelectAllChange);
-                }
+                // Restore both checkboxes
+                const restoreCheckbox = (cbId) => {
+                    const newCb = document.getElementById(cbId);
+                    if (!newCb) return;
+                    const label = newCb.closest('label') || newCb.parentElement;
+                    if (label) {
+                        label.innerHTML = `<input type="checkbox" id="${cbId}" checked> 全選`;
+                        const restoredCb = document.getElementById(cbId);
+                        if (restoredCb) {
+                            restoredCb.checked = true;
+                            restoredCb.addEventListener('change', handleSelectAllChange);
+                        }
+                    }
+                };
+
+                restoreCheckbox('selectAllCheckbox');
+                restoreCheckbox('bottomSelectAllCheckbox');
             } else {
                 console.log('[SelectAll] No need to load more, using cache directly');
             }
@@ -447,6 +465,33 @@ function initEventListeners() {
         UI.updateSelectedCount();
     }
     document.getElementById('selectAllCheckbox')?.addEventListener('change', handleSelectAllChange);
+
+    // Bottom toolbar select all - sync with top toolbar
+    document.getElementById('bottomSelectAllCheckbox')?.addEventListener('change', handleSelectAllChange);
+
+    // Bottom toolbar cancel selection
+    document.getElementById('bottomCancelSelectBtn')?.addEventListener('click', () => {
+        document.getElementById('cancelSelectBtn')?.click();
+    });
+
+    // Bottom toolbar bulk actions - delegate to top toolbar buttons
+    document.getElementById('bottomBulkAddTagBtn')?.addEventListener('click', () => {
+        document.getElementById('bulkAddTagBtn')?.click();
+    });
+    document.getElementById('bottomBulkRemoveTagBtn')?.addEventListener('click', () => {
+        document.getElementById('bulkRemoveTagBtn')?.click();
+    });
+    document.getElementById('bottomBulkDeleteBtn')?.addEventListener('click', () => {
+        document.getElementById('bulkDeleteBtn')?.click();
+    });
+    document.getElementById('bottomBulkExportPdfBtn')?.addEventListener('click', () => {
+        document.getElementById('bulkExportPdfBtn')?.click();
+    });
+
+    // Bottom mobile actions button
+    document.getElementById('bottomMobileActionsBtn')?.addEventListener('click', () => {
+        document.getElementById('mobileActionsBtn')?.click();
+    });
 
     // Export Excel
     document.getElementById('exportExcelBtn')?.addEventListener('click', () => {

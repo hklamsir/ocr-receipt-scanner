@@ -235,14 +235,20 @@ export function updateReceiptCount() {
 // ========================================
 export function updateFilteredCount(hasActiveFilter, filteredCount, totalCount) {
     const filteredCountSpan = document.getElementById('filteredCount');
-    if (!filteredCountSpan) return;
+    const bottomFilteredCountSpan = document.getElementById('bottomFilteredCount');
 
-    if (hasActiveFilter && totalCount > 0) {
-        filteredCountSpan.textContent = `已篩選 ${filteredCount} 張單據`;
-        filteredCountSpan.style.display = 'inline';
-    } else {
-        filteredCountSpan.style.display = 'none';
-    }
+    const updateSpan = (span) => {
+        if (!span) return;
+        if (hasActiveFilter && totalCount > 0) {
+            span.textContent = `已篩選 ${filteredCount} 張單據`;
+            span.style.display = 'inline';
+        } else {
+            span.style.display = 'none';
+        }
+    };
+
+    updateSpan(filteredCountSpan);
+    updateSpan(bottomFilteredCountSpan);
 }
 
 export function updateSelectedTagsBar() {
@@ -280,20 +286,27 @@ export function updateSelectedTagsBar() {
 export function updateSelectAllState() {
     const checkboxes = document.querySelectorAll('.card-checkbox');
     const selectAllCb = document.getElementById('selectAllCheckbox');
-    if (!selectAllCb) return;
+    const bottomSelectAllCb = document.getElementById('bottomSelectAllCheckbox');
 
-    if (checkboxes.length === 0) {
-        selectAllCb.checked = false;
-        selectAllCb.indeterminate = false;
-        return;
-    }
-    const checkedCount = document.querySelectorAll('.card-checkbox:checked').length;
-    selectAllCb.checked = checkedCount === checkboxes.length;
-    selectAllCb.indeterminate = checkedCount > 0 && checkedCount < checkboxes.length;
+    const updateCheckbox = (cb) => {
+        if (!cb) return;
+        if (checkboxes.length === 0) {
+            cb.checked = false;
+            cb.indeterminate = false;
+            return;
+        }
+        const checkedCount = document.querySelectorAll('.card-checkbox:checked').length;
+        cb.checked = checkedCount === checkboxes.length;
+        cb.indeterminate = checkedCount > 0 && checkedCount < checkboxes.length;
+    };
+
+    updateCheckbox(selectAllCb);
+    updateCheckbox(bottomSelectAllCb);
 }
 
 export function updateSelectedCount() {
     const countSpan = document.getElementById('selectedCount');
+    const bottomCountSpan = document.getElementById('bottomSelectedCount');
     const selectedIds = State.getSelectedReceiptIds();
     const count = selectedIds.size;
 
@@ -305,23 +318,31 @@ export function updateSelectedCount() {
         if (currentIds.has(id)) visibleSelectedCount++;
     });
 
-    if (countSpan) {
+    const updateSpan = (span) => {
+        if (!span) return;
         if (count > 0) {
             // If all selected items are visible, just show the count
             // Otherwise show "visible / total" to indicate some are filtered out
             if (visibleSelectedCount === count) {
-                countSpan.textContent = `已選 ${count} 筆`;
+                span.textContent = `已選 ${count} 筆`;
             } else {
-                countSpan.textContent = `已選 ${visibleSelectedCount} / ${count} 筆`;
+                span.textContent = `已選 ${visibleSelectedCount} / ${count} 筆`;
             }
         } else {
-            countSpan.textContent = '';
+            span.textContent = '';
         }
-    }
+    };
+
+    updateSpan(countSpan);
+    updateSpan(bottomCountSpan);
 
     const toolbarActions = document.getElementById('toolbarActions');
+    const bottomToolbarActions = document.getElementById('bottomToolbarActions');
     if (toolbarActions) {
         toolbarActions.style.display = count > 0 ? 'flex' : 'none';
+    }
+    if (bottomToolbarActions) {
+        bottomToolbarActions.style.display = count > 0 ? 'flex' : 'none';
     }
 }
 

@@ -17,6 +17,8 @@ export const PRESET_COLORS = [
 // ========================================
 export function renderColorPalette(containerId, selectedColor, onSelect) {
     const container = document.getElementById(containerId);
+    if (!container) return;
+
     container.innerHTML = PRESET_COLORS.map(color => `
             <div class="color-swatch ${color === selectedColor ? 'selected' : ''}" 
                  data-color="${color}" 
@@ -38,6 +40,8 @@ export function renderColorPalette(containerId, selectedColor, onSelect) {
 // ========================================
 export function renderYearSelector(years) {
     const select = document.getElementById('yearFilter');
+    if (!select) return;
+
     select.innerHTML = '<option value="">所有年份</option>' +
         years.map(y => `<option value="${y}">${y}</option>`).join('');
 }
@@ -49,6 +53,7 @@ export function renderTagGrid() {
     const allTags = State.getAllTags();
     const selectedFilterTags = State.getSelectedFilterTags();
     const grid = document.getElementById('tagGrid');
+    if (!grid) return;
 
     if (allTags.length === 0) {
         grid.innerHTML = '<p style="color:#999;text-align:center;">尚無標籤，請先在設定中建立</p>';
@@ -88,6 +93,8 @@ export function truncateText(text, maxLen = 15) {
 
 export function renderReceipts(receipts, append = false) {
     const container = document.getElementById('receipts-container');
+    if (!container) return;
+
     const selectedReceiptIds = State.getSelectedReceiptIds();
 
     const html = receipts.map(r => `
@@ -243,6 +250,7 @@ export function updateSelectedTagsBar() {
     const allTags = State.getAllTags();
     const bar = document.getElementById('selectedTagsBar');
     const list = document.getElementById('selectedTagsList');
+    if (!bar || !list) return;
 
     if (selectedFilterTags.length === 0) {
         bar.style.display = 'none';
@@ -272,6 +280,8 @@ export function updateSelectedTagsBar() {
 export function updateSelectAllState() {
     const checkboxes = document.querySelectorAll('.card-checkbox');
     const selectAllCb = document.getElementById('selectAllCheckbox');
+    if (!selectAllCb) return;
+
     if (checkboxes.length === 0) {
         selectAllCb.checked = false;
         selectAllCb.indeterminate = false;
@@ -295,20 +305,24 @@ export function updateSelectedCount() {
         if (currentIds.has(id)) visibleSelectedCount++;
     });
 
-    if (count > 0) {
-        // If all selected items are visible, just show the count
-        // Otherwise show "visible / total" to indicate some are filtered out
-        if (visibleSelectedCount === count) {
-            countSpan.textContent = `已選 ${count} 筆`;
+    if (countSpan) {
+        if (count > 0) {
+            // If all selected items are visible, just show the count
+            // Otherwise show "visible / total" to indicate some are filtered out
+            if (visibleSelectedCount === count) {
+                countSpan.textContent = `已選 ${count} 筆`;
+            } else {
+                countSpan.textContent = `已選 ${visibleSelectedCount} / ${count} 筆`;
+            }
         } else {
-            countSpan.textContent = `已選 ${visibleSelectedCount} / ${count} 筆`;
+            countSpan.textContent = '';
         }
-    } else {
-        countSpan.textContent = '';
     }
 
     const toolbarActions = document.getElementById('toolbarActions');
-    toolbarActions.style.display = count > 0 ? 'flex' : 'none';
+    if (toolbarActions) {
+        toolbarActions.style.display = count > 0 ? 'flex' : 'none';
+    }
 }
 
 // ========================================
@@ -317,6 +331,8 @@ export function updateSelectedCount() {
 export function renderEditTags() {
     const editReceiptTags = State.getEditReceiptTags();
     const container = document.getElementById('editTagsContainer');
+    if (!container) return;
+
     if (editReceiptTags.length === 0) {
         container.innerHTML = '<span style="color:#999;font-size:13px;">尚無標籤</span>';
         return;
@@ -340,6 +356,8 @@ export function setBulkRemoveTags(tags) { bulkRemoveTags = tags; }
 export function renderBulkTagsGrid() {
     const allTags = State.getAllTags();
     const grid = document.getElementById('bulkTagsGrid');
+    if (!grid) return;
+
     if (allTags.length === 0) {
         grid.innerHTML = '<p style="color:#999;text-align:center;">尚無標籤，請先在設定中建立</p>';
         return;
@@ -368,6 +386,8 @@ export function renderBulkTagsGrid() {
 export function renderBulkRemoveTagsGrid() {
     const allTags = State.getAllTags();
     const grid = document.getElementById('bulkRemoveTagsGrid');
+    if (!grid) return;
+
     if (allTags.length === 0) {
         grid.innerHTML = '<p style="color:#999;text-align:center;">尚無標籤</p>';
         return;
@@ -400,6 +420,7 @@ export function renderEditTagsGrid() {
     const allTags = State.getAllTags();
     const tempSelectedTags = State.getTempSelectedTags();
     const grid = document.getElementById('editTagsGrid');
+    if (!grid) return;
 
     if (allTags.length === 0) {
         grid.innerHTML = '<p style="color:#999;text-align:center;">尚無標籤，請先在設定中建立</p>';

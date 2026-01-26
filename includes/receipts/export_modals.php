@@ -4,6 +4,7 @@
  * Uses shared form components from includes/shared/export/
  */
 ?>
+<!-- DEBUG: export_modals.php included -->
 
 <!-- 匯出 Excel 設定 Modal -->
 <div id="exportModal" class="edit-modal">

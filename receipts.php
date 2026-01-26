@@ -130,6 +130,23 @@ include __DIR__ . '/includes/receipts/tag_modals.php';
 include __DIR__ . '/includes/receipts/export_modals.php';
 ?>
 
+<script>
+    // Pre-define global functions that may be called by inline onclick handlers
+    // before ES module finishes loading. These will be overwritten by the module.
+    window.openPdfExportModal = function (id) {
+        console.warn('[Pre-module] openPdfExportModal called before module loaded, queuing...');
+        window._pendingPdfExportId = id;
+    };
+    window.openEditModal = function (id) {
+        console.warn('[Pre-module] openEditModal called before module loaded');
+    };
+    window.openDeleteModal = function (id) {
+        console.warn('[Pre-module] openDeleteModal called before module loaded');
+    };
+    window.openModal = function (src) {
+        console.warn('[Pre-module] openModal called before module loaded');
+    };
+</script>
 <script type="module" src="js/receipts.js"></script>
 
 <?php include __DIR__ . '/includes/footer.php'; ?>

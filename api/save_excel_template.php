@@ -47,15 +47,17 @@ try {
     // 插入新模板
     $stmt = $pdo->prepare("
         INSERT INTO excel_templates (
-            user_id, template_name, is_default, fields_config
-        ) VALUES (?, ?, ?, ?)
+            user_id, template_name, is_default, fields_config, sort_by, sort_order
+        ) VALUES (?, ?, ?, ?, ?, ?)
     ");
 
     $stmt->execute([
         $userId,
         $data['template_name'],
         !empty($data['is_default']) ? 1 : 0,
-        json_encode($data['fields_config'], JSON_UNESCAPED_UNICODE)
+        json_encode($data['fields_config'], JSON_UNESCAPED_UNICODE),
+        $data['sort_by'] ?? 'date',
+        $data['sort_order'] ?? 'desc'
     ]);
 
     ApiResponse::success([

@@ -43,7 +43,9 @@ try {
         UPDATE excel_templates SET
             template_name = ?,
             is_default = ?,
-            fields_config = ?
+            fields_config = ?,
+            sort_by = ?,
+            sort_order = ?
         WHERE id = ? AND user_id = ?
     ");
 
@@ -51,6 +53,8 @@ try {
         $data['template_name'] ?? '',
         !empty($data['is_default']) ? 1 : 0,
         json_encode($data['fields_config'] ?? [], JSON_UNESCAPED_UNICODE),
+        $data['sort_by'] ?? 'date',
+        $data['sort_order'] ?? 'desc',
         $templateId,
         $userId
     ]);

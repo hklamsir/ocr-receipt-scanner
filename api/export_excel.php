@@ -25,6 +25,13 @@ try {
         }
     }
 
+    // 解析排序設定
+    $sortBy = $_POST['sort_by'] ?? 'date';
+    $sortOrder = strtoupper($_POST['sort_order'] ?? 'DESC');
+    if (!in_array($sortOrder, ['ASC', 'DESC'])) {
+        $sortOrder = 'DESC';
+    }
+
     // 預設欄位對應
     $defaultColumns = [
         ['key' => 'date', 'label' => '日期'],
@@ -43,14 +50,25 @@ try {
 
     // 欄位 key 到資料庫欄位的映射
     $fieldMapping = [
-        'date' => 'receipt_date',
-        'time' => 'receipt_time',
-        'company' => 'company_name',
-        'items' => 'items_summary',
-        'summary' => 'summary',
-        'payment' => 'payment_method',
-        'amount' => 'total_amount'
+        'date' => 'r.receipt_date',
+        'time' => 'r.receipt_time',
+        'company' => 'r.company_name',
+        'items' => 'r.items_summary',
+        'summary' => 'r.summary',
+        'payment' => 'r.payment_method',
+        'amount' => 'r.total_amount'
     ];
+
+    // 建立 ORDER BY 子句
+    $orderBy = "r.receipt_date DESC, r.receipt_time DESC"; // 預設
+    if (isset($fieldMapping[$sortBy])) {
+        $dbSortField = $fieldMapping[$sortBy];
+        if ($sortBy === 'date') {
+            $orderBy = "$dbSortField $sortOrder, r.receipt_time $sortOrder";
+        } else {
+            $orderBy = "$dbSortField $sortOrder";
+        }
+    }
 
     // 查詢該用戶的單據（包含標籤）
     if ($ids && count($ids) > 0) {
@@ -60,7 +78,7 @@ try {
                    r.summary, r.payment_method, r.total_amount
             FROM receipts r
             WHERE r.user_id = ? AND r.id IN ($placeholders)
-            ORDER BY r.receipt_date DESC, r.receipt_time DESC
+            ORDER BY $orderBy
         ");
         $stmt->execute(array_merge([$userId], $ids));
     } else {
@@ -69,7 +87,7 @@ try {
                    r.summary, r.payment_method, r.total_amount
             FROM receipts r
             WHERE r.user_id = ?
-            ORDER BY r.receipt_date DESC, r.receipt_time DESC
+            ORDER BY $orderBy
         ");
         $stmt->execute([$userId]);
     }

@@ -13,9 +13,17 @@ import * as Export from './modules/receipts-export.js';
 // Filter and Render
 // ========================================
 async function filterAndRenderReceipts() {
-    const search = document.getElementById('searchInput').value.trim().toLowerCase();
-    const month = document.getElementById('monthFilter').value;
-    const year = document.getElementById('yearFilter').value;
+    const searchInput = document.getElementById('searchInput');
+    const monthFilter = document.getElementById('monthFilter');
+    const yearFilter = document.getElementById('yearFilter');
+    const sortSelectEl = document.getElementById('sortSelect');
+    const container = document.getElementById('receipts-container');
+    const emptyState = document.getElementById('empty-state');
+    const noFilterResults = document.getElementById('no-filter-results');
+
+    const search = searchInput ? searchInput.value.trim().toLowerCase() : '';
+    const month = monthFilter ? monthFilter.value : '';
+    const year = yearFilter ? yearFilter.value : '';
     const selectedFilterTags = State.getSelectedFilterTags();
 
     // Check if any filter is active
@@ -64,7 +72,7 @@ async function filterAndRenderReceipts() {
     }
 
     // Sort
-    const sortValue = document.getElementById('sortSelect').value;
+    const sortValue = sortSelectEl ? sortSelectEl.value : 'date_desc';
     const [sortField, sortDir] = sortValue.split('_');
     filtered.sort((a, b) => {
         let valA, valB;
@@ -94,9 +102,6 @@ async function filterAndRenderReceipts() {
         return 0;
     });
 
-    const container = document.getElementById('receipts-container');
-    const emptyState = document.getElementById('empty-state');
-
     State.setReceiptsData(filtered);
 
     // Clear selection when filter changes to avoid confusion
@@ -115,22 +120,22 @@ async function filterAndRenderReceipts() {
 
     if (filtered.length > 0) {
         UI.renderReceipts(filtered);
-        emptyState.style.display = 'none';
-        document.getElementById('no-filter-results').style.display = 'none';
-        container.style.display = '';
+        if (emptyState) emptyState.style.display = 'none';
+        if (noFilterResults) noFilterResults.style.display = 'none';
+        if (container) container.style.display = '';
     } else {
-        container.innerHTML = '';
-        container.style.display = 'none';
+        if (container) container.innerHTML = '';
+        if (container) container.style.display = 'none';
 
         // Show different empty state based on whether filter is active
         if (hasActiveFilter) {
             // Filter is active but no results - show "no filter results" message
-            document.getElementById('no-filter-results').style.display = 'block';
-            emptyState.style.display = 'none';
+            if (noFilterResults) noFilterResults.style.display = 'block';
+            if (emptyState) emptyState.style.display = 'none';
         } else {
             // No filter and no receipts - show "no records" message
-            emptyState.style.display = 'block';
-            document.getElementById('no-filter-results').style.display = 'none';
+            if (emptyState) emptyState.style.display = 'block';
+            if (noFilterResults) noFilterResults.style.display = 'none';
         }
     }
 
@@ -960,11 +965,21 @@ function initEventListeners() {
 
 // Initial load
 function init() {
-    Modals.attachWindowHandlers();
-    initEventListeners();
-    initYears();
-    initTags();
-    loadInitialReceipts();
+    console.log('[receipts.js] init() started');
+    try {
+        Modals.attachWindowHandlers();
+        console.log('[receipts.js] attachWindowHandlers done');
+        initEventListeners();
+        console.log('[receipts.js] initEventListeners done');
+        initYears();
+        console.log('[receipts.js] initYears done');
+        initTags();
+        console.log('[receipts.js] initTags done');
+        loadInitialReceipts();
+        console.log('[receipts.js] loadInitialReceipts started');
+    } catch (err) {
+        console.error('[receipts.js] init() error:', err);
+    }
 }
 
 init();

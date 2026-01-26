@@ -104,10 +104,12 @@ include __DIR__ . '/includes/receipts/main_modals.php';
 // Tag Management Modals
 include __DIR__ . '/includes/receipts/tag_modals.php';
 
-// Export & Bulk Modals
-echo "<!-- DEBUG: About to include export_modals.php -->";
-include __DIR__ . '/includes/receipts/export_modals.php';
-echo "<!-- DEBUG: After include export_modals.php -->";
+// Export & Bulk Modals - Debug version
+$exportModalsPath = __DIR__ . '/includes/receipts/export_modals.php';
+echo "<!-- DEBUG: Path = " . $exportModalsPath . " -->";
+echo "<!-- DEBUG: File exists = " . (file_exists($exportModalsPath) ? 'YES' : 'NO') . " -->";
+echo "<!-- DEBUG: File size = " . (file_exists($exportModalsPath) ? filesize($exportModalsPath) : 'N/A') . " bytes -->";
+include $exportModalsPath;
 ?>
 
 <script type="module" src="js/receipts.js?v=20260126b"></script>

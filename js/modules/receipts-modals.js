@@ -304,7 +304,12 @@ export function closePdfExportModal() {
 // ========================================
 export function openPdfHintModal() {
     const pdfHintModal = document.getElementById('pdfHintModal');
-    if (pdfHintModal) pdfHintModal.style.display = 'flex';
+    if (pdfHintModal) {
+        console.log('[PDF Hint] Modal element found, showing...');
+        pdfHintModal.style.setProperty('display', 'flex', 'important');
+    } else {
+        console.error('[PDF Hint] Modal element NOT found in DOM!');
+    }
 }
 
 export function closePdfHintModal() {
@@ -375,6 +380,12 @@ export function closeAddEmptyColumnModal() {
 // Attach Window Handlers
 // ========================================
 export function attachWindowHandlers() {
+    // This is now done automatically on module load
+    console.log('[Modals] attachWindowHandlers called (legacy support)');
+}
+
+// 立即將所有必要的函數綁定到 window，確保渲染時 inline onclick 可用
+if (typeof window !== 'undefined') {
     window.openModal = openModal;
     window.closeModal = closeModal;
     window.openEditModal = openEditModal;
@@ -388,9 +399,12 @@ export function attachWindowHandlers() {
     window.closeEditTagsModal = closeEditTagsModal;
     window.closeCreateTagModal = closeCreateTagModal;
     window.closeMobileActionsModal = closeMobileActionsModal;
+    window.openPdfExportModal = openPdfExportModal;
+    window.openBulkPdfExportModal = openBulkPdfExportModal;
     window.closePdfExportModal = closePdfExportModal;
     window.openPdfHintModal = openPdfHintModal;
     window.closePdfHintModal = closePdfHintModal;
     window.closeExportModal = closeExportModal;
     window.closeAddEmptyColumnModal = closeAddEmptyColumnModal;
+    console.log('[Modals] Global handlers attached');
 }

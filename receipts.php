@@ -105,7 +105,9 @@ include __DIR__ . '/includes/receipts/main_modals.php';
 include __DIR__ . '/includes/receipts/tag_modals.php';
 
 // Export & Bulk Modals
+echo "<!-- DEBUG: About to include export_modals.php -->";
 include __DIR__ . '/includes/receipts/export_modals.php';
+echo "<!-- DEBUG: After include export_modals.php -->";
 ?>
 
 <script type="module" src="js/receipts.js?v=20260126b"></script>

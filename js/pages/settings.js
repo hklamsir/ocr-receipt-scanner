@@ -825,3 +825,29 @@ document.getElementById('confirmDeleteExcelTemplateBtn')?.addEventListener('clic
         Toast.error('刪除模板失敗');
     }
 });
+
+// ========================================
+// PDF Hint Modal (Shared)
+// ========================================
+window.openPdfHintModal = function () {
+    const pdfHintModal = document.getElementById('pdfHintModal');
+    if (pdfHintModal) {
+        pdfHintModal.style.setProperty('display', 'flex', 'important');
+    } else {
+        console.error('[Settings] PDF Hint Modal not found');
+    }
+};
+
+window.closePdfHintModal = function () {
+    const pdfHintModal = document.getElementById('pdfHintModal');
+    if (pdfHintModal) pdfHintModal.style.display = 'none';
+};
+
+// Event delegation for PDF hint triggers
+document.addEventListener('click', (e) => {
+    const trigger = e.target.closest('.pdf-hint-trigger');
+    if (trigger) {
+        e.preventDefault();
+        window.openPdfHintModal();
+    }
+});

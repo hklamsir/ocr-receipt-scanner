@@ -37,15 +37,7 @@
 
             <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">
 
-            <!-- 欄位配置 -->
-            <div class="form-group">
-                <label style="font-weight: 600;">📌 選擇並排序欄位（拖拉調整順序）：</label>
-                <div id="editExcelFieldsList" class="export-fields-list"></div>
-                <div style="margin-top: 10px;">
-                    <button type="button" class="btn btn-outline btn-sm" id="editExcelAddEmptyColumnBtn">+
-                        新增空欄位</button>
-                </div>
-            </div>
+            <?php include __DIR__ . '/../shared/export/excel_form.php'; ?>
 
             <div class="form-actions">
                 <button type="button" class="btn btn-secondary" onclick="closeEditExcelTemplateModal()">取消</button>

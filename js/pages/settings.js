@@ -404,31 +404,31 @@ window.openEditPdfTemplateModal = function (id) {
     document.getElementById('editTemplateIsDefault').checked = template.is_default;
 
     // 頁面設定
-    document.getElementById('editPageSize').value = template.page_size;
-    document.getElementById('editMarginTop').value = template.margin_top;
-    document.getElementById('editMarginBottom').value = template.margin_bottom;
-    document.getElementById('editMarginLeft').value = template.margin_left;
-    document.getElementById('editMarginRight').value = template.margin_right;
+    document.getElementById('pdf_pageSize').value = template.page_size;
+    document.getElementById('pdf_marginTop').value = template.margin_top;
+    document.getElementById('pdf_marginBottom').value = template.margin_bottom;
+    document.getElementById('pdf_marginLeft').value = template.margin_left;
+    document.getElementById('pdf_marginRight').value = template.margin_right;
 
     // 頁首設定
-    document.getElementById('editHeader').value = template.header_text || '';
-    const headerAlignRadio = document.querySelector(`input[name="editHeaderAlign"][value="${template.header_align}"]`);
+    document.getElementById('pdf_headerText').value = template.header_text || '';
+    const headerAlignRadio = document.querySelector(`input[name="pdf_headerAlign"][value="${template.header_align}"]`);
     if (headerAlignRadio) headerAlignRadio.checked = true;
-    document.getElementById('editHeaderFontSize').value = template.header_font_size;
+    document.getElementById('pdf_headerFontSize').value = template.header_font_size;
 
     // 頁尾設定
-    document.getElementById('editFooter').value = template.footer_text || '';
-    const footerAlignRadio = document.querySelector(`input[name="editFooterAlign"][value="${template.footer_align}"]`);
+    document.getElementById('pdf_footerText').value = template.footer_text || '';
+    const footerAlignRadio = document.querySelector(`input[name="pdf_footerAlign"][value="${template.footer_align}"]`);
     if (footerAlignRadio) footerAlignRadio.checked = true;
-    document.getElementById('editFooterFontSize').value = template.footer_font_size;
+    document.getElementById('pdf_footerFontSize').value = template.footer_font_size;
 
     // 圖片設定
-    const imageAlignRadio = document.querySelector(`input[name="editImageAlign"][value="${template.image_align}"]`);
+    const imageAlignRadio = document.querySelector(`input[name="pdf_imageAlign"][value="${template.image_align}"]`);
     if (imageAlignRadio) imageAlignRadio.checked = true;
-    document.getElementById('editImageHeightScale').value = template.image_height_scale;
-    document.getElementById('editImageHeightScaleValue').textContent = template.image_height_scale;
-    document.getElementById('editImageWidthScale').value = template.image_width_scale;
-    document.getElementById('editImageWidthScaleValue').textContent = template.image_width_scale;
+    document.getElementById('pdf_imageHeightScale').value = template.image_height_scale;
+    document.getElementById('pdf_imageHeightScaleValue').textContent = template.image_height_scale;
+    document.getElementById('pdf_imageWidthScale').value = template.image_width_scale;
+    document.getElementById('pdf_imageWidthScaleValue').textContent = template.image_width_scale;
 
     document.getElementById('editPdfTemplateModal').style.display = 'flex';
 };
@@ -438,12 +438,12 @@ window.closeEditPdfTemplateModal = function () {
 };
 
 // 滑桿事件
-document.getElementById('editImageHeightScale')?.addEventListener('input', function () {
-    document.getElementById('editImageHeightScaleValue').textContent = this.value;
+document.getElementById('pdf_imageHeightScale')?.addEventListener('input', function () {
+    document.getElementById('pdf_imageHeightScaleValue').textContent = this.value;
 });
 
-document.getElementById('editImageWidthScale')?.addEventListener('input', function () {
-    document.getElementById('editImageWidthScaleValue').textContent = this.value;
+document.getElementById('pdf_imageWidthScale')?.addEventListener('input', function () {
+    document.getElementById('pdf_imageWidthScaleValue').textContent = this.value;
 });
 
 document.getElementById('editPdfTemplateForm')?.addEventListener('submit', async (e) => {
@@ -455,20 +455,20 @@ document.getElementById('editPdfTemplateForm')?.addEventListener('submit', async
         template_id: id,
         template_name: document.getElementById('editTemplateName').value.trim(),
         is_default: document.getElementById('editTemplateIsDefault').checked,
-        page_size: document.getElementById('editPageSize').value,
-        margin_top: document.getElementById('editMarginTop').value,
-        margin_bottom: document.getElementById('editMarginBottom').value,
-        margin_left: document.getElementById('editMarginLeft').value,
-        margin_right: document.getElementById('editMarginRight').value,
-        header_text: document.getElementById('editHeader').value,
-        header_align: document.querySelector('input[name="editHeaderAlign"]:checked')?.value || 'C',
-        header_font_size: document.getElementById('editHeaderFontSize').value,
-        footer_text: document.getElementById('editFooter').value,
-        footer_align: document.querySelector('input[name="editFooterAlign"]:checked')?.value || 'C',
-        footer_font_size: document.getElementById('editFooterFontSize').value,
-        image_align: document.querySelector('input[name="editImageAlign"]:checked')?.value || 'C',
-        image_height_scale: document.getElementById('editImageHeightScale').value,
-        image_width_scale: document.getElementById('editImageWidthScale').value
+        page_size: document.getElementById('pdf_pageSize').value,
+        margin_top: document.getElementById('pdf_marginTop').value,
+        margin_bottom: document.getElementById('pdf_marginBottom').value,
+        margin_left: document.getElementById('pdf_marginLeft').value,
+        margin_right: document.getElementById('pdf_marginRight').value,
+        header_text: document.getElementById('pdf_headerText').value,
+        header_align: document.querySelector('input[name="pdf_headerAlign"]:checked')?.value || 'C',
+        header_font_size: document.getElementById('pdf_headerFontSize').value,
+        footer_text: document.getElementById('pdf_footerText').value,
+        footer_align: document.querySelector('input[name="pdf_footerAlign"]:checked')?.value || 'C',
+        footer_font_size: document.getElementById('pdf_footerFontSize').value,
+        image_align: document.querySelector('input[name="pdf_imageAlign"]:checked')?.value || 'C',
+        image_height_scale: document.getElementById('pdf_imageHeightScale').value,
+        image_width_scale: document.getElementById('pdf_imageWidthScale').value
     };
 
     try {
@@ -623,7 +623,7 @@ window.openEditExcelTemplateModal = function (id) {
 
 // 渲染欄位列表
 function renderEditExcelFieldsList() {
-    const container = document.getElementById('editExcelFieldsList');
+    const container = document.getElementById('excel_fieldsList');
     if (!container) return;
     container.innerHTML = editExcelTemplateData.fields_config.map((field, index) => `
         <div class="export-field-item ${field.enabled ? 'enabled' : ''}" 
@@ -682,7 +682,7 @@ function handleExcelEditDragStart(e) {
 
 function handleExcelEditDragEnd() {
     this.classList.remove('dragging');
-    document.querySelectorAll('#editExcelFieldsList .export-field-item').forEach(item => {
+    document.querySelectorAll('#excel_fieldsList .export-field-item').forEach(item => {
         item.classList.remove('drag-over');
     });
     excelEditDraggedItem = null;
@@ -720,7 +720,7 @@ function handleExcelEditDrop(e) {
 }
 
 // 新增空欄位
-document.getElementById('editExcelAddEmptyColumnBtn')?.addEventListener('click', () => {
+document.getElementById('excel_addEmptyColumnBtn')?.addEventListener('click', () => {
     document.getElementById('editExcelEmptyColumnName').value = '';
     document.getElementById('editExcelAddColumnModal').style.display = 'flex';
 });

@@ -48,21 +48,22 @@ try {
         $columns = $defaultColumns;
     }
 
-    // 欄位 key 到資料庫欄位的映射
+    // 欄位 key 到資料庫欄位的映射 (用於資料讀取，不含表別名前綴)
     $fieldMapping = [
-        'date' => 'r.receipt_date',
-        'time' => 'r.receipt_time',
-        'company' => 'r.company_name',
-        'items' => 'r.items_summary',
-        'summary' => 'r.summary',
-        'payment' => 'r.payment_method',
-        'amount' => 'r.total_amount'
+        'date' => 'receipt_date',
+        'time' => 'receipt_time',
+        'company' => 'company_name',
+        'items' => 'items_summary',
+        'summary' => 'summary',
+        'payment' => 'payment_method',
+        'amount' => 'total_amount'
     ];
 
     // 建立 ORDER BY 子句
     $orderBy = "r.receipt_date DESC, r.receipt_time DESC"; // 預設
     if (isset($fieldMapping[$sortBy])) {
-        $dbSortField = $fieldMapping[$sortBy];
+        // 在排序時才加上表別名前綴 r.
+        $dbSortField = 'r.' . $fieldMapping[$sortBy];
         if ($sortBy === 'date') {
             $orderBy = "$dbSortField $sortOrder, r.receipt_time $sortOrder";
         } else {

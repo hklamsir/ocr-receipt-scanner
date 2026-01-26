@@ -108,6 +108,6 @@ include __DIR__ . '/includes/receipts/tag_modals.php';
 include __DIR__ . '/includes/receipts/export_modals.php';
 ?>
 
-<script type="module" src="js/receipts.js"></script>
+<script type="module" src="js/receipts.js?v=20260126"></script>
 
 <?php include __DIR__ . '/includes/footer.php'; ?>

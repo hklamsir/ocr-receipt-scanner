@@ -20,6 +20,8 @@ try {
             is_default,
             is_system,
             fields_config,
+            sort_by,
+            sort_order,
             created_at,
             updated_at
         FROM excel_templates

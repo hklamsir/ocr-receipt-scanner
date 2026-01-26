@@ -573,6 +573,31 @@ footer {
   padding-right: 15px;
 }
 
+/* Hint Table Styles */
+.hint-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+.hint-table th, .hint-table td {
+    padding: 10px;
+    border: 1px solid #eee;
+    text-align: left;
+}
+.hint-table th {
+    background: #f8f9fa;
+    font-weight: 600;
+}
+.code-var {
+    color: #e83e8c;
+    font-family: monospace;
+    font-weight: 600;
+}
+.pdf-hint-trigger:hover {
+    text-decoration: underline !important;
+}
+
 /* Mobile */
 @media (max-width: 600px) {
   header {

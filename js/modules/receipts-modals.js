@@ -300,6 +300,19 @@ export function closePdfExportModal() {
 }
 
 // ========================================
+// PDF Hint Modal
+// ========================================
+export function openPdfHintModal() {
+    const pdfHintModal = document.getElementById('pdfHintModal');
+    if (pdfHintModal) pdfHintModal.style.display = 'flex';
+}
+
+export function closePdfHintModal() {
+    const pdfHintModal = document.getElementById('pdfHintModal');
+    if (pdfHintModal) pdfHintModal.style.display = 'none';
+}
+
+// ========================================
 // Apply PDF Template
 // ========================================
 export function applyTemplate(template) {
@@ -375,8 +388,9 @@ export function attachWindowHandlers() {
     window.closeEditTagsModal = closeEditTagsModal;
     window.closeCreateTagModal = closeCreateTagModal;
     window.closeMobileActionsModal = closeMobileActionsModal;
-    window.openPdfExportModal = openPdfExportModal;
     window.closePdfExportModal = closePdfExportModal;
+    window.openPdfHintModal = openPdfHintModal;
+    window.closePdfHintModal = closePdfHintModal;
     window.closeExportModal = closeExportModal;
     window.closeAddEmptyColumnModal = closeAddEmptyColumnModal;
 }

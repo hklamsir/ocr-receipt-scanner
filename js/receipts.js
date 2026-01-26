@@ -998,6 +998,14 @@ function initEventListeners() {
         document.getElementById('pdf_imageWidthScaleValue').textContent = this.value;
     });
 
+    // PDF variable hints
+    document.querySelectorAll('.pdf-hint-trigger').forEach(trigger => {
+        trigger.addEventListener('click', (e) => {
+            e.preventDefault();
+            Modals.openPdfHintModal();
+        });
+    });
+
     // Infinite scroll
     let scrollTimeout = null;
     window.addEventListener('scroll', () => {

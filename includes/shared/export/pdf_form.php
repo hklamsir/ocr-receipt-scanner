@@ -34,7 +34,11 @@
 
     <!-- 頁首設定 -->
     <div class="form-group">
-        <label for="pdf_headerText">頁首文字（選填，最多5行）</label>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+            <label for="pdf_headerText" style="margin-bottom: 0;">頁首文字（選填，最多5行）</label>
+            <a href="javascript:void(0)" class="pdf-hint-trigger"
+                style="font-size: 12px; color: #3b82f6; text-decoration: none;">💡 變數說明</a>
+        </div>
         <textarea id="pdf_headerText" rows="3" maxlength="500" placeholder="例如：我的單據\n2026年度"></textarea>
     </div>
     <div class="form-row">
@@ -64,7 +68,11 @@
 
     <!-- 頁尾設定 -->
     <div class="form-group">
-        <label for="pdf_footerText">頁尾文字（選填，最多5行）</label>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+            <label for="pdf_footerText" style="margin-bottom: 0;">頁尾文字（選填，最多5行）</label>
+            <a href="javascript:void(0)" class="pdf-hint-trigger"
+                style="font-size: 12px; color: #3b82f6; text-decoration: none;">💡 變數說明</a>
+        </div>
         <textarea id="pdf_footerText" rows="3" maxlength="500" placeholder="例如：第 {PAGENO} 頁\n版權所有"></textarea>
     </div>
     <div class="form-row">

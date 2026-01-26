@@ -114,11 +114,31 @@ try {
         // 添加新頁
         $pdf->AddPage();
 
+        // 定義共用的系統變數替換函數
+        $replaceCommonVariables = function ($text, $pdf, $receipt) {
+            $vars = [
+                '{PAGENO}' => $pdf->PageNo(),
+                '{PAGES}' => $pdf->getAliasNbPages(),
+                '{TODAY}' => date('Y-m-d'),
+                '{NOW}' => date('H:i'),
+                '{USER}' => $receipt['username'] ?? '',
+                '{COMPANY}' => $receipt['company_name'] ?? '',
+                '{DATE}' => $receipt['receipt_date'] ?? '',
+                '{AMOUNT}' => $receipt['total_amount'] ?? '',
+                '{PAYMENT}' => $receipt['payment_method'] ?? '',
+                '{SUMMARY}' => $receipt['summary'] ?? '',
+                '{ITEMS}' => $receipt['items_summary'] ?? ''
+            ];
+            return strtr($text, $vars);
+        };
+
         // 如果有頁首文字
         if (!empty($headerText)) {
             $pdf->SetFont('stsongstdlight', '', $headerFontSize);
+            // 替換變數
+            $currentHeaderContent = $replaceCommonVariables($headerText, $pdf, $receipt);
             // 將 \n 轉換為實際換行，支援多行
-            $headerLines = explode("\n", $headerText);
+            $headerLines = explode("\n", $currentHeaderContent);
             $lineCount = min(count($headerLines), 5); // 最多5行
             foreach (array_slice($headerLines, 0, $lineCount) as $line) {
                 $pdf->Cell(0, 8, trim($line), 0, 1, $headerAlign);
@@ -128,7 +148,7 @@ try {
 
         // 插入單據圖片
         if (!empty($receipt['image_filename'])) {
-            // 圖片存儲在 receipts/{username}/ 目錄下
+            // ... (保持原本的圖片處理邏輯)
             $imagePath = __DIR__ . '/../receipts/' . $receipt['username'] . '/' . $receipt['image_filename'];
 
             if (file_exists($imagePath)) {
@@ -210,12 +230,11 @@ try {
 
         // 如果有頁尾文字
         if (!empty($footerText)) {
-            // 替換頁碼占位符
-            $footerContent = str_replace('{PAGENO}', $pdf->getAliasNumPage(), $footerText);
-            $footerContent = str_replace('{PAGES}', $pdf->getAliasNbPages(), $footerContent);
+            // 替換變數
+            $currentFooterContent = $replaceCommonVariables($footerText, $pdf, $receipt);
 
             // 將 \n 轉換為實際換行，支援多行
-            $footerLines = explode("\n", $footerContent);
+            $footerLines = explode("\n", $currentFooterContent);
             $lineCount = min(count($footerLines), 5); // 最多5行
 
             // 移動到頁面底部，根據行數調整位置

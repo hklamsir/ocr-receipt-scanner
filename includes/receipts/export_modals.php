@@ -44,6 +44,77 @@
     </div>
 </div>
 
+<!-- PDF 變數說明 Modal -->
+<div id="pdfHintModal" class="edit-modal">
+    <div class="edit-modal-content" style="max-width: 500px;">
+        <div class="edit-modal-header">
+            <span>💡 PDF 變數說明</span>
+            <button class="close-btn" onclick="closePdfHintModal()">✕</button>
+        </div>
+        <div class="edit-modal-body" style="padding: 20px;">
+            <p style="margin-bottom: 15px; font-size: 14px; color: #666;">您可以在頁首或頁尾文字中使用以下變數，系統將在產生 PDF 時自動替換為實際內容：</p>
+            <table class="hint-table">
+                <thead>
+                    <tr>
+                        <th>變數</th>
+                        <th>說明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="code-var">{PAGENO}</td>
+                        <td>當前頁碼</td>
+                    </tr>
+                    <tr>
+                        <td class="code-var">{PAGES}</td>
+                        <td>總頁數</td>
+                    </tr>
+                    <tr>
+                        <td class="code-var">{TODAY}</td>
+                        <td>今日日期 (YYYY-MM-DD)</td>
+                    </tr>
+                    <tr>
+                        <td class="code-var">{NOW}</td>
+                        <td>當前時間 (HH:MM)</td>
+                    </tr>
+                    <tr>
+                        <td class="code-var">{USER}</td>
+                        <td>使用者名稱</td>
+                    </tr>
+                    <tr>
+                        <td class="code-var">{COMPANY}</td>
+                        <td>單據公司名稱</td>
+                    </tr>
+                    <tr>
+                        <td class="code-var">{DATE}</td>
+                        <td>單據日期</td>
+                    </tr>
+                    <tr>
+                        <td class="code-var">{AMOUNT}</td>
+                        <td>單據金額</td>
+                    </tr>
+                    <tr>
+                        <td class="code-var">{PAYMENT}</td>
+                        <td>支付方式</td>
+                    </tr>
+                    <tr>
+                        <td class="code-var">{SUMMARY}</td>
+                        <td>單據總結</td>
+                    </tr>
+                    <tr>
+                        <td class="code-var">{ITEMS}</td>
+                        <td>項目摘要</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="form-actions" style="margin-top: 20px;">
+                <button type="button" class="btn btn-secondary" style="width: 100%;"
+                    onclick="closePdfHintModal()">關閉</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- 新增空欄位 Modal (Excel) -->
 <div id="addEmptyColumnModal" class="edit-modal">
     <div class="edit-modal-content" style="max-width:350px;">

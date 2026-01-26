@@ -604,6 +604,8 @@ window.openEditExcelTemplateModal = function (id) {
     const template = excelTemplates.find(t => t.id === id);
     if (!template) return;
 
+    console.log('[Debug] Opening template:', template);
+
     // Deep copy the fields config so we can edit it
     editExcelTemplateData = {
         ...template,

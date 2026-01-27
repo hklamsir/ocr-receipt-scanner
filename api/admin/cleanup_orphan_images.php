@@ -3,6 +3,7 @@
 
 require_once __DIR__ . '/../../includes/db.php';
 require_once __DIR__ . '/../../includes/admin_check.php';
+require_once __DIR__ . '/../../includes/csrf_check.php';
 require_once __DIR__ . '/../../includes/api_response.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

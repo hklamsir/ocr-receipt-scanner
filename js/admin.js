@@ -4,6 +4,17 @@
 
 import { Toast, Dialog } from './modules/toast.js';
 
+// ============ CSRF Token Helpers ============
+function getCSRFToken() {
+  return document.querySelector('meta[name="csrf-token"]')?.content;
+}
+
+function getCSRFHeaders() {
+  return {
+    'X-CSRF-TOKEN': getCSRFToken()
+  };
+}
+
 // ============ Global State ============
 let currentSection = 'dashboard';
 let currentUserTab = 'list';
@@ -227,6 +238,7 @@ document.getElementById('create-form')?.addEventListener('submit', async (e) => 
   try {
     const res = await fetch('api/admin/create_user.php', {
       method: 'POST',
+      headers: getCSRFHeaders(),
       body: formData
     });
     const data = await res.json();
@@ -255,7 +267,7 @@ window.deleteUser = async function (id, username) {
   try {
     const res = await fetch('api/admin/delete_user.php', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded', ...getCSRFHeaders() },
       body: `user_id=${id}`
     });
     const data = await res.json();
@@ -282,7 +294,7 @@ window.resetPassword = async function (id, username) {
   try {
     const res = await fetch('api/admin/reset_password.php', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded', ...getCSRFHeaders() },
       body: `user_id=${id}&new_password=${encodeURIComponent(newPassword)}`
     });
     const data = await res.json();
@@ -306,7 +318,7 @@ window.toggleUserStatus = async function (id, newStatus) {
   try {
     const res = await fetch('api/admin/update_user_status.php', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded', ...getCSRFHeaders() },
       body: `user_id=${id}&status=${newStatus}`
     });
     const data = await res.json();
@@ -417,7 +429,7 @@ document.getElementById('quotaForm')?.addEventListener('submit', async (e) => {
   try {
     const res = await fetch('api/admin/update_user_quota.php', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded', ...getCSRFHeaders() },
       body: `user_id=${userId}&quota_limit=${quotaLimit}`
     });
     const data = await res.json();
@@ -529,7 +541,7 @@ window.cleanupOrphans = async function () {
   try {
     const res = await fetch('api/admin/cleanup_orphan_images.php', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...getCSRFHeaders() },
       body: JSON.stringify({ paths: checked })
     });
     const data = await res.json();
@@ -681,7 +693,7 @@ document.getElementById('settingsForm')?.addEventListener('submit', async (e) =>
   try {
     const res = await fetch('api/admin/settings.php', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...getCSRFHeaders() },
       body: JSON.stringify(settings)
     });
     const data = await res.json();
@@ -775,7 +787,7 @@ document.getElementById('announcementForm')?.addEventListener('submit', async (e
   try {
     const res = await fetch('api/admin/announcements.php', {
       method: id ? 'PUT' : 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...getCSRFHeaders() },
       body: JSON.stringify(payload)
     });
     const data = await res.json();
@@ -797,7 +809,7 @@ window.deleteAnnouncement = async function (id) {
   if (!confirmed) return;
 
   try {
-    const res = await fetch(`api/admin/announcements.php?id=${id}`, { method: 'DELETE' });
+    const res = await fetch(`api/admin/announcements.php?id=${id}`, { method: 'DELETE', headers: getCSRFHeaders() });
     const data = await res.json();
 
     if (data.success) {
@@ -910,7 +922,7 @@ document.getElementById('blockIPForm')?.addEventListener('submit', async (e) => 
   try {
     const res = await fetch('api/admin/manage_ip_block.php', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...getCSRFHeaders() },
       body: JSON.stringify({
         ip_address: document.getElementById('blockIP').value,
         reason: document.getElementById('blockReason').value,
@@ -937,7 +949,7 @@ window.unblockIP = async function (id) {
   if (!confirmed) return;
 
   try {
-    const res = await fetch(`api/admin/manage_ip_block.php?id=${id}`, { method: 'DELETE' });
+    const res = await fetch(`api/admin/manage_ip_block.php?id=${id}`, { method: 'DELETE', headers: getCSRFHeaders() });
     const data = await res.json();
 
     if (data.success) {
@@ -989,7 +1001,7 @@ window.forceLogout = async function (sessionId) {
   try {
     const res = await fetch('api/admin/force_logout.php', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...getCSRFHeaders() },
       body: JSON.stringify({ session_id: sessionId })
     });
     const data = await res.json();

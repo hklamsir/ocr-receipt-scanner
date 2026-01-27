@@ -1,7 +1,7 @@
 -- ==========================================
 -- OCR Receipt Scanner Init Script
 -- Combined verification and migration scripts
--- Date: 2026-01-25
+-- Date: 2026-01-27 (Updated with Excel sorting fields)
 -- ==========================================
 
 SET NAMES utf8mb4;
@@ -109,6 +109,8 @@ CREATE TABLE IF NOT EXISTS excel_templates (
     is_default TINYINT(1) DEFAULT 0,
     is_system TINYINT(1) DEFAULT 0,
     fields_config JSON NOT NULL COMMENT '欄位配置 JSON 陣列',
+    sort_by VARCHAR(50) DEFAULT 'date' COMMENT '排序欄位',
+    sort_order VARCHAR(10) DEFAULT 'desc' COMMENT '排序順序 (asc/desc)',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
@@ -246,11 +248,11 @@ INSERT INTO pdf_templates (
 
 -- Default System Excel Template
 INSERT INTO excel_templates (
-    user_id, template_name, is_system, is_default, fields_config
+    user_id, template_name, is_system, is_default, fields_config, sort_by, sort_order
 ) VALUES (
     NULL, '標準格式 (系統預設)', 1, 0,
-    '[{"key":"date","label":"日期","enabled":true},{"key":"time","label":"時間","enabled":true},{"key":"company","label":"公司名稱","enabled":true},{"key":"items","label":"項目摘要","enabled":true},{"key":"summary","label":"總結","enabled":true},{"key":"payment","label":"支付方式","enabled":true},{"key":"amount","label":"總金額","enabled":true},{"key":"tags","label":"標籤","enabled":false}]'
+    '[{"key":"date","label":"日期","enabled":true},{"key":"time","label":"時間","enabled":true},{"key":"company","label":"公司名稱","enabled":true},{"key":"items","label":"項目摘要","enabled":true},{"key":"summary","label":"總結","enabled":true},{"key":"payment","label":"支付方式","enabled":true},{"key":"amount","label":"總金額","enabled":true},{"key":"tags","label":"標籤","enabled":false}]',
+    'date', 'desc'
 );
 
 SET FOREIGN_KEY_CHECKS = 1;
-

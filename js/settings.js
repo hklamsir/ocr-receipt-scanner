@@ -1,4 +1,4 @@
-import { Toast } from '../modules/toast.js';
+import { Toast } from './modules/toast.js';
 
 // CSRF Token 輔助函數
 function getCSRFToken() {

@@ -68,7 +68,7 @@ include __DIR__ . '/includes/settings/pdf_modals.php';
 include __DIR__ . '/includes/settings/excel_modals.php';
 ?>
 
-<script type="module" src="js/pages/settings.js"></script>
+<script type="module" src="js/settings.js"></script>
 
 
 <!-- PDF 變數說明 Modal (Copied from receipts.php for consistency) -->

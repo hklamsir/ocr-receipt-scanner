@@ -2,6 +2,7 @@
 // 新增用戶 API（Admin）
 require_once __DIR__ . '/../../includes/db.php';
 require_once __DIR__ . '/../../includes/admin_check.php';
+require_once __DIR__ . '/../../includes/csrf_check.php';
 require_once __DIR__ . '/../../includes/logger.php';
 require_once __DIR__ . '/../../includes/api_response.php';
 

@@ -2,6 +2,7 @@
  * receipts-ui.js - UI rendering functions for receipts page
  */
 import * as State from './receipts-state.js';
+import { escapeHtml, safeColor } from './utils.js';
 
 // 30 色調色盤 (6 hues x 5 shades)
 export const PRESET_COLORS = [
@@ -43,7 +44,7 @@ export function renderYearSelector(years) {
     if (!select) return;
 
     select.innerHTML = '<option value="">所有年份</option>' +
-        years.map(y => `<option value="${y}">${y}</option>`).join('');
+        years.map(y => `<option value="${escapeHtml(y)}">${escapeHtml(y)}</option>`).join('');
 }
 
 // ========================================
@@ -61,8 +62,8 @@ export function renderTagGrid() {
     }
     grid.innerHTML = allTags.map(t => `
             <div class="tag-item ${selectedFilterTags.includes(t.id) ? 'selected' : ''}" 
-                 data-id="${t.id}" style="--tag-color:${t.color};">
-                <span class="tag" style="background:${t.color};">${t.name}</span>
+                 data-id="${t.id}" style="--tag-color:${safeColor(t.color)};">
+                <span class="tag" style="background:${safeColor(t.color)};">${escapeHtml(t.name)}</span>
             </div>
         `).join('');
 
@@ -102,21 +103,21 @@ export function renderReceipts(receipts, append = false) {
       <label class="card-checkbox-wrapper" onclick="event.stopPropagation()">
         <input type="checkbox" class="card-checkbox" data-id="${r.id}" ${selectedReceiptIds.has(r.id) ? 'checked' : ''}>
       </label>
-      ${r.image_filename ? `<img class="lazy-img" data-src="api/get_image.php?filename=${r.image_filename}" onclick="openModal('api/get_image.php?filename=${r.image_filename}')">` : ''}
+      ${r.image_filename ? `<img class="lazy-img" data-src="api/get_image.php?filename=${escapeHtml(r.image_filename)}" onclick="openModal('api/get_image.php?filename=${escapeHtml(r.image_filename)}')">` : ''}
       <div class="receipt-info">
-        <div><strong>日期：</strong>${r.receipt_date || '無'} ${r.receipt_time || ''}</div>
-        <div><strong>公司：</strong>${r.company_name || '無'}</div>
-        <div><strong>項目：</strong>${truncateText(r.items_summary, 15)}</div>
-        <div><strong>總結：</strong>${r.summary || '無'}</div>
-        <div><strong>支付：</strong>${r.payment_method || '無'}</div>
-        <div><strong>金額：</strong>${r.total_amount || '無'}</div>
+        <div><strong>日期：</strong>${escapeHtml(r.receipt_date) || '無'} ${escapeHtml(r.receipt_time) || ''}</div>
+        <div><strong>公司：</strong>${escapeHtml(r.company_name) || '無'}</div>
+        <div><strong>項目：</strong>${escapeHtml(truncateText(r.items_summary, 15))}</div>
+        <div><strong>總結：</strong>${escapeHtml(r.summary) || '無'}</div>
+        <div><strong>支付：</strong>${escapeHtml(r.payment_method) || '無'}</div>
+        <div><strong>金額：</strong>${escapeHtml(r.total_amount) || '無'}</div>
         ${r.tags && r.tags.length > 0 ? `
         <div class="receipt-tags">
-            ${r.tags.map(t => `<span class="tag tag-sm" style="background:${t.color};">${t.name}</span>`).join('')}
+            ${r.tags.map(t => `<span class="tag tag-sm" style="background:${safeColor(t.color)};">${escapeHtml(t.name)}</span>`).join('')}
         </div>
         ` : ''}
         <div style="margin-top:10px;color:#999;font-size:12px;">
-          建立時間：${r.created_at}
+          建立時間：${escapeHtml(r.created_at)}
         </div>
       </div>
       <div class="receipt-card-actions">
@@ -267,7 +268,7 @@ export function updateSelectedTagsBar() {
     list.innerHTML = selectedFilterTags.map(id => {
         const tag = allTags.find(t => t.id === id);
         if (!tag) return '';
-        return `<span class="tag" style="background:${tag.color};">${tag.name}
+        return `<span class="tag" style="background:${safeColor(tag.color)};">${escapeHtml(tag.name)}
                 <button class="tag-remove" data-id="${id}">×</button>
             </span>`;
     }).join('');
@@ -359,7 +360,7 @@ export function renderEditTags() {
         return;
     }
     container.innerHTML = editReceiptTags.map(t => `
-            <span class="tag" style="background:${t.color};">${t.name}</span>
+            <span class="tag" style="background:${safeColor(t.color)};">${escapeHtml(t.name)}</span>
         `).join('');
 }
 
@@ -385,8 +386,8 @@ export function renderBulkTagsGrid() {
     }
     grid.innerHTML = allTags.map(t => `
             <div class="tag-item ${bulkSelectedTags.includes(t.id) ? 'selected' : ''}" 
-                 data-id="${t.id}" style="--tag-color:${t.color};">
-                <span class="tag" style="background:${t.color};">${t.name}</span>
+                 data-id="${t.id}" style="--tag-color:${safeColor(t.color)};">
+                <span class="tag" style="background:${safeColor(t.color)};">${escapeHtml(t.name)}</span>
             </div>
         `).join('');
 
@@ -415,8 +416,8 @@ export function renderBulkRemoveTagsGrid() {
     }
     grid.innerHTML = allTags.map(t => `
             <div class="tag-item ${bulkRemoveTags.includes(t.id) ? 'selected' : ''}" 
-                 data-id="${t.id}" style="--tag-color:${t.color};">
-                <span class="tag" style="background:${t.color};">${t.name}</span>
+                 data-id="${t.id}" style="--tag-color:${safeColor(t.color)};">
+                <span class="tag" style="background:${safeColor(t.color)};">${escapeHtml(t.name)}</span>
             </div>
         `).join('');
 
@@ -449,8 +450,8 @@ export function renderEditTagsGrid() {
     }
     grid.innerHTML = allTags.map(t => `
             <div class="tag-item ${tempSelectedTags.includes(t.id) ? 'selected' : ''}" 
-                 data-id="${t.id}" style="--tag-color:${t.color};">
-                <span class="tag" style="background:${t.color};">${t.name}</span>
+                 data-id="${t.id}" style="--tag-color:${safeColor(t.color)};">
+                <span class="tag" style="background:${safeColor(t.color)};">${escapeHtml(t.name)}</span>
             </div>
         `).join('');
 

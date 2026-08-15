@@ -1,4 +1,5 @@
 import { Toast } from './modules/toast.js';
+import { escapeHtml, safeColor } from './modules/utils.js';
 
 // CSRF Token 輔助函數
 function getCSRFToken() {
@@ -73,7 +74,7 @@ function renderTagsList() {
     list.innerHTML = allTags.map((tag, index) => `
             <div class="tag-list-item" draggable="true" data-id="${tag.id}" data-index="${index}">
                 <span class="drag-handle">⋮⋮</span>
-                <span class="tag" style="background:${tag.color};">${tag.name}</span>
+                <span class="tag" style="background:${safeColor(tag.color)};">${escapeHtml(tag.name)}</span>
                 <div class="tag-actions">
                     <button class="btn btn-sm btn-secondary" onclick="openEditTagModal(${tag.id})">✏️</button>
                     <button class="btn btn-sm btn-danger" onclick="openDeleteTagModal(${tag.id})">🗑️</button>
@@ -378,11 +379,11 @@ function renderPdfTemplatesList() {
         <div class="template-item" style="display: flex; align-items: center; padding: 15px; background: #f8f9fa; border-radius: 8px; margin-bottom: 10px;">
             <div style="flex: 1;">
                 <div style="font-weight: 600; margin-bottom: 5px;">
-                    ${t.template_name}
+                    ${escapeHtml(t.template_name)}
                     ${t.is_default ? '<span style="background: #22c55e; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-left: 8px;">預設</span>' : ''}
                 </div>
                 <div style="font-size: 13px; color: #666;">
-                    ${t.page_size} | 邊界 ${t.margin_top}mm | 頁首/頁尾 ${t.header_font_size}pt/${t.footer_font_size}pt
+                    ${escapeHtml(t.page_size)} | 邊界 ${t.margin_top}mm | 頁首/頁尾 ${t.header_font_size}pt/${t.footer_font_size}pt
                 </div>
             </div>
             <div style="display: flex; gap: 8px;">
@@ -576,12 +577,12 @@ function renderExcelTemplatesList() {
     }
 
     list.innerHTML = excelTemplates.map(t => {
-        const enabledFields = t.fields_config.filter(f => f.enabled).map(f => f.label).join(', ');
+        const enabledFields = t.fields_config.filter(f => f.enabled).map(f => escapeHtml(f.label)).join(', ');
         return `
         <div class="template-item" style="display: flex; align-items: center; padding: 15px; background: #f8f9fa; border-radius: 8px; margin-bottom: 10px;">
             <div style="flex: 1;">
                 <div style="font-weight: 600; margin-bottom: 5px;">
-                    ${t.template_name}
+                    ${escapeHtml(t.template_name)}
                     ${t.is_default ? '<span style="background: #22c55e; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-left: 8px;">預設</span>' : ''}
                 </div>
                 <div style="font-size: 13px; color: #666;">
@@ -642,7 +643,7 @@ function renderEditExcelFieldsList() {
                 <input type="checkbox" class="edit-excel-field-checkbox" 
                        data-index="${index}" 
                        ${field.enabled ? 'checked' : ''}>
-                <span>${field.label}</span>
+                <span>${escapeHtml(field.label)}</span>
             </label>
             ${field.key.startsWith('empty_') ?
             `<button type="button" class="remove-empty-column" data-index="${index}">✕</button>` :

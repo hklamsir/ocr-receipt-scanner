@@ -1,5 +1,6 @@
 <?php
 // ocr_proxy.php - OCR.space API 直接實現（不依賴 Google Apps Script）
+require_once __DIR__ . '/includes/auth_check.php';
 require_once __DIR__ . '/includes/config.php';
 require_once __DIR__ . '/includes/security.php';
 require_once __DIR__ . '/includes/logger.php';
@@ -31,7 +32,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // =============== 用戶配額檢查 ===============
-session_start();
 if (isset($_SESSION['user_id'])) {
     try {
         $pdo = getDB();

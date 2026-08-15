@@ -1,5 +1,6 @@
 <?php
 // proxy.php - DeepSeek API 代理（含安全檢查）
+require_once __DIR__ . '/includes/auth_check.php';
 require_once __DIR__ . '/includes/config.php';
 require_once __DIR__ . '/includes/security.php';
 require_once __DIR__ . '/includes/logger.php';
@@ -33,7 +34,6 @@ if (!Security::checkRateLimit(10, 60)) {
 }
 
 // =============== 用戶配額檢查 ===============
-session_start();
 if (isset($_SESSION['user_id'])) {
     try {
         $pdo = getDB();

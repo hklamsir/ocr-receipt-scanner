@@ -149,7 +149,21 @@ try {
         // 插入單據圖片
         if (!empty($receipt['image_filename'])) {
             // ... (保持原本的圖片處理邏輯)
-            $imagePath = __DIR__ . '/../receipts/' . $receipt['username'] . '/' . $receipt['image_filename'];
+
+            // #9 路徑防穿越驗證：username 與 image_filename 皆來自資料庫，
+            // 但為防禦縱深，仍須排除 ../、路徑分隔符與空字元，避免讀取到使用者目錄之外的檔案
+            $pdfUsername = $receipt['username'] ?? '';
+            $pdfImageFilename = $receipt['image_filename'];
+            if ($pdfUsername === '' || $pdfImageFilename === '' ||
+                strpos($pdfUsername, '..') !== false || strpos($pdfUsername, '/') !== false || strpos($pdfUsername, '\\') !== false ||
+                strpos($pdfImageFilename, '..') !== false || strpos($pdfImageFilename, '/') !== false || strpos($pdfImageFilename, '\\') !== false ||
+                strpos($pdfUsername, "\0") !== false || strpos($pdfImageFilename, "\0") !== false) {
+                // 路徑可疑，視同圖片不存在，跳過插入
+                $pdf->SetFont('stsongstdlight', '', 10);
+                $pdf->Cell(0, 10, '(圖片檔案不存在)', 0, 1, 'C');
+                $pdf->Ln(5);
+            } else {
+            $imagePath = __DIR__ . '/../receipts/' . $pdfUsername . '/' . $pdfImageFilename;
 
             if (file_exists($imagePath)) {
                 // 計算可用空間
@@ -224,6 +238,7 @@ try {
                 $pdf->Cell(0, 10, '(圖片檔案不存在)', 0, 1, 'C');
                 $pdf->Ln(5);
             }
+            } // 結束 #9 路徑驗證 else 區塊
         }
 
         // 不顯示單據資訊，只顯示圖片和頁首頁尾
@@ -249,8 +264,17 @@ try {
     } // 結束 foreach ($receipts as $index => $receipt) 循環
 
     // 輸出 PDF
+    // #9 下載檔名防穿越與注入：移除路徑分隔符與控制字元，避免惡意檔名被瀏覽器/系統誤解為路徑
+    $safeCompany = 'receipt';
+    if (!empty($receipts[0]['company_name'])) {
+        $safeCompany = preg_replace("/[\/\\\\:*?\"<>|\x00-\x1f]/u", '_', $receipts[0]['company_name']);
+        $safeCompany = trim($safeCompany, ' ._');
+        if ($safeCompany === '') {
+            $safeCompany = 'receipt';
+        }
+    }
     if (count($receipts) === 1) {
-        $filename = '單據_' . ($receipts[0]['company_name'] ?: 'receipt') . '_' . ($receipts[0]['receipt_date'] ?: date('Y-m-d')) . '.pdf';
+        $filename = '單據_' . $safeCompany . '_' . ($receipts[0]['receipt_date'] ?: date('Y-m-d')) . '.pdf';
     } else {
         $filename = '批量單據_' . count($receipts) . '筆_' . date('Y-m-d_His') . '.pdf';
     }

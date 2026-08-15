@@ -3,6 +3,7 @@
  */
 import * as State from './receipts-state.js';
 import { Toast } from './toast.js';
+import { escapeHtml } from './utils.js';
 
 // ========================================
 // Export Fields Configuration
@@ -190,7 +191,7 @@ export function renderExportFieldsList() {
                 <input type="checkbox" class="export-field-checkbox" 
                        data-index="${index}" 
                        ${field.enabled ? 'checked' : ''}>
-                <span>${field.label}</span>
+                <span>${escapeHtml(field.label)}</span>
             </label>
             ${field.key.startsWith('empty_') ?
             `<button type="button" class="remove-empty-column" data-index="${index}">✕</button>` :

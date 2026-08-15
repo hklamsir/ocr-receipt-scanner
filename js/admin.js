@@ -860,9 +860,9 @@ window.loadLoginAttempts = async function () {
         <div class="attempt-item ${a.success ? 'success' : 'failed'}">
           <span class="status-icon">${a.success ? '✅' : '❌'}</span>
           <span style="flex:1">${escapeHtml(a.username || '未知')}</span>
-          <span style="font-family:monospace">${a.ip_address}</span>
-          <span style="color:var(--text-muted);font-size:0.8rem">${a.created_at}</span>
-          ${!a.success ? `<button class="btn btn-sm btn-warning" onclick="blockIP('${a.ip_address}')">封鎖</button>` : ''}
+          <span style="font-family:monospace">${escapeHtml(a.ip_address)}</span>
+          <span style="color:var(--text-muted);font-size:0.8rem">${escapeHtml(a.created_at)}</span>
+          ${!a.success ? `<button class="btn btn-sm btn-warning" onclick="blockIP('${escapeHtml(a.ip_address)}')">封鎖</button>` : ''}
         </div>
       `).join('');
     }
@@ -885,8 +885,8 @@ window.loadIPBlocklist = async function () {
         container.innerHTML = data.blocklist.map(b => `
           <div class="ip-block-item">
             <div>
-              <div class="ip">${b.ip_address}</div>
-              <div class="reason">${b.reason || '無原因'} ${b.blocked_until ? '| 到期: ' + b.blocked_until : '| 永久'}</div>
+              <div class="ip">${escapeHtml(b.ip_address)}</div>
+              <div class="reason">${escapeHtml(b.reason || '無原因')} ${b.blocked_until ? '| 到期: ' + escapeHtml(b.blocked_until) : '| 永久'}</div>
             </div>
             <button class="btn btn-sm btn-success" onclick="unblockIP(${b.id})">解除</button>
           </div>
@@ -978,12 +978,12 @@ window.loadActiveSessions = async function () {
             <div class="user-info">
               <strong>${escapeHtml(s.username)}</strong>
               <span class="session-meta">
-                ${s.session_id_masked} | ${s.ip_address || 'N/A'} | 最後活動: ${s.last_activity}
+                ${escapeHtml(s.session_id_masked)} | ${escapeHtml(s.ip_address || 'N/A')} | 最後活動: ${escapeHtml(s.last_activity)}
               </span>
             </div>
             ${s.is_current ?
             '<span class="badge badge-info">目前 Session</span>' :
-            `<button class="btn btn-sm btn-danger" onclick="forceLogout('${s.session_id}')">強制登出</button>`
+            `<button class="btn btn-sm btn-danger" onclick="forceLogout('${escapeHtml(s.session_id)}')">強制登出</button>`
           }
           </div>
         `).join('');

@@ -3,22 +3,34 @@
 
 class Security
 {
-    // Referer 檢查（簡易但有效）
+    // Referer 檢查（防禦縱深，不可作為授權依據；授權請依賴 auth_check 的 Session 驗證）
     public static function validateReferer()
     {
-        // 允許本機測試
+        $host = $_SERVER['HTTP_HOST'] ?? '';
+        $isLocalhost = strpos($host, 'localhost') !== false || strpos($host, '127.0.0.1') !== false;
+
+        // 缺少 Referer：僅本機開發環境放行，生產環境一律拒絕（避免跨站呼叫）
         if (!isset($_SERVER['HTTP_REFERER'])) {
-            // 如果沒有 Referer，檢查是否為本機
-            $host = $_SERVER['HTTP_HOST'];
-            if (strpos($host, 'localhost') !== false || strpos($host, '127.0.0.1') !== false) {
-                return true;
-            }
-            return false;
+            return $isLocalhost;
         }
 
         $referer_host = parse_url($_SERVER['HTTP_REFERER'], PHP_URL_HOST);
-        $current_host = $_SERVER['HTTP_HOST'];
-        return $referer_host === $current_host;
+        $current_host = parse_url(($host !== '' ? 'http://' . $host : ''), PHP_URL_HOST);
+
+        // 必須同源
+        if ($referer_host !== $current_host) {
+            return false;
+        }
+
+        // 生產環境若使用 HTTPS，Referer 也必須為 HTTPS，防中間人降級攻擊
+        if (!$isLocalhost && !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
+            $referer_scheme = parse_url($_SERVER['HTTP_REFERER'], PHP_URL_SCHEME);
+            if ($referer_scheme !== 'https') {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     // Session-based Rate Limiting（避免檔案寫入問題）

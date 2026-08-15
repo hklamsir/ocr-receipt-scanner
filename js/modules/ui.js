@@ -1,4 +1,5 @@
 // UI 更新模組
+import { escapeHtml } from './utils.js';
 
 // 更新全域狀態訊息
 export function updateGlobalStatus(message) {
@@ -69,14 +70,14 @@ export function renderTable(data) {
                     const icon = hasError ? '⚠️' : (hasWarning ? '⚡' : '');
                     const tooltip = fieldErrors.map(e => e.message).join('; ');
 
-                    return `<span class="${className}" data-tooltip="${tooltip}">${icon} ${value || ''}</span>`;
+                    return `<span class="${className}" data-tooltip="${escapeHtml(tooltip)}">${icon} ${escapeHtml(value)}</span>`;
                 }
                 return value || '';
             };
 
             // 購買物品欄：總結（第1行）+ 購買物品摘要（第2行）
-            const summary = item.總結 || '';
-            const items = item.購買物品摘要 || '';
+            const summary = escapeHtml(item.總結 || '');
+            const items = escapeHtml(item.購買物品摘要 || '');
             const purchaseContent = summary
                 ? `${summary}<br><span style="color:#666;font-size:12px;">${items}</span>`
                 : items;
@@ -84,9 +85,9 @@ export function renderTable(data) {
             tableHtml += `<tr>
       <td>${getFieldHtml('日期', item.日期)}</td>
       <td>${getFieldHtml('時間', item.時間)}</td>
-      <td>${item.公司名稱 || ''}</td>
+      <td>${escapeHtml(item.公司名稱) || ''}</td>
       <td>${purchaseContent}</td>
-      <td>${item.支付方式 || ''}</td>
+      <td>${escapeHtml(item.支付方式) || ''}</td>
       <td>${getFieldHtml('總金額', item.總金額)}</td>
     </tr>`;
         }
@@ -111,19 +112,19 @@ function renderTableWithoutValidation(data) {
         '</tr></thead><tbody>';
 
     for (let item of data) {
-        const summary = item.總結 || '';
-        const items = item.購買物品摘要 || '';
+        const summary = escapeHtml(item.總結 || '');
+        const items = escapeHtml(item.購買物品摘要 || '');
         const purchaseContent = summary
             ? `${summary}<br><span style="color:#666;font-size:12px;">${items}</span>`
             : items;
 
         tableHtml += `<tr>
-      <td>${item.日期 || ''}</td>
-      <td>${item.時間 || ''}</td>
-      <td>${item.公司名稱 || ''}</td>
+      <td>${escapeHtml(item.日期 || '')}</td>
+      <td>${escapeHtml(item.時間 || '')}</td>
+      <td>${escapeHtml(item.公司名稱 || '')}</td>
       <td>${purchaseContent}</td>
-      <td>${item.支付方式 || ''}</td>
-      <td>${item.總金額 || ''}</td>
+      <td>${escapeHtml(item.支付方式 || '')}</td>
+      <td>${escapeHtml(item.總金額 || '')}</td>
     </tr>`;
     }
     tableHtml += '</tbody></table>';
@@ -133,9 +134,10 @@ function renderTableWithoutValidation(data) {
 // 顯示錯誤訊息
 export function showError(message, rawData = null) {
     const tableDiv = document.getElementById('structuredTable');
-    tableDiv.innerHTML = `<p style="color: red;">提取失敗：${message}</p>`;
+    tableDiv.innerHTML = `<p style="color: red;">提取失敗：${escapeHtml(message)}</p>`;
     if (rawData) {
-        tableDiv.innerHTML += `<pre style="background:#f0f0f0;padding:10px;overflow:auto;white-space:pre-wrap;">${rawData}</pre>`;
+        const rawText = typeof rawData === 'string' ? rawData : JSON.stringify(rawData, null, 2);
+        tableDiv.innerHTML += `<pre style="background:#f0f0f0;padding:10px;overflow:auto;white-space:pre-wrap;">${escapeHtml(rawText)}</pre>`;
     }
 }
 

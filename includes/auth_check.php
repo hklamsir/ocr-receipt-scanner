@@ -2,13 +2,35 @@
 // Session 驗證模組
 // 檢查用戶是否已登入，未登入則重定向至登入頁
 
+// 設定 Session Cookie 安全屬性
+// 僅在 HTTPS 環境啟用 Secure，避免本機 HTTP 開發時 Cookie 失效
+session_set_cookie_params([
+    'lifetime' => 0,
+    'path' => '/',
+    'domain' => '',
+    'secure' => (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'),
+    'httponly' => true,
+    'samesite' => 'Lax'
+]);
 session_start();
 
 // Helper function to check if request is API
 function isApiRequest()
 {
-    return strpos($_SERVER['REQUEST_URI'] ?? '', '/api/') !== false
-        || (isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false);
+    $uri = $_SERVER['REQUEST_URI'] ?? '';
+    // 位於 /api/ 下的端點
+    if (strpos($uri, '/api/') !== false) {
+        return true;
+    }
+    // 根目錄的代理端點（proxy.php / ocr_proxy.php）亦屬 API，應回傳 JSON 而非重導向
+    $script = basename($_SERVER['SCRIPT_NAME'] ?? '');
+    if (in_array($script, ['proxy.php', 'ocr_proxy.php'], true)) {
+        return true;
+    }
+    if (isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false) {
+        return true;
+    }
+    return false;
 }
 
 // Helper function for API error response

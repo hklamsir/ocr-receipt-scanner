@@ -1,5 +1,14 @@
 <?php
 // 如果已登入，直接跳轉
+// 設定 Session Cookie 安全屬性（HTTPS 時啟用 Secure）
+session_set_cookie_params([
+    'lifetime' => 0,
+    'path' => '/',
+    'domain' => '',
+    'secure' => (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'),
+    'httponly' => true,
+    'samesite' => 'Lax'
+]);
 session_start();
 if (isset($_SESSION['user_id'])) {
     header('Location: index.php');

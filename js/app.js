@@ -2,7 +2,7 @@
 import { AppState } from './modules/state.js';
 import { processImagesParallel, extractStructuredData, combineOCRResults } from './modules/ocr.js';
 import { updateGlobalStatus, updateOCRStatus, showOCRResultModal, closeOCRModal, openImageModal, closeImageModal, renderTable, showError, toggleCopyButton, clearUI } from './modules/ui.js';
-import { compressImage, validateImageFile, sortTableData, convertToTSV } from './modules/utils.js';
+import { compressImage, validateImageFile, sortTableData, convertToTSV, escapeHtml, safeColor } from './modules/utils.js';
 import { Toast, Dialog } from './modules/toast.js';
 
 // CSRF Token 輔助函數
@@ -114,7 +114,7 @@ function renderPreview() {
         card.className = 'card';
         card.innerHTML = `
       <img src="${img.dataUrl}">
-      <div class="info">${img.name}</div>
+      <div class="info">${escapeHtml(img.name)}</div>
       <div class="status">等待 OCR</div>
       <button class="crop-btn">裁切</button>
       <button class="delete-btn">×</button>
@@ -319,8 +319,8 @@ function renderSaveTagsGrid() {
     }
     grid.innerHTML = allTagsCache.map(t => `
         <div class="tag-item ${selectedSaveTags.includes(t.id) ? 'selected' : ''}" 
-             data-id="${t.id}" style="--tag-color:${t.color};">
-            <span class="tag" style="background:${t.color};">${t.name}</span>
+             data-id="${t.id}" style="--tag-color:${safeColor(t.color)};">
+            <span class="tag" style="background:${safeColor(t.color)};">${escapeHtml(t.name)}</span>
         </div>
     `).join('');
 

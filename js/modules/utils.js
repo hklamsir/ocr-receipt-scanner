@@ -87,3 +87,22 @@ export function convertToTSV(data) {
 
     return tsv;
 }
+
+// 轉義 HTML：同時防範文字內容與屬性上下文的 XSS（涵蓋 & < > " '）
+export function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+// 標籤顏色白名單：僅允許 #rgb / #rrggbb，其餘回傳預設色，避免注入任意 CSS/屬性
+export function safeColor(color) {
+    if (typeof color === 'string' && /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(color)) {
+        return color;
+    }
+    return '#94a3b8';
+}

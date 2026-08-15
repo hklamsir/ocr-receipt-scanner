@@ -6,7 +6,6 @@ require_once __DIR__ . '/../includes/config.php';
 session_start();
 
 header('Content-Type: application/json; charset=utf-8');
-header('Access-Control-Allow-Origin: *');
 
 echo json_encode([
     'maxFiles' => MAX_FILES,

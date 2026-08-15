@@ -13,9 +13,9 @@ config/secret.php
 # ----------------
 # 用戶上傳資料
 # ----------------
-# 保留 .htaccess 安全設定，排除所有用戶上傳的圖片
+# 保留 htaccess.txt 安全設定（部署時複製為 .htaccess），排除所有用戶上傳的圖片
 receipts/*
-!receipts/.htaccess
+!receipts/htaccess.txt
 
 # ----------------
 # 暫存與日誌

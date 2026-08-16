@@ -50,7 +50,10 @@ INSERT IGNORE INTO system_settings (setting_key, setting_value, description) VAL
 ('login_lockout_minutes', '15', '登入鎖定時間 (分鐘)'),
 ('deepseek_api_key', '', 'DeepSeek API 金鑰'),
 ('ocrspace_api_key', '', 'OCR.space API 金鑰'),
-('ocr_engine', '2', 'OCR.space 引擎 (1=較穩定, 2=較準確)');
+('ocr_engine', '2', 'OCR.space 引擎 (1=較穩定, 2=較準確)'),
+('gemini_api_key', '', 'Gemini API 金鑰'),
+('llm_provider', 'deepseek', '文字 LLM 提供者 (deepseek|gemini)'),
+('gemini_vision_enabled', '0', '啟用 Gemini 視覺端到端 (0=關, 1=開)');
 
 -- 5. 系統公告表
 CREATE TABLE IF NOT EXISTS announcements (

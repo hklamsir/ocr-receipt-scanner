@@ -56,3 +56,8 @@ composer.lock
 *.sql.bak
 *_backup.sql
 dump.sql
+
+# ----------------
+# 專案內部工具資料（勿上傳）
+# ----------------
+.workbuddy/

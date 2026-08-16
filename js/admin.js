@@ -600,13 +600,16 @@ window.downloadBackup = async function () {
 
 // ============ Settings ============
 // 定義 API 金鑰設定
-const API_KEY_SETTINGS = ['deepseek_api_key', 'ocrspace_api_key', 'ocr_engine'];
+const API_KEY_SETTINGS = ['deepseek_api_key', 'ocrspace_api_key', 'ocr_engine', 'gemini_api_key'];
 
 // 設定項顯示名稱對照表
 const SETTING_LABELS = {
   'deepseek_api_key': 'DeepSeek API 金鑰',
   'ocrspace_api_key': 'OCR.space API 金鑰',
+  'gemini_api_key': 'Gemini API 金鑰',
   'ocr_engine': 'OCR.space 引擎',
+  'llm_provider': '文字 LLM 提供者',
+  'gemini_vision_enabled': '啟用 Gemini 視覺端到端',
   'max_files_per_upload': '每次上傳最大檔案數',
   'image_quality': '圖片壓縮品質 (1-100)',
   'max_image_size_kb': '圖片最大大小 (KB)',
@@ -623,6 +626,9 @@ async function loadSettings() {
       const settingsContainer = document.getElementById('settingsList');
       const apiKeysContainer = document.getElementById('apiKeysList');
 
+      // 視覺模式開啟時，文字 LLM 提供者（DeepSeek）自動停用
+      const visionEnabled = (data.settings['gemini_vision_enabled']?.value ?? '0') === '1';
+
       let settingsHtml = '';
       let apiKeysHtml = '';
 
@@ -631,25 +637,49 @@ async function loadSettings() {
         const isApiKey = API_KEY_SETTINGS.includes(key);
         const isPassword = key.includes('api_key');
 
+        // 依設定類型渲染控制項
+        let controlHtml;
+        let showToggle = isPassword;
+        if (key === 'ocr_engine') {
+            controlHtml = `
+              <select class="form-control setting-input" name="${key}">
+                <option value="1" ${val.value === '1' ? 'selected' : ''}>Engine 1 (較穩定)</option>
+                <option value="2" ${val.value === '2' ? 'selected' : ''}>Engine 2 (較準確)</option>
+              </select>`;
+        } else if (key === 'llm_provider') {
+            const disabled = visionEnabled ? 'disabled' : '';
+            controlHtml = `
+              <select class="form-control setting-input" name="${key}" ${disabled}>
+                <option value="deepseek" ${val.value === 'deepseek' ? 'selected' : ''}>DeepSeek</option>
+                <option value="gemini" ${val.value === 'gemini' ? 'selected' : ''}>Gemini</option>
+              </select>
+              ${visionEnabled ? '<div class="setting-hint">視覺模式已開啟，DeepSeek 自動停用</div>' : ''}`;
+        } else if (key === 'gemini_vision_enabled') {
+            const checked = val.value === '1' ? 'checked' : '';
+            controlHtml = `
+              <label class="switch">
+                <input type="checkbox" class="setting-input" name="${key}" value="1" ${checked}>
+                <span class="slider"></span>
+              </label>
+              <div class="setting-hint">啟用後直接使用 Gemini 視覺端到端處理，DeepSeek 自動停用</div>`;
+            showToggle = false;
+        } else {
+            controlHtml = `
+              <input type="${isPassword ? 'password' : 'text'}" 
+                     class="form-control setting-input ${isPassword ? 'api-key-input' : ''}" 
+                     name="${key}" 
+                     value="${escapeHtml(val.value)}"
+                     ${isPassword ? 'autocomplete="off"' : ''}>`;
+        }
+
         const itemHtml = `
           <div class="setting-item">
             <div>
               <div class="setting-label">${label}</div>
               <div class="setting-description">${val.description || ''}</div>
             </div>
-            ${key === 'ocr_engine' ? `
-              <select class="form-control setting-input" name="${key}">
-                <option value="1" ${val.value === '1' ? 'selected' : ''}>Engine 1 (較穩定)</option>
-                <option value="2" ${val.value === '2' ? 'selected' : ''}>Engine 2 (較準確)</option>
-              </select>
-            ` : `
-              <input type="${isPassword ? 'password' : 'text'}" 
-                     class="form-control setting-input ${isPassword ? 'api-key-input' : ''}" 
-                     name="${key}" 
-                     value="${escapeHtml(val.value)}"
-                     ${isPassword ? 'autocomplete="off"' : ''}>
-            `}
-            ${isPassword ? `<button type="button" class="btn btn-sm toggle-visibility" onclick="toggleApiKeyVisibility(this)">👁️</button>` : ''}
+            ${controlHtml}
+            ${showToggle ? `<button type="button" class="btn btn-sm toggle-visibility" onclick="toggleApiKeyVisibility(this)">👁️</button>` : ''}
           </div>
         `;
 
@@ -687,7 +717,8 @@ document.getElementById('settingsForm')?.addEventListener('submit', async (e) =>
   const inputs = e.target.querySelectorAll('.setting-input');
   const settings = {};
   inputs.forEach(input => {
-    settings[input.name] = input.value;
+    // checkbox（如 Gemini 視覺開關）轉為 1/0；其餘取 value
+    settings[input.name] = input.type === 'checkbox' ? (input.checked ? '1' : '0') : input.value;
   });
 
   try {

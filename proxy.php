@@ -1,21 +1,12 @@
 <?php
-// proxy.php - DeepSeek API 代理（含安全檢查）
+// proxy.php - LLM 代理（含安全檢查）
+// 依 LLM_PROVIDER 選擇文字 LLM：deepseek（預設）或 gemini。
+// 兩者皆先經 OCR.space 取得文字，再出結構化 JSON；deepseek 與 gemini 之間不降級。
 require_once __DIR__ . '/includes/auth_check.php';
 require_once __DIR__ . '/includes/config.php';
 require_once __DIR__ . '/includes/security.php';
 require_once __DIR__ . '/includes/logger.php';
 require_once __DIR__ . '/includes/db.php';
-
-// 從設定檔載入 API Key
-$DEEPSEEK_API_KEY = DEEPSEEK_API_KEY;
-
-// 檢查 API Key 是否已設定
-if (empty($DEEPSEEK_API_KEY)) {
-    header('Content-Type: application/json; charset=utf-8');
-    http_response_code(503);
-    echo json_encode(['success' => false, 'error' => '系統尚未設定 DeepSeek API 金鑰，請聯繫管理員']);
-    exit;
-}
 
 // Referer 檢查
 if (!Security::validateReferer()) {
@@ -62,7 +53,7 @@ if (isset($_SESSION['user_id'])) {
             if ($currentCount >= $quotaLimit) {
                 http_response_code(429);
                 header('Content-Type: application/json; charset=utf-8');
-                logInfo("DeepSeek Proxy - User quota exceeded: user_id=$userId, current=$currentCount, limit=$quotaLimit");
+                logInfo("LLM Proxy - User quota exceeded: user_id=$userId, current=$currentCount, limit=$quotaLimit");
                 echo json_encode([
                     'success' => false,
                     'error' => "已達本月配額上限（$quotaLimit 張）。本月已儲存 $currentCount 張，無法繼續處理。"
@@ -71,7 +62,7 @@ if (isset($_SESSION['user_id'])) {
             }
         }
     } catch (Exception $e) {
-        logError("DeepSeek Proxy - Quota check error: " . $e->getMessage());
+        logError("LLM Proxy - Quota check error: " . $e->getMessage());
         // 配額檢查失敗不阻止處理
     }
 }
@@ -141,10 +132,58 @@ OCR 文字內容：
 請直接輸出 JSON 陣列，不要有任何其他說明文字。
 PROMPT;
 
+$system_prompt = '你是一個嚴格遵守指示的助手，只輸出純粹的 JSON。';
+
+// =============== 依 LLM_PROVIDER 路由 ===============
+$provider = defined('LLM_PROVIDER') ? LLM_PROVIDER : 'deepseek';
+
+if ($provider === 'gemini') {
+    // ---- Gemini 文字 LLM ----
+    require_once __DIR__ . '/includes/llm_gemini.php';
+
+    try {
+        $text = generateGeminiText($system_prompt, $prompt);
+    } catch (Exception $e) {
+        echo json_encode([
+            'success' => false,
+            'error' => 'Gemini API 錯誤：' . $e->getMessage(),
+            'engine' => 'gemini'
+        ]);
+        exit;
+    }
+
+    if (preg_match('/\[[\s\S]*\]/', $text, $matches)) {
+        $json_str = $matches[0];
+        $parsed = json_decode($json_str, true);
+        if (json_last_error() === JSON_ERROR_NONE && is_array($parsed)) {
+            echo json_encode(['success' => true, 'result' => $parsed, 'engine' => 'gemini']);
+            exit;
+        }
+    }
+
+    echo json_encode([
+        'success' => false,
+        'error' => '無法解析 Gemini 回應為有效 JSON',
+        'raw' => $text,
+        'engine' => 'gemini'
+    ]);
+    exit;
+}
+
+// ---- DeepSeek 文字 LLM（預設）----
+$DEEPSEEK_API_KEY = DEEPSEEK_API_KEY;
+
+// 檢查 API Key 是否已設定
+if (empty($DEEPSEEK_API_KEY)) {
+    http_response_code(503);
+    echo json_encode(['success' => false, 'error' => '系統尚未設定 DeepSeek API 金鑰，請聯繫管理員']);
+    exit;
+}
+
 $payload = [
     'model' => 'deepseek-chat',
     'messages' => [
-        ['role' => 'system', 'content' => '你是一個嚴格遵守指示的助手，只輸出純粹的 JSON。'],
+        ['role' => 'system', 'content' => $system_prompt],
         ['role' => 'user', 'content' => $prompt]
     ],
     'temperature' => 0.3,
@@ -169,7 +208,8 @@ if ($http_code !== 200) {
     echo json_encode([
         'success' => false,
         'error' => 'DeepSeek API 錯誤 (HTTP ' . $http_code . ')',
-        'raw' => $response
+        'raw' => $response,
+        'engine' => 'deepseek'
     ]);
     exit;
 }
@@ -181,7 +221,7 @@ if (preg_match('/\[[\s\S]*\]/', $content, $matches)) {
     $json_str = $matches[0];
     $parsed = json_decode($json_str, true);
     if (json_last_error() === JSON_ERROR_NONE && is_array($parsed)) {
-        echo json_encode(['success' => true, 'result' => $parsed]);
+        echo json_encode(['success' => true, 'result' => $parsed, 'engine' => 'deepseek']);
         exit;
     }
 }
@@ -189,6 +229,7 @@ if (preg_match('/\[[\s\S]*\]/', $content, $matches)) {
 echo json_encode([
     'success' => false,
     'error' => '無法解析為有效 JSON',
-    'raw' => $content
+    'raw' => $content,
+    'engine' => 'deepseek'
 ]);
 ?>

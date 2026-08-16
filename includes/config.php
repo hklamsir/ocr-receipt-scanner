@@ -28,6 +28,9 @@ try {
 define('DEEPSEEK_API_KEY', $config['deepseek_api_key'] ?? '');
 define('OCR_API_KEY', $config['ocrspace_api_key'] ?? '');
 define('OCR_ENGINE', $config['ocr_engine'] ?? '2');
+define('GEMINI_API_KEY', $config['gemini_api_key'] ?? '');
+define('LLM_PROVIDER', $config['llm_provider'] ?? 'deepseek');
+define('GEMINI_VISION_ENABLED', (int) ($config['gemini_vision_enabled'] ?? 0) === 1);
 define('MAX_FILES', (int) ($config['max_files_per_upload'] ?? 20));
 define('IMAGE_QUALITY', (int) ($config['image_quality'] ?? 60));
 define('MAX_IMAGE_SIZE_KB', (int) ($config['max_image_size_kb'] ?? 200));

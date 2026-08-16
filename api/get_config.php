@@ -12,6 +12,8 @@ echo json_encode([
     'imageQuality' => IMAGE_QUALITY,
     'maxImageSizeKb' => MAX_IMAGE_SIZE_KB,
     'ocrProxyUrl' => 'ocr_proxy.php', // 使用本地 proxy
-    'userId' => $_SESSION['user_id'] ?? null // 提供用戶 ID 用於 localStorage 區分
+    'userId' => $_SESSION['user_id'] ?? null, // 提供用戶 ID 用於 localStorage 區分
+    'geminiVisionEnabled' => defined('GEMINI_VISION_ENABLED') ? (GEMINI_VISION_ENABLED ? true : false) : false,
+    'llmProvider' => defined('LLM_PROVIDER') ? LLM_PROVIDER : 'deepseek'
 ], JSON_UNESCAPED_SLASHES);
 

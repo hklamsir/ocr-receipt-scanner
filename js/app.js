@@ -1,6 +1,6 @@
 // 主應用程式（使用模組化架構）
 import { AppState } from './modules/state.js';
-import { processImagesParallel, extractStructuredData, combineOCRResults } from './modules/ocr.js';
+import { processImagesParallel, extractStructuredData, combineOCRResults, processImagesVisionParallel } from './modules/ocr.js';
 import { updateGlobalStatus, updateOCRStatus, showOCRResultModal, closeOCRModal, openImageModal, closeImageModal, renderTable, showError, toggleCopyButton, clearUI } from './modules/ui.js';
 import { compressImage, validateImageFile, sortTableData, convertToTSV, escapeHtml, safeColor } from './modules/utils.js';
 import { Toast, Dialog } from './modules/toast.js';
@@ -169,6 +169,13 @@ async function startOCR() {
     }
     // ===== 配額預檢查結束 =====
 
+    // ===== Gemini 視覺端到端模式 =====
+    if (appConfig.geminiVisionEnabled) {
+        await processWithVision(images);
+        return;
+    }
+    // ===== 傳統 OCR + LLM 模式 =====
+
     updateGlobalStatus('OCR 處理中...');
 
     // 並行處理 OCR（限制 2 個）
@@ -254,6 +261,64 @@ async function startOCR() {
         }
     } else {
         updateGlobalStatus('OCR 完成（無文字內容）');
+    }
+}
+
+// Gemini 視覺端到端處理（跳過 OCR.space 與 DeepSeek，直接送圖給 Gemini）
+async function processWithVision(images) {
+    updateGlobalStatus('Gemini 視覺處理中...');
+
+    const results = await processImagesVisionParallel(images, 'vision_proxy.php', updateOCRStatus);
+
+    // 檢查是否有配額錯誤
+    const quotaError = results.find(r =>
+        r.status === 'fulfilled' && r.value.error && r.value.error.includes('配額上限')
+    );
+    if (quotaError) {
+        Toast.error(quotaError.value.error);
+        updateGlobalStatus('錯誤：已達配額上限');
+        return;
+    }
+
+    // 檢查是否有配置錯誤（如 API Key 未設定）
+    const configError = results.find(r =>
+        r.status === 'fulfilled' && r.value.error && r.value.error.includes('系統尚未設定')
+    );
+    if (configError) {
+        Toast.error(configError.value.error);
+        updateGlobalStatus('錯誤：' + configError.value.error);
+        return;
+    }
+
+    // 檢查是否全部都有錯誤
+    const allErrors = results.every(r =>
+        r.status === 'rejected' || (r.status === 'fulfilled' && !r.value.success)
+    );
+    if (allErrors) {
+        const firstError = results.find(r =>
+            r.status === 'fulfilled' && r.value.error
+        );
+        const errorMsg = firstError?.value?.error || 'Gemini 視覺處理失敗';
+        Toast.error(errorMsg);
+        updateGlobalStatus('錯誤：' + errorMsg);
+        return;
+    }
+
+    // 合併所有圖片的結構化結果
+    let allData = [];
+    results.forEach(r => {
+        if (r.status === 'fulfilled' && r.value.success && Array.isArray(r.value.result)) {
+            allData = allData.concat(r.value.result);
+        }
+    });
+
+    if (allData.length > 0) {
+        AppState.setCurrentData(allData);
+        renderTable(allData);
+        toggleCopyButton(true);
+        updateGlobalStatus('全部完成（Gemini 視覺）');
+    } else {
+        updateGlobalStatus('Gemini 視覺完成（無結果）');
     }
 }
 

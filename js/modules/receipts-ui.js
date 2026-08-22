@@ -104,7 +104,7 @@ export function renderReceipts(receipts, append = false) {
         <input type="checkbox" class="card-checkbox" data-id="${r.id}" ${selectedReceiptIds.has(r.id) ? 'checked' : ''}>
       </label>
       ${r.image_filename ? `
-      <div class="receipt-img-wrap">
+      <div class="receipt-img-wrap" data-tip="放大圖片">
         <img class="lazy-img" data-src="api/get_image.php?filename=${escapeHtml(r.image_filename)}" onclick="openModal('api/get_image.php?filename=${escapeHtml(r.image_filename)}')">
         <button type="button" class="crop-btn" title="裁剪圖片" aria-label="裁剪圖片" onclick="event.stopPropagation(); openCropModal(${r.id});">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>

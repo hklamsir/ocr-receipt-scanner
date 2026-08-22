@@ -362,6 +362,30 @@ header {
   overflow: hidden;
 }
 
+/* 單據記錄頁：圖片 hover 提示「放大圖片」 */
+.receipt-img-wrap::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.78);
+  color: #fff;
+  font-size: 12px;
+  line-height: 1.4;
+  padding: 4px 10px;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+  z-index: 9;
+}
+
+.receipt-img-wrap:hover::after {
+  opacity: 1;
+}
+
 /* 單據記錄頁裁剪按鈕：圖片右上角，純剪刀 icon，常駐半透明，hover 加深 */
 .receipt-img-wrap .crop-btn {
   top: 8px;

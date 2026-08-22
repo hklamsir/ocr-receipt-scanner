@@ -1031,6 +1031,128 @@ function initEventListeners() {
     });
 }
 
+// ========================================
+// 裁剪單據圖片 (Crop Receipt Image)
+// ========================================
+let currentCropper = null;
+let cropScaleX = 1;
+let cropScaleY = 1;
+let currentCropReceiptId = null;
+
+window.openCropModal = function (receiptId) {
+    currentCropReceiptId = receiptId;
+    cropScaleX = 1;
+    cropScaleY = 1;
+
+    const receipt = State.getAllReceiptsCache().find(r => r.id === receiptId);
+    if (!receipt || !receipt.image_filename) {
+        Toast.error('此單據沒有可裁剪的圖片');
+        return;
+    }
+
+    const cropImage = document.getElementById('cropImage');
+    if (!cropImage) {
+        console.error('[Crop] #cropImage not found');
+        return;
+    }
+    cropImage.src = 'api/get_image.php?filename=' + encodeURIComponent(receipt.image_filename);
+
+    const modal = document.getElementById('cropModal');
+    if (modal) modal.style.display = 'flex';
+
+    cropImage.onload = function () {
+        if (currentCropper) {
+            currentCropper.destroy();
+        }
+        currentCropper = new Cropper(cropImage, {
+            viewMode: 1,
+            dragMode: 'move',
+            autoCropArea: 0.9,
+            responsive: true,
+            restore: false,
+            guides: true,
+            center: true,
+            highlight: true,
+            toggleDragModeOnDblclick: true,
+            background: true
+        });
+    };
+};
+
+window.closeCropModal = function () {
+    if (currentCropper) {
+        currentCropper.destroy();
+        currentCropper = null;
+    }
+    currentCropReceiptId = null;
+    const modal = document.getElementById('cropModal');
+    if (modal) modal.style.display = 'none';
+};
+
+window.cropperRotate = function (degree) {
+    if (currentCropper) currentCropper.rotate(degree);
+};
+
+window.cropperFlipH = function () {
+    if (currentCropper) {
+        cropScaleX = cropScaleX * -1;
+        currentCropper.scaleX(cropScaleX);
+    }
+};
+
+window.cropperFlipV = function () {
+    if (currentCropper) {
+        cropScaleY = cropScaleY * -1;
+        currentCropper.scaleY(cropScaleY);
+    }
+};
+
+window.cropperReset = function () {
+    if (currentCropper) {
+        cropScaleX = 1;
+        cropScaleY = 1;
+        currentCropper.reset();
+    }
+};
+
+window.applyCrop = async function () {
+    if (!currentCropper || currentCropReceiptId == null) return;
+
+    const canvas = currentCropper.getCroppedCanvas({
+        maxWidth: 3000,
+        maxHeight: 3000,
+        imageSmoothingEnabled: true,
+        imageSmoothingQuality: 'high'
+    });
+
+    if (!canvas) {
+        Toast.error('裁剪失敗，請重試');
+        return;
+    }
+
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+
+    try {
+        const res = await fetch('api/crop_receipt_image.php', {
+            method: 'POST',
+            headers: API.getCSRFHeaders(),
+            body: JSON.stringify({ receipt_id: currentCropReceiptId, image: dataUrl })
+        });
+        const result = await res.json();
+
+        if (result.success) {
+            Toast.success('圖片裁剪成功');
+            closeCropModal();
+            loadInitialReceipts();
+        } else {
+            Toast.error(result.error || '裁剪儲存失敗');
+        }
+    } catch (err) {
+        console.error('[Crop] 儲存錯誤:', err);
+        Toast.error('裁剪儲存發生錯誤');
+    }
+};
+
 // Initial load
 function init() {
     Modals.attachWindowHandlers();

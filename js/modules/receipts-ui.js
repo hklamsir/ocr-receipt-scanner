@@ -103,7 +103,11 @@ export function renderReceipts(receipts, append = false) {
       <label class="card-checkbox-wrapper" onclick="event.stopPropagation()">
         <input type="checkbox" class="card-checkbox" data-id="${r.id}" ${selectedReceiptIds.has(r.id) ? 'checked' : ''}>
       </label>
-      ${r.image_filename ? `<img class="lazy-img" data-src="api/get_image.php?filename=${escapeHtml(r.image_filename)}" onclick="openModal('api/get_image.php?filename=${escapeHtml(r.image_filename)}')">` : ''}
+      ${r.image_filename ? `
+      <div class="receipt-img-wrap">
+        <img class="lazy-img" data-src="api/get_image.php?filename=${escapeHtml(r.image_filename)}" onclick="openModal('api/get_image.php?filename=${escapeHtml(r.image_filename)}')">
+        <button type="button" class="crop-btn" title="裁剪圖片" onclick="event.stopPropagation(); openCropModal(${r.id});">✂️ 裁剪</button>
+      </div>` : ''}
       <div class="receipt-info">
         <div><strong>日期：</strong>${escapeHtml(r.receipt_date) || '無'} ${escapeHtml(r.receipt_time) || ''}</div>
         <div><strong>公司：</strong>${escapeHtml(r.company_name) || '無'}</div>

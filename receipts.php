@@ -123,6 +123,10 @@ include __DIR__ . '/includes/header.php';
 // Main Modals (Preview, Edit, Delete, Mobile)
 include __DIR__ . '/includes/receipts/main_modals.php';
 
+// Crop Modal (裁剪圖片，複用 index.php 的 Cropper 結構)
+include __DIR__ . '/includes/receipts/crop_modal.php';
+
+
 // Tag Management Modals
 include __DIR__ . '/includes/receipts/tag_modals.php';
 

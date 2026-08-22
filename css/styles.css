@@ -355,6 +355,29 @@ header {
   background: rgba(74, 144, 217, 1);
 }
 
+/* 單據記錄頁：圖片容器與裁剪按鈕（中央 hover 顯示，參照 index.php） */
+.receipt-img-wrap {
+  position: relative;
+  line-height: 0;
+  overflow: hidden;
+}
+
+.receipt-img-wrap .crop-btn {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.receipt-img-wrap:hover .crop-btn {
+  opacity: 0.9;
+  pointer-events: auto;
+}
+
+.receipt-img-wrap:hover .crop-btn:hover {
+  opacity: 1;
+  background: rgba(74, 144, 217, 1);
+  transform: translate(-50%, -50%) scale(1.05);
+}
+
 #globalStatus {
   text-align: center;
   font-weight: bold;

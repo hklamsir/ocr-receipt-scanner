@@ -362,20 +362,34 @@ header {
   overflow: hidden;
 }
 
+/* 單據記錄頁裁剪按鈕：圖片右上角，純剪刀 icon，常駐半透明，hover 加深 */
 .receipt-img-wrap .crop-btn {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.receipt-img-wrap:hover .crop-btn {
-  opacity: 0.9;
+  top: 8px;
+  right: 8px;
+  left: auto;
+  bottom: auto;
+  transform: none;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.55);
+  opacity: 0.85;
   pointer-events: auto;
+  transition: opacity 0.2s, background 0.2s, transform 0.2s;
 }
 
-.receipt-img-wrap:hover .crop-btn:hover {
+.receipt-img-wrap .crop-btn:hover,
+.receipt-img-wrap:hover .crop-btn {
   opacity: 1;
   background: rgba(74, 144, 217, 1);
-  transform: translate(-50%, -50%) scale(1.05);
+}
+
+.receipt-img-wrap .crop-btn:hover {
+  transform: scale(1.08);
 }
 
 #globalStatus {

@@ -79,3 +79,7 @@ if (!isset($headerTitle))
             <button class="announcement-close" onclick="closeAnnouncement()">×</button>
         </div>
     </div>
+
+    <?php if (empty($hidePageTitle)): ?>
+    <h1 class="page-title"><?php echo htmlspecialchars($pageTitle); ?> - 收據浣熊</h1>
+    <?php endif; ?>

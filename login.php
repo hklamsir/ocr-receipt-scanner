@@ -19,6 +19,7 @@ if (isset($_SESSION['user_id'])) {
 $pageTitle = '登入';
 $headerTitle = '收據浣熊';
 $showNav = false;  // 登入頁不顯示導航列
+$hidePageTitle = true;  // 登入頁使用卡片內自建 H1，唔用共用頁頭 H1
 $extraStyles = '
     <style>
         /* 登入頁面 Header 置中 */
@@ -68,7 +69,7 @@ include __DIR__ . '/includes/header.php';
 
 <div class="container login-wrapper">
     <div class="login-box">
-        <h1>🔐 登入</h1>
+        <h1>🔐 登入 - 收據浣熊</h1>
 
         <div class="login-error" id="error"></div>
 

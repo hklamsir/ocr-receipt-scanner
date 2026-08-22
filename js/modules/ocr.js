@@ -145,7 +145,8 @@ async function processVisionWithRetry(img, index, visionProxyUrl, onProgress) {
                     success: true,
                     name: img.name,
                     result: json.result,
-                    engine: json.engine || 'gemini-vision'
+                    engine: json.engine || 'gemini-vision',
+                    image: img.dataUrl
                 };
             } else {
                 onProgress(index, '失敗');

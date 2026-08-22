@@ -55,6 +55,22 @@ try {
                     continue;
                 }
 
+                // 數值型設定範圍檢查，避免設定錯誤導致圖片無法儲存
+                if ($key === 'max_image_size_kb') {
+                    $intValue = (int) $value;
+                    if ($intValue < 50 || $intValue > 10240) {
+                        ApiResponse::error("圖片最大大小必須介於 50 至 10240 KB 之間");
+                    }
+                    $value = (string) $intValue;
+                }
+                if ($key === 'image_quality') {
+                    $intValue = (int) $value;
+                    if ($intValue < 1 || $intValue > 100) {
+                        ApiResponse::error("圖片壓縮品質必須介於 1 至 100 之間");
+                    }
+                    $value = (string) $intValue;
+                }
+
                 $stmt->execute([$key, $value, $description]);
                 $updated[] = $key;
             }

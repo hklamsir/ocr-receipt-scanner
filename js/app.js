@@ -242,6 +242,12 @@ async function startOCR() {
                 renderTable(data.result);
                 toggleCopyButton(true);
 
+                // 記錄 OCR 引擎，供儲存時寫入資料庫
+                const successfulOcr = results.find(r =>
+                    r.status === 'fulfilled' && r.value.success && r.value.engine
+                );
+                window.lastOcrEngine = successfulOcr?.value?.engine || 2;
+
                 updateGlobalStatus('全部完成（含結構化提取）');
             } else {
                 showError(data.error || '未知錯誤', data.raw);
@@ -304,13 +310,20 @@ async function processWithVision(images) {
         return;
     }
 
-    // 合併所有圖片的結構化結果
+    // 合併所有圖片的結構化結果，並把來源圖片 dataUrl 綁定到每筆收據
     let allData = [];
     results.forEach(r => {
         if (r.status === 'fulfilled' && r.value.success && Array.isArray(r.value.result)) {
-            allData = allData.concat(r.value.result);
+            const items = r.value.result.map(item => ({
+                ...item,
+                _imageDataUrl: r.value.image || ''
+            }));
+            allData = allData.concat(items);
         }
     });
+
+    // 標記最後使用的引擎，供儲存時寫入資料庫（3 = Gemini Vision）
+    window.lastOcrEngine = 3;
 
     if (allData.length > 0) {
         AppState.setCurrentData(allData);
@@ -501,7 +514,7 @@ document.getElementById('confirmSaveWithTagsBtn')?.addEventListener('click', asy
     const currentData = AppState.getCurrentData();
     const images = AppState.getAllImages();
 
-    // 組合資料
+    // 組合資料：優先使用收據物件自身綁定的圖片（Vision 模式），再 fallback 到 images 陣列索引
     const receipts = currentData.map((item, index) => ({
         date: item.日期,
         time: item.時間,
@@ -510,7 +523,7 @@ document.getElementById('confirmSaveWithTagsBtn')?.addEventListener('click', asy
         payment: item.支付方式,
         amount: item.總金額,
         summary: item.總結,
-        image: images[index]?.dataUrl || '',
+        image: item._imageDataUrl || images[index]?.dataUrl || '',
         engine: window.lastOcrEngine || 2,
         tag_ids: selectedSaveTags  // 加入選中的 tags
     }));

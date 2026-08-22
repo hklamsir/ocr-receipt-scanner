@@ -133,20 +133,28 @@ try {
         $imageData = $receipt['image'] ?? '';
         $imageFilename = null;
 
-        if ($imageData) {
+        if (empty($imageData)) {
+            logError("Receipt $index has no image data (empty string) - saving receipt without image");
+        } else {
             // 移除 data URL 前綴
             $imageData = preg_replace('/^data:image\/\w+;base64,/', '', $imageData);
             $imageBytes = base64_decode($imageData);
+            $imageSize = strlen($imageBytes);
 
-            // 檢查大小（從系統設定取得，轉換 KB 為 bytes）
-            $maxImageBytes = MAX_IMAGE_SIZE_KB * 1024 + 500; // (留點餘裕)
-            if (strlen($imageBytes) > $maxImageBytes) { // 使用系統設定的大小限制
-                logError("Image too large for receipt $index: " . strlen($imageBytes) . " bytes - saving receipt without image");
+            // 檢查大小（從系統設定取得，轉換 KB 為 bytes；設定異常時最低容許 50KB）
+            $configuredMaxKb = (int) (defined('MAX_IMAGE_SIZE_KB') ? MAX_IMAGE_SIZE_KB : 200);
+            if ($configuredMaxKb <= 0) {
+                logError("MAX_IMAGE_SIZE_KB is invalid ($configuredMaxKb), falling back to 200KB");
+                $configuredMaxKb = 200;
+            }
+            $maxImageBytes = $configuredMaxKb * 1024 + 500; // (留點餘裕)
+            if ($imageSize > $maxImageBytes) {
+                logError("Image too large for receipt $index: $imageSize bytes (limit $maxImageBytes) - saving receipt without image");
                 // 不使用 continue，繼續儲存單據資料（沒有圖片）
             }
             // 驗證 MIME 類型（Magic Bytes）
             elseif (!isValidImageMime($imageBytes)) {
-                logError("Invalid image MIME type for receipt $index - saving receipt without image");
+                logError("Invalid image MIME type for receipt $index (size $imageSize bytes) - saving receipt without image");
                 // 不使用 continue，繼續儲存單據資料（沒有圖片）
             }
             // 只有當圖片有效時才儲存
@@ -156,7 +164,7 @@ try {
                 $imagePath = $userDir . '/' . $imageFilename;
 
                 if (!saveImageWithRetry($imagePath, $imageBytes)) {
-                    logError("Failed to save image for receipt $index after 3 attempts: $imagePath - saving receipt without image");
+                    logError("Failed to save image for receipt $index after 3 attempts: $imagePath (size $imageSize bytes) - saving receipt without image");
                     $imageFilename = null; // 儲存失敗，設為 null
                 }
             }

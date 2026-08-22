@@ -17,11 +17,13 @@ function getQuotaStatus($pdo, $userId)
     $quotaLimit = $user['quota_limit'] ?? 0;
 
     // 計算本月已儲存的單據數量
+    // 用「本月首日至下月首日」的範圍過濾，避免依賴 YEAR()/MONTH() 字串比較，
+    // 即便連線時區變動也不會跨月歸錯（同時可用到 created_at 索引）。
     $countStmt = $pdo->prepare("
         SELECT COUNT(*) as count FROM receipts 
         WHERE user_id = ? 
-        AND YEAR(created_at) = YEAR(CURRENT_DATE())
-        AND MONTH(created_at) = MONTH(CURRENT_DATE())
+        AND created_at >= DATE_FORMAT(CURRENT_DATE(), '%Y-%m-01 00:00:00')
+        AND created_at <  DATE_FORMAT(CURRENT_DATE(), '%Y-%m-01 00:00:00') + INTERVAL 1 MONTH
     ");
     $countStmt->execute([$userId]);
     $result = $countStmt->fetch();

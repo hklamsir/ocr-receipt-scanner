@@ -7,6 +7,8 @@ include __DIR__ . '/includes/header.php';
 ?>
 
 <div class="container">
+    <h2>設定</h2>
+
     <div class="settings-grid">
         <!-- 管理標籤卡片 -->
         <div class="settings-card" id="tagsCard">

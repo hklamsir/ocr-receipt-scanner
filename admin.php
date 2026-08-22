@@ -9,6 +9,8 @@ include __DIR__ . '/includes/header.php';
 <link rel="stylesheet" href="css/admin.css">
 
 <div class="container">
+  <h2>系統管理</h2>
+
   <div class="admin-nav">
     <button class="btn active" onclick="showSection('dashboard')">📊 統計儀表板</button>
     <button class="btn" onclick="showSection('users')">👥 用戶管理</button>

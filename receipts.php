@@ -3,7 +3,6 @@ require_once __DIR__ . '/includes/auth_check.php';
 
 // 頁面設定
 $pageTitle = '單據記錄';
-$headerTitle = '單據記錄';
 include __DIR__ . '/includes/header.php';
 ?>
 

@@ -5,7 +5,6 @@ require_once __DIR__ . '/includes/config.php';
 
 // 頁面設定
 $pageTitle = '辨識單據';
-$headerTitle = '辨識單據';
 include __DIR__ . '/includes/header.php';
 ?>
 

@@ -3,7 +3,6 @@ require_once __DIR__ . '/includes/admin_check.php';
 
 // 頁面設定
 $pageTitle = '管理後台';
-$headerTitle = '管理後台';
 include __DIR__ . '/includes/header.php';
 ?>
 

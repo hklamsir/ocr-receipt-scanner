@@ -69,7 +69,7 @@ include __DIR__ . '/includes/header.php';
 
 <div class="container login-wrapper">
     <div class="login-box">
-        <h1>🔐 登入</h1>
+        <h1>🔐 登入 - 收據浣熊</h1>
 
         <div class="login-error" id="error"></div>
 

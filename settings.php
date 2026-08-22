@@ -3,7 +3,6 @@ require_once __DIR__ . '/includes/auth_check.php';
 
 // 頁面設定
 $pageTitle = '設定';
-$headerTitle = '設定';
 include __DIR__ . '/includes/header.php';
 ?>
 

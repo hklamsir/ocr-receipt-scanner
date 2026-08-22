@@ -100,7 +100,10 @@ chmod 755 tmp/
 - **LLM 提供者**：選 `deepseek` 或 `gemini`（文字結構化模型）
 - **Gemini 視覺**：可開啟端到端視覺模式（開啟後 DeepSeek 自動停用）
 
-> ⚠️ **重要安全提醒**：首次登入後，請務必立即至「設定」頁修改密碼！
+> ⚠️ **重要安全提醒（務必執行，否則系統極易被入侵）**：
+> 1. **改密碼**：首次登入後，請立即至「設定」頁修改密碼。預設密碼 `admin123` 已公開於本檔，任何人都能直接登入。
+> 2. **刪 setup.php**：改完密碼後，**請立刻從伺服器刪除 `config/setup.php`**！此檔會將 `admin` 密碼重設回 `admin123`，若不刪除，任何人重新瀏覽該檔即可奪回管理員權限、重置你的密碼。
+> 3. 部署清單：① 瀏覽 `config/setup.php` 建立 admin 帳號 → ② 登入改密碼 → ③ 刪除 `config/setup.php`。三步缺一不可。
 
 ---
 
@@ -135,7 +138,7 @@ chmod 755 tmp/
 ```
 ocr_ds/
 ├── api/                    # RESTful API 端點 (處理 AJAX 請求)
-├── config/                 # 系統設定檔 (secret.php 僅存 DB 連線)
+├── config/                 # 系統設定檔 (secret.php 僅存 DB 連線；setup.php 為一次性初始化腳本，用完必刪)
 ├── css/                    # 樣式表 (包含 Design System)
 ├── includes/               # PHP 共用模組 (Auth, DB, config, llm_gemini, TCPDF)
 ├── js/                     # 前端 JavaScript 邏輯

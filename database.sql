@@ -213,12 +213,12 @@ CREATE TABLE IF NOT EXISTS active_sessions (
 
 -- Admin User (admin / admin123)
 -- WARN: Change password immediately after deployment!
+-- 注意：此 hash 對應密碼 admin123（與 config/setup.php、README 步驟 5 一致）。
+-- 首次登入後務必改密碼，並立即從伺服器刪除 config/setup.php。
 INSERT IGNORE INTO users (username, password_hash, is_admin, status) VALUES 
-('admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 1, 'active');
+('admin', '$2b$10$rzGqaaT1cfQiiFP8FeN93.7P9R1S4MkfVHq1akJPkBojR2IcFIJWa', 1, 'active');
 
--- Test User (testuser / test123)
-INSERT IGNORE INTO users (username, password_hash, is_admin, status) VALUES 
-('testuser', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 0, 'active');
+-- 已移除預建 testuser 帳號：原帳號共用已知密碼，存在安全風險，請勿重新加入生產環境。
 
 -- System Settings
 INSERT IGNORE INTO system_settings (setting_key, setting_value, description) VALUES

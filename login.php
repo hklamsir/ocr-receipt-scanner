@@ -17,7 +17,7 @@ if (isset($_SESSION['user_id'])) {
 
 // 頁面設定
 $pageTitle = '登入';
-$headerTitle = '智慧單據辨識系統';
+$headerTitle = '收據浣熊';
 $showNav = false;  // 登入頁不顯示導航列
 $extraStyles = '
     <style>

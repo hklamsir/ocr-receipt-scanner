@@ -11,7 +11,7 @@ require_once __DIR__ . '/security.php';
 
 // 預設值
 if (!isset($pageTitle))
-    $pageTitle = '智慧單據辨識';
+    $pageTitle = '收據管理';
 if (!isset($showNav))
     $showNav = true;
 if (!isset($headerTitle))
@@ -24,7 +24,7 @@ if (!isset($headerTitle))
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="<?php echo Security::getCSRFToken(); ?>">
-    <title><?php echo htmlspecialchars($pageTitle); ?> - 智慧單據辨識工具</title>
+    <title><?php echo htmlspecialchars($pageTitle); ?> - 收據浣熊</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/design-system.css">
     <link rel="stylesheet" href="css/pdf-buttons.css">
@@ -61,7 +61,7 @@ if (!isset($headerTitle))
 
     <header>
         <div class="header-branding">
-            <img src="images/logo.svg" alt="DS OCR Logo" class="header-logo">
+            <img src="images/logo.svg" alt="收據浣熊 Logo" class="header-logo">
             <span class="header-title">
                 <?php echo htmlspecialchars($headerTitle); ?>
             </span>

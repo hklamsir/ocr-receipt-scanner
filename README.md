@@ -1,12 +1,12 @@
-# 📃 收據發票 OCR 辨識系統
+# 📃 收據浣熊
 
 <p align="center">
-  <img src="images/logo.svg" alt="OCR Receipt Scanner Logo" width="120">
+  <img src="images/logo.svg" alt="收據浣熊 Logo" width="120">
 </p>
 
 <p align="center">
-  <strong>一站式收據管理解決方案</strong><br>
-  支援批次上傳、智慧辨識、標籤分類、Excel/PDF 匯出
+  <strong>一站式收據 / 發票 OCR 辨識與管理系統</strong><br>
+  支援批次上傳、AI 智能辨識、標籤分類、Excel / PDF 匯出、多用戶隔離
 </p>
 
 <p align="center">
@@ -22,8 +22,9 @@
 
 | 功能 | 說明 |
 |------|------|
-| 📸 **批次上傳** | 一次上傳多達 20 張收據圖片，支援相機直接拍照 |
-| 🤖 **智慧 OCR** | 整合 OCR.space + DeepSeek AI，自動提取日期、金額、商家並生成摘要 |
+| 📸 **批次上傳** | 一次上傳多達 20 張收據圖片（設定值 `max_files_per_upload`），支援相機直接拍照 |
+| 🤖 **智慧 OCR** | 整合 OCR.space 出文字 + AI 結構化（自動提取日期、金額、商家並生成摘要） |
+| 🧠 **可切換 AI 引擎** | 管理後台可選 **DeepSeek** 或 **Gemini** 文字模型；亦可另開 **Gemini 視覺**端到端模式（直接讀圖出 JSON，跳過 OCR.space） |
 | 🏷️ **標籤系統** | 自訂標籤分類，支援顏色管理與批次操作 |
 | 📊 **資料匯出** | 一鍵匯出 Excel 或 PDF 報表，支援高度客製化 PDF 模板 |
 | 👥 **多用戶管理** | 用戶資料隔離，管理員後台可監控系統狀態與管理用戶 |
@@ -36,52 +37,48 @@
 
 ### 環境需求
 
-- PHP 7.4 或更高版本
+- PHP 7.4 或更高版本（需 PDO 擴展）
 - MySQL 5.7 或更高版本
-- 支援 PDO 擴展
-- Web 伺服器 (Apache/Nginx/InfinityFree)
+- Web 伺服器（Apache / Nginx / InfinityFree 等）
 
 ### 安裝步驟
 
-#### 1. 下載專案
+#### 1. 取得專案
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/ocr-receipt-scanner.git
-cd ocr-receipt-scanner
+git clone <你的倉庫網址>
+cd <專案資料夾>
 ```
 
 #### 2. 設定資料庫
 
-請在您的 MySQL 資料庫中執行根目錄下的 `database.sql` 檔案。這將會自動建立所有需要的資料表並匯入預設資料。
+在 MySQL 執行根目錄嘅 `database.sql`，會自動建立所有資料表並匯入預設設定（含 `system_settings` 中的 API Key 欄位）：
 
 ```sql
--- 使用 phpMyAdmin 或 MySQL CLI 匯入
 source database.sql;
 ```
 
-#### 3. 設定敏感資料
+#### 3. 設定資料庫連線
 
-複製設定範本並填入實際值：
+複製設定範本並填入實際資料庫連線資訊：
 
 ```bash
 cp config/config.example.php config/secret.php
 ```
 
-編輯 `config/secret.php`：
+編輯 `config/secret.php`（**只含資料庫連線**，API Key 不在此檔）：
 
 ```php
 <?php
 return [
     'db_host' => 'localhost',
-    'db_name' => '您的資料庫名稱',
-    'db_user' => '您的資料庫使用者',
-    'db_pass' => '您的資料庫密碼',
-    
-    // API 金鑰 (請至對應服務申請)
-    'deepseek_api_key' => '您的 DeepSeek API Key',
-    'ocr_api_key' => '您的 OCR.space API Key',
+    'db_name' => '你的資料庫名稱',
+    'db_user' => '你的資料庫使用者',
+    'db_pass' => '你的資料庫密碼',
 ];
 ```
+
+> 💡 **API Key 喺邊？** OCR.space、DeepSeek、Gemini 嘅 API Key，以及 LLM 提供者 / 視覺開關，都儲存在資料庫嘅 `system_settings` 表，請於登入後到「設定」頁填寫（見下方步驟 5），**唔係**寫入 `secret.php`。
 
 #### 4. 設定目錄權限
 
@@ -92,32 +89,33 @@ chmod 755 receipts/
 chmod 755 tmp/
 ```
 
-#### 5. 登入系統
+#### 5. 登入並填寫 API Key
 
 - **管理員帳號**：`admin`
 - **預設密碼**：`admin123`
 
-> ⚠️ **重要安全提醒**：首次登入後，請務必立即至「設定」頁面修改密碼！
+登入後到「設定」頁面：
+
+- **API 金鑰**：填寫 `OCR.space API Key`、`DeepSeek API Key`、`Gemini API Key`
+- **LLM 提供者**：選 `deepseek` 或 `gemini`（文字結構化模型）
+- **Gemini 視覺**：可開啟端到端視覺模式（開啟後 DeepSeek 自動停用）
+
+> ⚠️ **重要安全提醒**：首次登入後，請務必立即至「設定」頁修改密碼！
 
 ---
 
-## 📁 專案結構
+## 🧠 AI 引擎模式說明
 
-```
-ocr_ds/
-├── api/                    # RESTful API 端點 (處理 AJAX 請求)
-├── config/                 # 系統設定檔
-├── css/                    # 樣式表 (包含 Design System)
-├── includes/               # PHP 共用模組 (Auth, DB, TCPDF)
-├── js/                     # 前端 JavaScript 邏輯
-├── sql/                    # 歷史資料庫遷移腳本 (僅供參考)
-├── receipts/               # 用戶上傳的收據圖片 (需寫入權限)
-├── database.sql            # 完整資料庫初始化腳本
-├── index.php               # 首頁 (上傳與 OCR 處理)
-├── receipts.php            # 收據列表 (查詢、編輯、匯出)
-├── settings.php            # 系統與個人設定
-└── admin.php               # 管理員後台
-```
+系統提供三種處理管線，由「Gemini 視覺」開關與「LLM 提供者」共同決定：
+
+| Gemini 視覺 | LLM 提供者 | 實際管線 |
+|-------------|------------|----------|
+| 關 | `deepseek`（預設） | OCR.space 出文字 → DeepSeek 出結構化 JSON |
+| 關 | `gemini` | OCR.space 出文字 → Gemini 文字模型出 JSON |
+| 開 | （忽略） | Gemini 視覺端到端：直接讀圖出 JSON（DeepSeek 停用） |
+
+- **Gemini 模型級自動降級**：所有 Gemini 呼叫（文字與視覺）共用 `FALLBACK_MODELS` 優先清單，遇逾時 / 429 / 5xx 自動跳備援模型並有冷卻與指數退避，提升可用性。
+- **無跨 LLM 降級**：選 `deepseek` 與 `gemini` 之間不互相降級，失敗直接報錯。
 
 ---
 
@@ -127,8 +125,30 @@ ocr_ds/
 
 - **系統監控**：檢視每日 OCR 請求統計、儲存空間使用量。
 - **用戶管理**：查看用戶列表、停用違規帳號、設定用戶配額。
-- **系統設定**：調整全域參數（如上傳限制、圖片壓縮品質）。
+- **系統設定**：調整全域參數（上傳限制、圖片壓縮品質、LLM 提供者、Gemini 視覺開關等）。
 - **公告管理**：發布系統公告給所有用戶。
+
+---
+
+## 📁 專案結構
+
+```
+ocr_ds/
+├── api/                    # RESTful API 端點 (處理 AJAX 請求)
+├── config/                 # 系統設定檔 (secret.php 僅存 DB 連線)
+├── css/                    # 樣式表 (包含 Design System)
+├── includes/               # PHP 共用模組 (Auth, DB, config, llm_gemini, TCPDF)
+├── js/                     # 前端 JavaScript 邏輯
+├── sql/                    # 歷史資料庫遷移腳本 (僅供參考)
+├── receipts/               # 用戶上傳的收據圖片 (需寫入權限)
+├── images/                 # 圖示與 Logo
+├── database.sql            # 完整資料庫初始化腳本
+├── index.php               # 首頁 (上傳與 OCR 處理)
+├── receipts.php            # 收據列表 (查詢、編輯、匯出)
+├── settings.php            # 系統與個人設定
+├── admin.php               # 管理員後台
+└── login.php               # 登入頁
+```
 
 ---
 
@@ -154,4 +174,5 @@ ocr_ds/
 
 - [OCR.space](https://ocr.space/) - 提供 OCR 辨識服務
 - [DeepSeek](https://deepseek.com/) - 提供強大的 AI 語意分析
+- [Google Gemini](https://ai.google.dev/) - 提供 Gemini 文字與視覺多模態能力
 - [TCPDF](https://tcpdf.org/) - 支援 PDF 報表生成

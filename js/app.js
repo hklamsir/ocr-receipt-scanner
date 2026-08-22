@@ -552,6 +552,8 @@ document.getElementById('confirmSaveWithTagsBtn')?.addEventListener('click', asy
             renderPreview();
             clearUI();
             closeOCRModal();
+            // 儲存成功後跳轉到收據列表頁
+            setTimeout(() => { window.location.href = 'receipts.php'; }, 600);
         } else {
             Toast.error('儲存失敗：' + (result.error || '未知錯誤'));
         }

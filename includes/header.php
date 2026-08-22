@@ -15,7 +15,7 @@ if (!isset($pageTitle))
 if (!isset($showNav))
     $showNav = true;
 if (!isset($headerTitle))
-    $headerTitle = $pageTitle;
+    $headerTitle = '收據浣熊';
 ?>
 <!DOCTYPE html>
 <html lang="zh-HK">
@@ -81,5 +81,5 @@ if (!isset($headerTitle))
     </div>
 
     <?php if (empty($hidePageTitle)): ?>
-    <h1 class="page-title"><?php echo htmlspecialchars($pageTitle); ?> - 收據浣熊</h1>
+    <h1 class="page-title"><?php echo htmlspecialchars($pageTitle); ?></h1>
     <?php endif; ?>

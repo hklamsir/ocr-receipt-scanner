@@ -246,6 +246,21 @@ header {
   color: var(--header-fg);
 }
 
+.nav-user-btn {
+  color: var(--header-fg);
+  border-color: color-mix(in srgb, var(--header-fg) 30%, transparent);
+}
+
+.nav-user-btn:hover,
+.nav-user-btn.active {
+  background: color-mix(in srgb, var(--header-fg) 16%, transparent);
+  border-color: color-mix(in srgb, var(--header-fg) 50%, transparent);
+}
+
+.nav-user-btn .dropdown-arrow {
+  color: var(--header-fg);
+}
+
 /* 手機版導航下拉（≤768px） */
 @media (max-width: 768px) {
   .nav-links {
@@ -500,4 +515,45 @@ table tbody tr:nth-child(even) td {
 
 .theme-saved-hint {
   font-size: 13px;
+}
+
+/* 設定卡片上的目前主題預覽 */
+.theme-current-preview {
+  margin: 12px 0 16px;
+}
+
+.theme-preview-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+}
+
+.theme-preview-swatches {
+  display: flex;
+  gap: 4px;
+  width: 60px;
+  height: 32px;
+  border-radius: 6px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.theme-preview-swatches span {
+  flex: 1;
+}
+
+.theme-preview-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.theme-preview-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 2px;
 }

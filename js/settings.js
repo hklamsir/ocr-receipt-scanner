@@ -866,31 +866,74 @@ document.addEventListener('click', (e) => {
 // ========================================
 // 外觀主題選擇器
 // ========================================
+const THEME_META = {
+    teal: { name: '活潑浣熊', desc: '森林青綠（預設）', swatches: ['#0d9488', '#5eead4', '#f0fdfa'] },
+    elegant: { name: '優雅商務', desc: '墨綠 · 正式', swatches: ['#166534', '#1c2b21', '#f6f3ec'] },
+    minimal: { name: '極簡清新', desc: '靛藍 · 留白', swatches: ['#4f46e5', '#ffffff', '#fafafa'] },
+    dark: { name: '深色專業', desc: '天藍 · 低光', swatches: ['#38bdf8', '#0e1830', '#0b1220'] }
+};
+
 (function initThemeManager() {
+    const modal = document.getElementById('themeModal');
     const options = document.querySelectorAll('#themeOptions .theme-option');
     const saveBtn = document.getElementById('saveThemeBtn');
     const hint = document.getElementById('themeSavedHint');
-    if (!options.length || !saveBtn) return;
+    const preview = document.getElementById('themeCurrentPreview');
+    if (!modal || !options.length) return;
 
-    let selectedTheme = document.documentElement.getAttribute('data-theme') || 'teal';
+    let originalTheme = document.documentElement.getAttribute('data-theme') || 'teal';
+    let selectedTheme = originalTheme;
+
+    function renderCardPreview(key) {
+        if (!preview) return;
+        const meta = THEME_META[key] || THEME_META.teal;
+        preview.innerHTML = `
+            <div class="theme-preview-row">
+                <div class="theme-preview-swatches">
+                    ${meta.swatches.map(c => `<span style="background:${c}"></span>`).join('')}
+                </div>
+                <div class="theme-preview-info">
+                    <div class="theme-preview-name">${meta.name}</div>
+                    <div class="theme-preview-desc">${meta.desc}</div>
+                </div>
+            </div>
+        `;
+    }
 
     function applyPreview(key) {
+        selectedTheme = key;
         document.documentElement.setAttribute('data-theme', key);
         options.forEach(o => o.classList.toggle('is-selected', o.dataset.themeKey === key));
     }
 
+    function revertTheme() {
+        applyPreview(originalTheme);
+    }
+
+    window.openThemeModal = function () {
+        originalTheme = document.documentElement.getAttribute('data-theme') || 'teal';
+        selectedTheme = originalTheme;
+        applyPreview(originalTheme);
+        options.forEach(o => o.classList.toggle('is-current', o.dataset.themeKey === originalTheme));
+        if (hint) hint.textContent = '';
+        modal.style.display = 'flex';
+    };
+
+    window.closeThemeModal = function () {
+        modal.style.display = 'none';
+        if (selectedTheme !== originalTheme) {
+            revertTheme();
+        }
+    };
+
     options.forEach(opt => {
         opt.addEventListener('click', () => {
-            selectedTheme = opt.dataset.themeKey;
-            applyPreview(selectedTheme);
+            applyPreview(opt.dataset.themeKey);
             if (hint) hint.textContent = '';
         });
     });
 
-    // 初始化預覽為目前主題
-    applyPreview(selectedTheme);
-
-    saveBtn.addEventListener('click', async () => {
+    saveBtn?.addEventListener('click', async () => {
         saveBtn.disabled = true;
         try {
             const res = await fetch('api/update_theme.php', {
@@ -900,12 +943,15 @@ document.addEventListener('click', (e) => {
             });
             const data = await res.json();
             if (data.success) {
+                originalTheme = selectedTheme;
                 options.forEach(o => o.classList.toggle('is-current', o.dataset.themeKey === selectedTheme));
+                renderCardPreview(selectedTheme);
                 if (hint) {
                     hint.textContent = '✓ 已儲存';
                     hint.style.color = 'var(--success)';
                 }
                 Toast.success('主題已更新');
+                setTimeout(() => closeThemeModal(), 600);
             } else {
                 Toast.error(data.error || '儲存失敗');
             }
@@ -915,4 +961,6 @@ document.addEventListener('click', (e) => {
             saveBtn.disabled = false;
         }
     });
+
+    renderCardPreview(originalTheme);
 })();

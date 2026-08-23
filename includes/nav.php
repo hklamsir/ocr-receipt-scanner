@@ -31,7 +31,7 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
         <!-- 用戶下拉選單 -->
         <div class="nav-user-dropdown-container">
             <button class="nav-user-btn" id="userDropdownBtn" aria-expanded="false">
-                👤 <?php echo htmlspecialchars($username); ?> <span class="dropdown-arrow">▼</span>
+                👤 <?php echo htmlspecialchars($username ?: '用戶'); ?> <span class="dropdown-arrow">▼</span>
             </button>
             <div class="nav-user-dropdown" id="userDropdownMenu">
                 <div class="dropdown-loading">載入中...</div>
@@ -54,8 +54,13 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
         if (hamburger && navLinks) {
             hamburger.addEventListener('click', function (e) {
                 e.stopPropagation();
+                const willOpen = !navLinks.classList.contains('open');
                 navLinks.classList.toggle('open');
                 hamburger.textContent = navLinks.classList.contains('open') ? '✕' : '☰';
+                // 手機選單展開時預先載入用戶資料，避免還要再按人頭
+                if (willOpen && !isProfileLoaded) {
+                    loadUserProfile();
+                }
             });
         }
 

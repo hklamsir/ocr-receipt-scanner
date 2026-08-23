@@ -1,0 +1,503 @@
+/* ============================================================
+   收據浣熊 ReceiptsRaccoon — 主題系統 themes.css
+   載入順序：須於 styles.css / design-system.css 之後（header.php 最後載入）
+   做法：分層覆寫 — 定義 4 套 token，並重新映射 design-system.css
+        既有語義變數 + 以同選擇器覆寫 styles.css 的 chrome 規則，
+        不改動原檔，theme token 缺失時退回原樣式。
+   ============================================================ */
+
+/* ============================================================
+   ① 活潑浣熊（森林青綠）teal —— 全站預設（:root）
+   ============================================================ */
+:root {
+  --bg: #f0fdfa;
+  --surface: #ffffff;
+  --surface-2: #ccfbf1;
+  --text: #1c1917;
+  --text-muted: #57534e;
+  --accent: #0d9488;
+  --accent-hover: #0f766e;
+  --border: #1c1917;            /* Neo-Brutalism 粗黑描邊 */
+  --border-soft: #99f6e4;
+  --radius: 14px;
+  --radius-sm: 10px;
+  --shadow: 4px 4px 0 #1c1917;  /* 硬偏移陰影 */
+  --shadow-soft: 0 6px 20px rgba(13, 148, 136, .18);
+  --header-bg: #5eead4;
+  --header-fg: #0f2e28;
+  --header-border: #1c1917;
+  --success: #65a30d;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --info: #0d9488;
+  --link: #0f766e;
+  --input-bg: #ffffff;
+  --table-head-bg: #5eead4;
+  --table-head-fg: #0f2e28;
+  --table-row-alt: #f0fdfa;
+  --on-accent: #ffffff;
+  --btn-text: #ffffff;
+
+  /* 重新映射 design-system.css 既有語義變數 → 主題 token（按鈕/表單/Toast/Dialog 自動跟主題） */
+  --color-primary: var(--accent);
+  --color-primary-hover: var(--accent-hover);
+  --color-primary-light: var(--accent);
+  --color-success: var(--success);
+  --color-success-hover: color-mix(in srgb, var(--success) 80%, #000);
+  --color-danger: var(--danger);
+  --color-danger-hover: color-mix(in srgb, var(--danger) 80%, #000);
+  --color-warning: var(--warning);
+  --color-warning-hover: color-mix(in srgb, var(--warning) 80%, #000);
+  --color-info: var(--info);
+  --color-info-hover: color-mix(in srgb, var(--info) 80%, #000);
+  --color-gray-800: var(--text);
+  --color-gray-700: var(--text-muted);
+  --color-gray-600: var(--text-muted);
+}
+
+/* ============================================================
+   ② 優雅商務 elegant
+   ============================================================ */
+[data-theme="elegant"] {
+  --bg: #f6f3ec;
+  --surface: #fffdf7;
+  --surface-2: #efe9dc;
+  --text: #292524;
+  --text-muted: #78716c;
+  --accent: #166534;
+  --accent-hover: #14532d;
+  --border: #ddd5c3;
+  --border-soft: #e7e0d0;
+  --radius: 4px;               /* 銳利正式 */
+  --radius-sm: 3px;
+  --shadow: 0 1px 2px rgba(60, 50, 30, .08), 0 4px 16px rgba(60, 50, 30, .06);
+  --shadow-soft: 0 6px 18px rgba(60, 50, 30, .10);
+  --header-bg: #1c2b21;        /* 深綠 */
+  --header-fg: #f6f3ec;
+  --header-border: #0f1a13;
+  --success: #15803d;
+  --danger: #b91c1c;
+  --warning: #b45309;
+  --info: #166534;
+  --link: #14532d;
+  --input-bg: #fffdf7;
+  --table-head-bg: #1c2b21;
+  --table-head-fg: #f6f3ec;
+  --table-row-alt: #f1ece1;
+  --on-accent: #ffffff;
+  --btn-text: #ffffff;
+
+  --color-primary: var(--accent);
+  --color-primary-hover: var(--accent-hover);
+  --color-primary-light: var(--accent);
+  --color-success: var(--success);
+  --color-success-hover: color-mix(in srgb, var(--success) 80%, #000);
+  --color-danger: var(--danger);
+  --color-danger-hover: color-mix(in srgb, var(--danger) 80%, #000);
+  --color-warning: var(--warning);
+  --color-warning-hover: color-mix(in srgb, var(--warning) 80%, #000);
+  --color-info: var(--info);
+  --color-info-hover: color-mix(in srgb, var(--info) 80%, #000);
+  --color-gray-800: var(--text);
+  --color-gray-700: var(--text-muted);
+  --color-gray-600: var(--text-muted);
+}
+
+/* ============================================================
+   ③ 極簡清新 minimal
+   ============================================================ */
+[data-theme="minimal"] {
+  --bg: #fafafa;
+  --surface: #ffffff;
+  --surface-2: #f4f4f5;
+  --text: #18181b;
+  --text-muted: #71717a;
+  --accent: #4f46e5;          /* 靛藍 */
+  --accent-hover: #4338ca;
+  --border: #e4e4e7;
+  --border-soft: #e4e4e7;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 1px 3px rgba(0, 0, 0, .06), 0 1px 2px rgba(0, 0, 0, .04);
+  --shadow-soft: 0 6px 20px rgba(24, 24, 27, .08);
+  --header-bg: #ffffff;
+  --header-fg: #18181b;
+  --header-border: #e4e4e7;
+  --success: #16a34a;
+  --danger: #dc2626;
+  --warning: #d97706;
+  --info: #4f46e5;
+  --link: #4338ca;
+  --input-bg: #ffffff;
+  --table-head-bg: #f4f4f5;
+  --table-head-fg: #18181b;
+  --table-row-alt: #fafafa;
+  --on-accent: #ffffff;
+  --btn-text: #ffffff;
+
+  --color-primary: var(--accent);
+  --color-primary-hover: var(--accent-hover);
+  --color-primary-light: var(--accent);
+  --color-success: var(--success);
+  --color-success-hover: color-mix(in srgb, var(--success) 80%, #000);
+  --color-danger: var(--danger);
+  --color-danger-hover: color-mix(in srgb, var(--danger) 80%, #000);
+  --color-warning: var(--warning);
+  --color-warning-hover: color-mix(in srgb, var(--warning) 80%, #000);
+  --color-info: var(--info);
+  --color-info-hover: color-mix(in srgb, var(--info) 80%, #000);
+  --color-gray-800: var(--text);
+  --color-gray-700: var(--text-muted);
+  --color-gray-600: var(--text-muted);
+}
+
+/* ============================================================
+   ④ 深色專業 dark
+   ============================================================ */
+[data-theme="dark"] {
+  --bg: #0b1220;
+  --surface: #141d31;
+  --surface-2: #1b2638;
+  --text: #e8eef7;
+  --text-muted: #8fa3bd;
+  --accent: #38bdf8;          /* 天藍 */
+  --accent-hover: #7dd3fc;
+  --border: #27374f;
+  --border-soft: #27374f;
+  --radius: 10px;
+  --radius-sm: 8px;
+  --shadow: 0 2px 8px rgba(0, 0, 0, .4);
+  --shadow-soft: 0 6px 22px rgba(0, 0, 0, .45);
+  --header-bg: #0e1830;
+  --header-fg: #e8eef7;
+  --header-border: #27374f;
+  --success: #34d399;
+  --danger: #f87171;
+  --warning: #fbbf24;
+  --info: #38bdf8;
+  --link: #7dd3fc;
+  --input-bg: #0f1830;
+  --table-head-bg: #0e1830;
+  --table-head-fg: #e8eef7;
+  --table-row-alt: #101a2e;
+  --on-accent: #0b1220;
+  --btn-text: #0b1220;        /* 深色主題按鈕用深色字（sky/olive/red 淺色底） */
+
+  --color-primary: var(--accent);
+  --color-primary-hover: var(--accent-hover);
+  --color-primary-light: var(--accent);
+  --color-success: var(--success);
+  --color-success-hover: color-mix(in srgb, var(--success) 80%, #000);
+  --color-danger: var(--danger);
+  --color-danger-hover: color-mix(in srgb, var(--danger) 80%, #000);
+  --color-warning: var(--warning);
+  --color-warning-hover: color-mix(in srgb, var(--warning) 80%, #000);
+  --color-info: var(--info);
+  --color-info-hover: color-mix(in srgb, var(--info) 80%, #000);
+  --color-gray-800: var(--text);
+  --color-gray-700: var(--text-muted);
+  --color-gray-600: var(--text-muted);
+
+  /* 深色主題重新映射中性灰階，避免淺色表面殘留 */
+  --color-gray-100: #1b2638;
+  --color-gray-200: #1b2638;
+  --color-gray-300: #27374f;
+  --color-gray-400: #3a4a63;
+  --color-gray-500: #8fa3bd;
+  --color-gray-900: #e8eef7;
+}
+
+/* ============================================================
+   主題應用層：將 styles.css 既有 chrome 規則改為使用主題 token
+   （同選擇器、source 順序在後，覆寫原硬編碼顏色）
+   ============================================================ */
+body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+header {
+  background: var(--header-bg);
+  color: var(--header-fg);
+  border-bottom: 3px solid var(--header-border);
+}
+
+.nav-links a {
+  color: var(--header-fg);
+}
+
+.nav-links a:hover {
+  background: color-mix(in srgb, var(--header-fg) 16%, transparent);
+}
+
+.nav-links a.active {
+  background: color-mix(in srgb, var(--header-fg) 20%, transparent);
+}
+
+.nav-links .nav-admin {
+  color: var(--warning);
+}
+
+.nav-links .nav-logout {
+  color: var(--danger);
+}
+
+.hamburger {
+  color: var(--header-fg);
+}
+
+/* 手機版導航下拉（≤768px） */
+@media (max-width: 768px) {
+  .nav-links {
+    background: var(--header-bg);
+    color: var(--header-fg);
+  }
+
+  .nav-links a,
+  .nav-links .nav-user {
+    color: var(--header-fg);
+    border-bottom: 1px solid color-mix(in srgb, var(--header-fg) 15%, transparent);
+  }
+
+  .nav-links .nav-user {
+    background: color-mix(in srgb, var(--header-fg) 8%, transparent);
+  }
+}
+
+#dropzone {
+  border: 2px dashed var(--border-soft);
+  background: var(--surface);
+}
+
+#dropzone.dragover {
+  background: var(--surface-2);
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.card .status {
+  color: var(--text-muted);
+}
+
+.receipt-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.receipt-card img {
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.receipt-card img.lazy-img {
+  background: linear-gradient(110deg, var(--surface-2) 8%, var(--surface) 18%, var(--surface-2) 33%);
+}
+
+table {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+
+th,
+td {
+  border: 1px solid var(--border-soft);
+}
+
+th {
+  background: var(--table-head-bg);
+  color: var(--table-head-fg);
+}
+
+th:hover {
+  background: color-mix(in srgb, var(--table-head-bg) 88%, #000);
+}
+
+table tbody tr:nth-child(even) td {
+  background: var(--table-row-alt);
+}
+
+.settings-card {
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.settings-card h3 {
+  color: var(--text);
+}
+
+.settings-card p {
+  color: var(--text-muted);
+}
+
+.edit-modal-content {
+  background: var(--surface);
+  color: var(--text);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.edit-modal-header {
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.edit-modal-header .close-btn {
+  color: var(--text-muted);
+}
+
+.edit-modal-header .close-btn:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+/* 表單控制項跟隨主題 */
+.form-control {
+  background: var(--input-bg);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.form-control:focus {
+  border-color: var(--accent);
+}
+
+.dialog-input {
+  background: var(--input-bg);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.dialog-input:focus {
+  border-color: var(--accent);
+}
+
+/* 按鈕文字顏色（深色主題用深色字以保對比度） */
+.btn-primary,
+.btn-info,
+.btn-success,
+.btn-danger,
+.btn-warning {
+  color: var(--btn-text);
+}
+
+/* 登入頁卡片 */
+.login-box,
+.login-container {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.login-page {
+  background: linear-gradient(135deg, var(--accent) 0%, color-mix(in srgb, var(--accent) 55%, #1e1b4b) 100%);
+}
+
+/* 焦點可見（無障礙） */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* 尊重「減少動畫」系統偏好 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================================
+   外觀主題選擇器（settings.php）
+   ============================================================ */
+.theme-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 12px;
+  margin: 12px 0 16px;
+}
+
+.theme-option {
+  position: relative;
+  border: 2px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  padding: 12px;
+  cursor: pointer;
+  text-align: center;
+  transition: border-color .15s, transform .15s, box-shadow .15s;
+  font: inherit;
+  color: var(--text);
+}
+
+.theme-option:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-soft);
+}
+
+.theme-option.is-selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.theme-option.is-current {
+  border-color: var(--accent);
+}
+
+.theme-option-swatches {
+  display: flex;
+  gap: 4px;
+  height: 36px;
+  margin-bottom: 8px;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.theme-option-swatches span {
+  flex: 1;
+}
+
+.theme-option-name {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.theme-option-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.theme-option-badge {
+  display: none;
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--on-accent);
+  background: var(--accent);
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+
+.theme-option.is-current .theme-option-badge {
+  display: inline-block;
+}
+
+.theme-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.theme-saved-hint {
+  font-size: 13px;
+}

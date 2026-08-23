@@ -862,3 +862,57 @@ document.addEventListener('click', (e) => {
         window.openPdfHintModal();
     }
 });
+
+// ========================================
+// 外觀主題選擇器
+// ========================================
+(function initThemeManager() {
+    const options = document.querySelectorAll('#themeOptions .theme-option');
+    const saveBtn = document.getElementById('saveThemeBtn');
+    const hint = document.getElementById('themeSavedHint');
+    if (!options.length || !saveBtn) return;
+
+    let selectedTheme = document.documentElement.getAttribute('data-theme') || 'teal';
+
+    function applyPreview(key) {
+        document.documentElement.setAttribute('data-theme', key);
+        options.forEach(o => o.classList.toggle('is-selected', o.dataset.themeKey === key));
+    }
+
+    options.forEach(opt => {
+        opt.addEventListener('click', () => {
+            selectedTheme = opt.dataset.themeKey;
+            applyPreview(selectedTheme);
+            if (hint) hint.textContent = '';
+        });
+    });
+
+    // 初始化預覽為目前主題
+    applyPreview(selectedTheme);
+
+    saveBtn.addEventListener('click', async () => {
+        saveBtn.disabled = true;
+        try {
+            const res = await fetch('api/update_theme.php', {
+                method: 'POST',
+                headers: getCSRFHeaders(),
+                body: JSON.stringify({ theme: selectedTheme })
+            });
+            const data = await res.json();
+            if (data.success) {
+                options.forEach(o => o.classList.toggle('is-current', o.dataset.themeKey === selectedTheme));
+                if (hint) {
+                    hint.textContent = '✓ 已儲存';
+                    hint.style.color = 'var(--success)';
+                }
+                Toast.success('主題已更新');
+            } else {
+                Toast.error(data.error || '儲存失敗');
+            }
+        } catch (err) {
+            Toast.error('儲存主題失敗');
+        } finally {
+            saveBtn.disabled = false;
+        }
+    });
+})();

@@ -593,7 +593,7 @@
    響應式調整
    ======================================== */
 
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   .toast-container {
     left: 20px;
     right: 20px;

@@ -139,7 +139,7 @@ header {
 }
 
 /* 手機版樣式 */
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   header {
     padding: 12px 15px;
     font-size: 18px;
@@ -670,7 +670,7 @@ footer {
 }
 
 /* Mobile */
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   header {
     font-size: 24px;
     padding: 14px;
@@ -1147,7 +1147,7 @@ footer {
    Responsive: Search Bar & Tags
    ======================================== */
 
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   .search-bar {
     flex-direction: column;
     gap: 8px;
@@ -1225,7 +1225,7 @@ footer {
 
 /* Tags Manager Modal */
 .tags-manager-content {
-  max-width: 600px;
+  max-width: 640px;
 }
 
 .tags-manager-body {
@@ -1356,7 +1356,7 @@ footer {
 }
 
 /* Responsive Settings */
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   .settings-grid {
     grid-template-columns: 1fr;
   }
@@ -1859,7 +1859,7 @@ body.has-announcement {
   padding-top: 120px;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   .announcement-banner {
     top: 50px;
   }
@@ -2064,7 +2064,7 @@ body.has-announcement {
 }
 
 /* Mobile dropdown adjustments */
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   .nav-user-dropdown-container {
     width: 100%;
     display: block;

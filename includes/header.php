@@ -16,9 +16,28 @@ if (!isset($showNav))
     $showNav = true;
 if (!isset($headerTitle))
     $headerTitle = '收據浣熊';
+
+// 主題（P1）：已登入使用者讀取偏好，否則用預設 teal
+$validThemes = ['teal', 'elegant', 'minimal', 'dark'];
+$theme = 'teal';
+if (!empty($_SESSION['user_id'])) {
+    try {
+        require_once __DIR__ . '/db.php';
+        $pdo = getDB();
+        $stmt = $pdo->prepare('SELECT theme FROM users WHERE id = ?');
+        $stmt->execute([$_SESSION['user_id']]);
+        $row = $stmt->fetch();
+        if (!empty($row['theme']) && in_array($row['theme'], $validThemes, true)) {
+            $theme = $row['theme'];
+        }
+    } catch (Throwable $e) {
+        // 資料庫錯誤時維持預設主題，不阻斷頁面
+        error_log('載入使用者主題失敗：' . $e->getMessage());
+    }
+}
 ?>
 <!DOCTYPE html>
-<html lang="zh-HK">
+<html lang="zh-HK" data-theme="<?php echo htmlspecialchars($theme); ?>">
 
 <head>
     <meta charset="UTF-8">
@@ -36,6 +55,8 @@ if (!isset($headerTitle))
     <?php if (isset($extraStyles)): ?>
         <?php echo $extraStyles; ?>
     <?php endif; ?>
+    <link rel="stylesheet" href="css/themes.css">
+    <link rel="stylesheet" href="css/rwd.css">
     <script>
         // 註冊 Service Worker（僅在支援且非重定向環境下）
         if ('serviceWorker' in navigator) {

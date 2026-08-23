@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <strong>一站式收據 / 發票 OCR 辨識與管理系統</strong><br>
+  <strong>收據浣熊 ReceiptsRaccoon — 一站式收據 / 發票 OCR 辨識與管理系統</strong><br>
   支援批次上傳、AI 智能辨識、標籤分類、Excel / PDF 匯出、多用戶隔離
 </p>
 

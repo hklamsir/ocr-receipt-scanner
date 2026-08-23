@@ -1,0 +1,67 @@
+/* ============================================================
+   收據浣熊 ReceiptsRaccoon — 全站 RWD 補強
+   斷點：1024（平板橫/小桌面）｜ 768（平板豎）｜ 640（手機）
+   載入順序：須於 themes.css 之後
+   ============================================================ */
+
+/* ---- 平板 / 小桌面（≤1024px）---- */
+@media (max-width: 1024px) {
+  .settings-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+
+  .container {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+}
+
+/* ---- 平板豎 / 手機（≤768px）---- */
+@media (max-width: 768px) {
+  /* 表格橫向捲動，避免擠壓變形 */
+  #tableContainer,
+  #user-list-tab {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #tableContainer table,
+  #users-table {
+    min-width: 720px;
+  }
+
+  /* 設定網格轉單欄 */
+  .settings-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* 水平表單列堆疊 */
+  .form-row {
+    flex-direction: column;
+  }
+}
+
+/* ---- 手機（≤640px）---- */
+@media (max-width: 640px) {
+  body {
+    padding: 64px 12px 0;
+  }
+
+  .login-wrapper {
+    min-height: calc(100vh - 140px);
+    padding: 12px;
+  }
+
+  .login-box {
+    padding: 24px 20px;
+  }
+
+  .history-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .bottom-export-bar .btn {
+    width: 100%;
+  }
+}

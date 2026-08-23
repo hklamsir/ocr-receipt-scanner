@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS users (
   status ENUM('active', 'suspended') DEFAULT 'active' COMMENT '帳號狀態',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '建立時間',
   last_login TIMESTAMP NULL COMMENT '最後登入時間',
+  theme VARCHAR(20) NOT NULL DEFAULT 'teal' COMMENT 'UI 主題：teal|elegant|minimal|dark',
   INDEX idx_username (username)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用戶表';
 

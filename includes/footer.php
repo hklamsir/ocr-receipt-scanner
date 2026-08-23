@@ -5,7 +5,7 @@
 ?>
 
 <footer>
-    &copy; 2026 Lamsir 設計架構｜Powered by Antigravity, Claude and Workbuddy
+    &copy; 2026 Lamsir 設計架構｜Antigravity, Workbuddy 編寫程式
 </footer>
 
 <!-- 公告載入腳本 -->

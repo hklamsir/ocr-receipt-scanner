@@ -873,85 +873,94 @@ const THEME_META = {
     dark: { name: '深色專業', desc: '天藍 · 低光', swatches: ['#38bdf8', '#0e1830', '#0b1220'] }
 };
 
+let themeOriginal = document.documentElement.getAttribute('data-theme') || 'teal';
+let themeSelected = themeOriginal;
+
+function themeApplyPreview(key) {
+    themeSelected = key;
+    document.documentElement.setAttribute('data-theme', key);
+    const options = document.querySelectorAll('#themeOptions .theme-option');
+    options.forEach(o => o.classList.toggle('is-selected', o.dataset.themeKey === key));
+}
+
+function themeRenderCardPreview(key) {
+    const preview = document.getElementById('themeCurrentPreview');
+    if (!preview) return;
+    const meta = THEME_META[key] || THEME_META.teal;
+    preview.innerHTML = `
+        <div class="theme-preview-row">
+            <div class="theme-preview-swatches">
+                ${meta.swatches.map(c => `<span style="background:${c}"></span>`).join('')}
+            </div>
+            <div class="theme-preview-info">
+                <div class="theme-preview-name">${meta.name}</div>
+                <div class="theme-preview-desc">${meta.desc}</div>
+            </div>
+        </div>
+    `;
+}
+
+function themeRevert() {
+    themeApplyPreview(themeOriginal);
+}
+
+// 開關函數定義於頂層（module 作用域外掛到 window），確保 inline onclick 可呼叫
+window.openThemeModal = function () {
+    const modal = document.getElementById('themeModal');
+    if (!modal) return;
+    themeOriginal = document.documentElement.getAttribute('data-theme') || 'teal';
+    themeSelected = themeOriginal;
+    themeApplyPreview(themeOriginal);
+    modal.querySelectorAll('#themeOptions .theme-option').forEach(o => {
+        o.classList.toggle('is-current', o.dataset.themeKey === themeOriginal);
+    });
+    const hint = document.getElementById('themeSavedHint');
+    if (hint) hint.textContent = '';
+    modal.style.display = 'flex';
+};
+
+window.closeThemeModal = function () {
+    const modal = document.getElementById('themeModal');
+    if (!modal) return;
+    modal.style.display = 'none';
+    if (themeSelected !== themeOriginal) {
+        themeRevert();
+    }
+};
+
 (function initThemeManager() {
     const modal = document.getElementById('themeModal');
     const options = document.querySelectorAll('#themeOptions .theme-option');
     const saveBtn = document.getElementById('saveThemeBtn');
     const hint = document.getElementById('themeSavedHint');
-    const preview = document.getElementById('themeCurrentPreview');
-    if (!modal || !options.length) return;
-
-    let originalTheme = document.documentElement.getAttribute('data-theme') || 'teal';
-    let selectedTheme = originalTheme;
-
-    function renderCardPreview(key) {
-        if (!preview) return;
-        const meta = THEME_META[key] || THEME_META.teal;
-        preview.innerHTML = `
-            <div class="theme-preview-row">
-                <div class="theme-preview-swatches">
-                    ${meta.swatches.map(c => `<span style="background:${c}"></span>`).join('')}
-                </div>
-                <div class="theme-preview-info">
-                    <div class="theme-preview-name">${meta.name}</div>
-                    <div class="theme-preview-desc">${meta.desc}</div>
-                </div>
-            </div>
-        `;
-    }
-
-    function applyPreview(key) {
-        selectedTheme = key;
-        document.documentElement.setAttribute('data-theme', key);
-        options.forEach(o => o.classList.toggle('is-selected', o.dataset.themeKey === key));
-    }
-
-    function revertTheme() {
-        applyPreview(originalTheme);
-    }
-
-    window.openThemeModal = function () {
-        originalTheme = document.documentElement.getAttribute('data-theme') || 'teal';
-        selectedTheme = originalTheme;
-        applyPreview(originalTheme);
-        options.forEach(o => o.classList.toggle('is-current', o.dataset.themeKey === originalTheme));
-        if (hint) hint.textContent = '';
-        modal.style.display = 'flex';
-    };
-
-    window.closeThemeModal = function () {
-        modal.style.display = 'none';
-        if (selectedTheme !== originalTheme) {
-            revertTheme();
-        }
-    };
+    if (!modal || !options.length || !saveBtn) return;
 
     options.forEach(opt => {
         opt.addEventListener('click', () => {
-            applyPreview(opt.dataset.themeKey);
+            themeApplyPreview(opt.dataset.themeKey);
             if (hint) hint.textContent = '';
         });
     });
 
-    saveBtn?.addEventListener('click', async () => {
+    saveBtn.addEventListener('click', async () => {
         saveBtn.disabled = true;
         try {
             const res = await fetch('api/update_theme.php', {
                 method: 'POST',
                 headers: getCSRFHeaders(),
-                body: JSON.stringify({ theme: selectedTheme })
+                body: JSON.stringify({ theme: themeSelected })
             });
             const data = await res.json();
             if (data.success) {
-                originalTheme = selectedTheme;
-                options.forEach(o => o.classList.toggle('is-current', o.dataset.themeKey === selectedTheme));
-                renderCardPreview(selectedTheme);
+                themeOriginal = themeSelected;
+                options.forEach(o => o.classList.toggle('is-current', o.dataset.themeKey === themeSelected));
+                themeRenderCardPreview(themeSelected);
                 if (hint) {
                     hint.textContent = '✓ 已儲存';
                     hint.style.color = 'var(--success)';
                 }
                 Toast.success('主題已更新');
-                setTimeout(() => closeThemeModal(), 600);
+                setTimeout(() => window.closeThemeModal(), 600);
             } else {
                 Toast.error(data.error || '儲存失敗');
             }
@@ -962,5 +971,5 @@ const THEME_META = {
         }
     });
 
-    renderCardPreview(originalTheme);
+    themeRenderCardPreview(themeOriginal);
 })();

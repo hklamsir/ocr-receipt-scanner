@@ -104,12 +104,86 @@ function saveImageWithRetry($imagePath, $imageBytes, $maxRetries = 3)
     return false;
 }
 
+/**
+ * 嘗試將圖片重新壓縮至指定 KB 上限內（需要 GD 擴充）
+ * 當前端送來的圖片超過 MAX_IMAGE_SIZE_KB 時，伺服器端自救，避免靜默丟棄圖片。
+ *
+ * @param string $bytes 原始圖片二進位
+ * @param int $maxKb 上限（KB）
+ * @return string|null 成功回傳重新壓縮後的 JPEG 二進位；GD 不可用或仍無法壓到上限則回傳 null
+ */
+function recompressImageToLimit($bytes, $maxKb)
+{
+    if (!function_exists('imagecreatefromstring') || !function_exists('imagejpeg')) {
+        return null; // GD 不可用，交回上層決定（略過圖片並警告）
+    }
+
+    $src = @imagecreatefromstring($bytes);
+    if ($src === false) {
+        return null;
+    }
+
+    // 先鋪白底，避免 PNG 透明區域轉 JPEG 時變黑
+    $w = imagesx($src);
+    $h = imagesy($src);
+    $white = imagecreatetruecolor($w, $h);
+    imagefill($white, 0, 0, imagecolorallocate($white, 255, 255, 255));
+    imagecopy($white, $src, 0, 0, 0, 0, $w, $h);
+    imagedestroy($src);
+    $src = $white;
+
+    $maxBytes = (int) ($maxKb * 1024);
+    $quality = 85;
+    $result = null;
+
+    // 第一輪：原尺寸逐步降質
+    do {
+        ob_start();
+        $ok = @imagejpeg($src, null, $quality);
+        $out = ob_get_clean();
+        if ($ok && is_string($out) && strlen($out) <= $maxBytes) {
+            $result = $out;
+            break;
+        }
+        $quality -= 5;
+    } while ($quality >= 30);
+
+    // 第二輪：仍過大則縮小至最大寬 1200px 再降質
+    if ($result === null) {
+        $maxW = 1200;
+        if ($w > $maxW) {
+            $nw = $maxW;
+            $nh = (int) round($h * $maxW / $w);
+            $dst = imagecreatetruecolor($nw, $nh);
+            if ($dst !== false) {
+                imagecopyresampled($dst, $src, 0, 0, 0, 0, $nw, $nh, $w, $h);
+                $quality = 85;
+                do {
+                    ob_start();
+                    $ok = @imagejpeg($dst, null, $quality);
+                    $out = ob_get_clean();
+                    if ($ok && is_string($out) && strlen($out) <= $maxBytes) {
+                        $result = $out;
+                        break;
+                    }
+                    $quality -= 5;
+                } while ($quality >= 30);
+                imagedestroy($dst);
+            }
+        }
+    }
+
+    imagedestroy($src);
+    return $result;
+}
+
 try {
     $pdo = getDB();
     $pdo->beginTransaction();
 
     $saved = 0;
     $timestamp = time();
+    $imageWarning = null; // 累積圖片相關警告，回傳前端明確提示
 
     // 欄位長度限制
     $fieldLimits = [
@@ -132,6 +206,7 @@ try {
         // 儲存圖片到檔案系統
         $imageData = $receipt['image'] ?? '';
         $imageFilename = null;
+        $imageBytes = null;
 
         if (empty($imageData)) {
             logError("Receipt $index has no image data (empty string) - saving receipt without image");
@@ -148,17 +223,30 @@ try {
                 $configuredMaxKb = 200;
             }
             $maxImageBytes = $configuredMaxKb * 1024 + 500; // (留點餘裕)
+
+            // 超過大小上限：嘗試伺服器端重新壓縮（GD 可用時）
             if ($imageSize > $maxImageBytes) {
-                logError("Image too large for receipt $index: $imageSize bytes (limit $maxImageBytes) - saving receipt without image");
-                // 不使用 continue，繼續儲存單據資料（沒有圖片）
+                $recompressed = recompressImageToLimit($imageBytes, $configuredMaxKb);
+                if ($recompressed !== null) {
+                    $imageBytes = $recompressed;
+                    $imageSize = strlen($imageBytes);
+                    logInfo("Receipt $index image recompressed to fit $configuredMaxKb KB (now $imageSize bytes)");
+                } else {
+                    logError("Image too large for receipt $index: $imageSize bytes (limit $maxImageBytes) and cannot recompress - saving receipt without image");
+                    $imageWarning = '部份單據因圖片過大而未能儲存圖片';
+                    $imageBytes = null; // 標記不存圖，但繼續儲存單據資料
+                }
             }
+
             // 驗證 MIME 類型（Magic Bytes）
-            elseif (!isValidImageMime($imageBytes)) {
+            if ($imageBytes !== null && !isValidImageMime($imageBytes)) {
                 logError("Invalid image MIME type for receipt $index (size $imageSize bytes) - saving receipt without image");
-                // 不使用 continue，繼續儲存單據資料（沒有圖片）
+                $imageWarning = '部份單據因圖片格式無效而未能儲存圖片';
+                $imageBytes = null; // 標記不存圖，但繼續儲存單據資料
             }
+
             // 只有當圖片有效時才儲存
-            else {
+            if ($imageBytes !== null) {
                 // 生成檔名
                 $imageFilename = $timestamp . '_' . ($index + 1) . '.jpg';
                 $imagePath = $userDir . '/' . $imageFilename;
@@ -166,6 +254,7 @@ try {
                 if (!saveImageWithRetry($imagePath, $imageBytes)) {
                     logError("Failed to save image for receipt $index after 3 attempts: $imagePath (size $imageSize bytes) - saving receipt without image");
                     $imageFilename = null; // 儲存失敗，設為 null
+                    $imageWarning = '部份單據圖片儲存失敗';
                 }
             }
         }
@@ -216,7 +305,8 @@ try {
 
     ApiResponse::success([
         'saved' => $saved,
-        'total' => count($receipts)
+        'total' => count($receipts),
+        'warning' => $imageWarning
     ]);
 
 } catch (PDOException $e) {

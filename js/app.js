@@ -546,6 +546,10 @@ document.getElementById('confirmSaveWithTagsBtn')?.addEventListener('click', asy
 
         if (result.success) {
             Toast.success(`成功儲存 ${result.saved} 筆單據！`);
+            // 後端回傳圖片相關警告（例如圖片過大被略過），明確告知使用者
+            if (result.warning) {
+                Toast.warning(result.warning);
+            }
             closeSaveTagsModal();
             // Clear data after successful save
             AppState.clearAll();
@@ -669,6 +673,42 @@ window.cropperReset = function () {
     }
 };
 
+// 將裁切後的 canvas 重新壓縮，確保不超過 maxImageSizeKb（與 compressImage 同樣的預算邏輯）
+// 否則裁切後的圖片體積可能遠超伺服器上限，導致 save_receipts.php 靜默丟棄圖片
+function recompressCroppedCanvas(canvas) {
+    const maxSizeKb = appConfig.maxImageSizeKb || 200;
+    const maxSizeBytes = maxSizeKb * 1024; // 與 compressImage 一致：以 dataURL 字串長度為準
+    const minQuality = 0.3;
+    const MAX_W = 1200;
+    const startQuality = Math.min((appConfig.imageQuality || 60) / 100 + 0.2, 0.95);
+
+    // 第一輪：原尺寸下逐步降質
+    let q = startQuality;
+    let dataUrl = canvas.toDataURL('image/jpeg', q);
+    while (dataUrl.length > maxSizeBytes && q > minQuality) {
+        q -= 0.05;
+        dataUrl = canvas.toDataURL('image/jpeg', q);
+    }
+
+    // 降質到底仍超標：縮小至最大寬 1200px 後再降質
+    if (dataUrl.length > maxSizeBytes && canvas.width > MAX_W) {
+        const w = MAX_W;
+        const h = Math.round(canvas.height * (MAX_W / canvas.width));
+        const c2 = document.createElement('canvas');
+        c2.width = w;
+        c2.height = h;
+        c2.getContext('2d').drawImage(canvas, 0, 0, w, h);
+        q = startQuality;
+        dataUrl = c2.toDataURL('image/jpeg', q);
+        while (dataUrl.length > maxSizeBytes && q > minQuality) {
+            q -= 0.05;
+            dataUrl = c2.toDataURL('image/jpeg', q);
+        }
+    }
+
+    return dataUrl;
+}
+
 // 套用裁剪
 window.applyCrop = function () {
     if (!currentCropper || currentCropIndex < 0) return;
@@ -686,10 +726,16 @@ window.applyCrop = function () {
         return;
     }
 
-    // 轉換為 dataUrl
-    // 使用系統設定的品質（轉換為 0-1 範圍）
-    const cropQuality = Math.min((appConfig.imageQuality || 60) / 100 + 0.2, 0.95); // 裁剪時稍微提高品質
-    const croppedDataUrl = canvas.toDataURL('image/jpeg', cropQuality);
+    // 轉換為 dataUrl 並重新壓縮，確保符合伺服器大小上限
+    // （避免裁切後體積過大，後端 save_receipts.php 因超過 MAX_IMAGE_SIZE_KB 而丟棄圖片）
+    let croppedDataUrl;
+    try {
+        croppedDataUrl = recompressCroppedCanvas(canvas);
+    } catch (e) {
+        console.error('裁切重新壓縮失敗，改用預設品質', e);
+        const fallbackQuality = Math.min((appConfig.imageQuality || 60) / 100 + 0.2, 0.95);
+        croppedDataUrl = canvas.toDataURL('image/jpeg', fallbackQuality);
+    }
 
     // 更新 AppState 中的圖片
     const images = AppState.getAllImages();
